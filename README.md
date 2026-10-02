@@ -196,6 +196,29 @@ Los archivos están en `public/brand/` (también se sirven en `/brand/…`):
 | `kefounder-horizontal.svg` · `-horizontal-crema.svg` · `kefounder-vertical.svg` | Isotipo + logotipo |
 | `kefounder-marca.png` | Hoja de marca con usos, tamaños y colores |
 
+### Isotipo y logotipo por separado, sin fondo
+
+En `public/brand/isotipo/` y `public/brand/logotipo/` están las dos piezas por separado, en **8 variantes de color**, como **PNG con fondo transparente** y como **SVG**. La hoja `public/brand/kefounder-variantes.png` muestra cada variante sobre el fondo para el que está pensada.
+
+| Variante | Letras | Punto del «!» | Cuándo usarla |
+|---|---|---|---|
+| `color` | Petróleo `#345F63` | Terracota `#C47F6A` | Principal, sobre fondos claros. |
+| `negativo` | Crema `#F1EDE4` | Terracota | Sobre fondos oscuros o petróleo. |
+| `negativo-blanco` | Blanco `#FFFFFF` | Terracota | Sobre fotos o fondos muy oscuros. |
+| `tinta` | Tinta `#252A2A` | Terracota | Sobre fondos claros, más sobrio. |
+| `mono-petroleo` | Petróleo | Petróleo | Una sola tinta de marca. |
+| `mono-negro` | Negro `#000000` | Negro | Impresión en blanco y negro, sellos, documentos. |
+| `mono-blanco` | Blanco | Blanco | Negativo de una tinta sobre fondos oscuros. |
+| `mono-crema` | Crema | Crema | Negativo de una tinta sobre petróleo o tinta. |
+
+Tamaños:
+
+- **Isotipo:** lienzo cuadrado de 2048, 1024, 512 y 256 px, centrado y con aire alrededor. Por ejemplo, `kefounder-isotipo-color-1024.png`.
+- **Logotipo:** recortado al texto, de 3000, 1500 y 750 px de ancho (proporción 6,17:1). Por ejemplo, `kefounder-logotipo-negativo-1500.png`.
+- **SVG:** uno por variante (`kefounder-isotipo-color.svg`, `kefounder-logotipo-mono-negro.svg`…), para imprimir o ampliar sin perder calidad.
+
+Se generan desde la geometría oficial de la marca. Si algún día cambia, se vuelven a crear todos con `npm run marca`.
+
 En la app, la marca sale de `src/components/Brand.jsx` (`Isotipo`, `IsotipoTile`, `Logotipo`), que dibuja la misma geometría en SVG (`brand-geometry.js`): las letras toman `currentColor` y el punto siempre es terracota (`--warm`).
 
 Colores: petróleo `#345F63`, terracota `#C47F6A`, crema `#F1EDE4`, tinta `#252A2A`.

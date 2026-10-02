@@ -15,7 +15,8 @@
     "seed": "node --disable-warning=ExperimentalWarning server/seed.js",
     "test": "node --disable-warning=ExperimentalWarning --test tests/api.test.js tests/admin.test.js tests/revista.test.js",
     "test:e2e": "node --disable-warning=ExperimentalWarning tests/e2e.mjs",
-    "admin": "node --disable-warning=ExperimentalWarning server/admin-cli.js"
+    "admin": "node --disable-warning=ExperimentalWarning server/admin-cli.js",
+    "marca": "node scripts/exportar-marca.mjs"
   },
   "dependencies": {
     "express": "^5.2.1",

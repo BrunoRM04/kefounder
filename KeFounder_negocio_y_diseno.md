@@ -119,7 +119,7 @@ A futuro, la plataforma puede convertirse en la herramienta con la que se arma u
 | **Logotipo** | «KeFounder!» en **Manrope ExtraBold** convertida a trazos, con un «!» propio cuyo punto también es terracota. |
 | **Colores de uso** | Petróleo sobre fondos claros, crema sobre petróleo. El punto es siempre terracota. |
 | **Dónde aparece** | Isotipo en crema en la barra lateral de PC; logotipo en la barra superior, la bienvenida, el ingreso, el registro y la página pública de proyectos; isotipo en un cuadro petróleo en la pantalla de carga, el favicon y los íconos de instalación. |
-| **Archivos** | `public/brand/`: SVG y PNG, más la hoja de marca `kefounder-marca.png`. |
+| **Archivos** | `public/brand/`: hoja de marca `kefounder-marca.png` e íconos. Además, isotipo y logotipo por separado en 8 variantes de color (color, negativo, negativo blanco, tinta y monocromos petróleo, negro, blanco y crema), en PNG sin fondo de varios tamaños y en SVG: `public/brand/isotipo/` y `public/brand/logotipo/`, con la hoja `kefounder-variantes.png`. |
 | **En el código** | `src/components/Brand.jsx` (`Isotipo`, `IsotipoTile`, `Logotipo`). Las letras toman el color del texto (`currentColor`) y el punto usa `--warm`. |
 
 ### 2.3. Colores
