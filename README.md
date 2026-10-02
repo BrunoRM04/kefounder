@@ -103,6 +103,25 @@ Los otros 27 perfiles son de demostración (ficticios): **aceptan conexiones, re
 
 Para volver los datos de demostración al estado inicial: `npm run seed` (con el servidor detenido). Rehace solo la demo: las cuentas reales, las de prueba y las de administración se conservan.
 
+## Revista KeFounder!
+
+Un diario online público en **`/revista`**: se lee sin cuenta. Desde la bienvenida se entra con el botón «Leé la Revista KeFounder!» (debajo de las cuentas demo); con sesión iniciada está en la barra lateral y en el perfil.
+
+- **Portada**: nota destacada, «Lo último», frase destacada, entrevistas, un bloque por sección, «Lo más leído» (últimos 30 días) e invitación a crear una cuenta.
+- **Secciones**: Entrevistas, Startups, Founders, Inversión y Ecosistema (`/revista/seccion/:id`), con «Ver más». También hay búsqueda (`/revista/buscar`).
+- **Cada nota** (`/revista/:dirección`): sección, título, bajada, firma, fecha, tiempo de lectura, foto de portada, ficha del protagonista, el texto (con preguntas y respuestas, citas, subtítulos, listas e imágenes), temas, enlace al proyecto en KeFounder! si lo tiene, botones para compartir (enlace, WhatsApp, LinkedIn, X) y «Seguí leyendo».
+- **Al compartir** en WhatsApp, LinkedIn o X, el enlace muestra el título, el resumen y la foto de la nota (el servidor los agrega a la página).
+- Se cuenta una lectura por persona y nota cada 6 horas; las visitas de administración no cuentan.
+
+Las notas se escriben desde el panel, en **Contenido → Revista**:
+
+- Lista con estado (publicada, programada o borrador), lecturas totales y de 7 días, filtros por sección y origen, y búsqueda.
+- **Editor de pantalla completa**: título, bajada y texto con barra de formato (subtítulo, pregunta, respuesta, cita, lista, negrita, enlace, imagen, separador), vista previa igual a la revista y guía de formato. Al costado: sección, formato (entrevista, perfil, noticia o análisis), firma, dirección, foto de portada (subida o de Unsplash) con crédito, protagonista (foto, nombre, cargo y empresa), proyecto de KeFounder! vinculado, temas, gráfico de lecturas y seguimiento (tareas, notas internas e historial).
+- **Publicar ahora o programar** para una fecha: la nota sale sola ese día. También se puede despublicar, poner en la portada o eliminar (con motivo). Mientras es borrador, «Vista previa» la muestra con el diseño real, solo para administración.
+- El texto nunca admite HTML: el formato se convierte en elementos seguros (sin scripts ni enlaces `javascript:`), y solo se aceptan imágenes subidas por administración o de Unsplash.
+
+En modo demo la revista arranca con **10 notas de ejemplo** sobre los founders y proyectos ficticios de la demo (marcadas «Ejemplo» en el panel y con una aclaración al pie). Se quitan todas juntas con «Quitar notas de ejemplo» y no vuelven a aparecer; `npm run seed` las rehace junto con la demo sin tocar las notas propias.
+
 ## Panel de administración
 
 Se entra por `/ingresar` con una cuenta de administración y se va directo a **`/admin`**. Esa cuenta usa solo el panel: no tiene perfil público, no aparece en Descubrir y no puede recibir conexiones.
@@ -115,7 +134,8 @@ Se entra por `/ingresar` con una cuenta de administración y se va directo a **`
 | **Usuarios** | Lista con búsqueda, filtros y orden; ficha con actividad, proyectos, suscripciones, reportes, identidad y seguimiento. Acciones: plan de cortesía, suspender/reactivar, verificar email, cerrar sesiones, cambiar segmento y eliminar (escribiendo el email para confirmar). |
 | **Proyectos** | Lista y ficha con rendimiento; ocultar o volver a mostrar con motivo (el founder recibe el aviso). |
 | **Moderación** | Cola de reportes por orden de llegada, con los últimos mensajes cuando se reporta una conversación, y verificación de identidad con la foto del documento (aprobar o rechazar con motivo). |
-| **Seguimiento** | Tareas con vencimiento y prioridad, vinculadas a cuentas, proyectos o reportes, y notas internas en cada ficha. |
+| **Seguimiento** | Tareas con vencimiento y prioridad, vinculadas a cuentas, proyectos, reportes o notas de la revista, y notas internas en cada ficha. |
+| **Revista** | Notas, entrevistas y noticias públicas: borradores, publicación programada, portada, lecturas y vista previa (ver «Revista KeFounder!» arriba). |
 | **Auditoría** | Registro de cada acción hecha desde el panel (quién, cuándo, sobre qué y el motivo). No se edita ni se borra. |
 | **Sistema** | Tamaño y filas de la base, versión del esquema, sesiones, archivos, copia de seguridad con un clic, chequeo de integridad y mantenimiento. |
 
@@ -150,6 +170,7 @@ La contraseña de administración necesita al menos 10 caracteres, con letras y 
 - **Mis proyectos**: asistente de 8 pasos, edición completa (portada, logo, historia, perfiles buscados con equity, stack, equipo, tracción), publicar/pausar/duplicar/eliminar, **estadísticas** (Pro) y **panel de candidatos** por etapa (Startup).
 - **Perfil** con indicador de completitud y señales de confianza; **notificaciones** en vivo; **planes** Free/Plus/Pro/Startup con precios mensuales y anuales; **configuración** (notificaciones, privacidad, bloqueados, contraseña, eliminar cuenta).
 - Página pública para compartir proyectos (`/p/:id`) sin necesidad de cuenta.
+- **Revista** pública (`/revista`) con entrevistas, startups, founders, inversión y ecosistema.
 - Diseño mobile-first tipo app: barra inferior en mobile, barra lateral en desktop, se instala en la pantalla de inicio (manifest + íconos). En PC (≥1100 px) cada sección pasa a pantalla completa en columnas, con poco scroll (`src/styles/desktop.css`).
 
 ### Qué está simulado
@@ -180,8 +201,8 @@ Colores: petróleo `#345F63`, terracota `#C47F6A`, crema `#F1EDE4`, tinta `#252A
 ## Pruebas
 
 ```bash
-npm test           # 67 pruebas: API (reglas de negocio, planes, permisos, tiempo real, uploads, marca) y panel de administración
-npm run build && npm run test:e2e   # recorrido completo en Chrome (app + panel) con un servidor y base temporales
+npm test           # 80 pruebas: API (reglas de negocio, planes, permisos, tiempo real, uploads, marca), panel de administración y revista
+npm run build && npm run test:e2e   # recorrido completo en Chrome (app, panel y revista) con un servidor y base temporales
 node tests/shots.mjs --out capturas --routes /,/matches --sizes small,mobile,hd,win,fhd --metrics 1   # capturas, desbordes y scroll/ancho usado por pantalla
 ```
 
@@ -189,9 +210,11 @@ node tests/shots.mjs --out capturas --routes /,/matches --sizes small,mobile,hd,
 
 ```
 shared/catalog.js      opciones, planes, límites y textos de paywall (compartido front/back)
+shared/revista.js      secciones de la revista y el formato seguro de las notas (compartido front/back)
 server/                Express 5 + SQLite (node:sqlite)
-  routes/              auth, perfil, descubrir, personas, proyectos, interesados, matches, notificaciones, planes, uploads
-  admin/               panel: métricas, cuentas, contenido y moderación, seguimiento, sistema
+  routes/              auth, perfil, descubrir, personas, proyectos, interesados, matches, notificaciones, planes, uploads, revista
+  admin/               panel: métricas, cuentas, contenido y moderación, revista, seguimiento, sistema
+  revista.js           revista: notas publicadas, lecturas por día, datos para compartir y notas de ejemplo
   admin-cli.js         consola de cuentas de administración (npm run admin)
   db.js                esquema y migraciones versionadas
   services.js          conexiones, matches, mensajes y notificaciones
@@ -201,6 +224,7 @@ server/                Express 5 + SQLite (node:sqlite)
 src/                   React 18 + Vite
   screens/             una pantalla por archivo
   admin/               panel de administración (paquete aparte: solo lo descarga la cuenta admin)
+  revista/             revista pública (paquete aparte)
   components/          UI base, shell, tarjetas, gráficos, hojas
   lib/                 API, router, sesión + tiempo real, formato
 tests/                 API (node:test), e2e (Playwright) y capturas
@@ -216,6 +240,7 @@ data/                  base de datos y archivos subidos (se crea sola)
 | `KEFOUNDER_DATA_DIR` | `./data` | Carpeta de la base y los uploads |
 | `KEFOUNDER_DEMO` | `1` | `0` oculta los accesos a cuentas demo |
 | `KEFOUNDER_DEMO_BOTS` | `1` | `0` apaga las respuestas automáticas de los perfiles demo |
+| `KEFOUNDER_TRUST_PROXY` | `loopback` | Detrás de un proxy (Nginx, Cloudflare…): cuál es, para leer la IP real de quien visita (`1`, una IP o `loopback`) |
 | `KEFOUNDER_ADMIN_PASSWORD` | — | Solo para `npm run admin`, si no querés escribir la contraseña en la consola |
 
 Las variables `FOUND_*` de antes del cambio de nombre siguen funcionando. Al primer arranque, una base vieja `data/found.db` se migra sola a `data/kefounder.db` (la original queda como `data/found-legacy.db`) y las cuentas demo pasan a `@kefounder.demo`.

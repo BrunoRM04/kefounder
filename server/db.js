@@ -299,6 +299,50 @@ const MIGRATIONS = [
       CREATE INDEX IF NOT EXISTS idx_tasks_status ON admin_tasks(status, due_at);
       CREATE INDEX IF NOT EXISTS idx_tasks_target ON admin_tasks(target_type, target_id);
     `
+  },
+  {
+    // Revista: notas, entrevistas y noticias públicas (se leen sin cuenta).
+    id: '2026-10-02-revista',
+    up: `
+      CREATE TABLE IF NOT EXISTS articles (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        slug TEXT NOT NULL UNIQUE,
+        section TEXT NOT NULL,
+        format TEXT NOT NULL DEFAULT 'perfil',
+        title TEXT NOT NULL,
+        dek TEXT NOT NULL DEFAULT '',
+        body TEXT NOT NULL DEFAULT '',
+        cover TEXT NOT NULL DEFAULT '',
+        cover_credit TEXT NOT NULL DEFAULT '',
+        author TEXT NOT NULL DEFAULT 'Redacción KeFounder!',
+        person_name TEXT NOT NULL DEFAULT '',
+        person_role TEXT NOT NULL DEFAULT '',
+        person_company TEXT NOT NULL DEFAULT '',
+        person_photo TEXT NOT NULL DEFAULT '',
+        project_id INTEGER REFERENCES projects(id) ON DELETE SET NULL,
+        tags TEXT NOT NULL DEFAULT '[]',
+        status TEXT NOT NULL DEFAULT 'draft',
+        featured INTEGER NOT NULL DEFAULT 0,
+        is_sample INTEGER NOT NULL DEFAULT 0,
+        reading_minutes INTEGER NOT NULL DEFAULT 1,
+        views INTEGER NOT NULL DEFAULT 0,
+        published_at TEXT,
+        created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_articles_public ON articles(status, published_at);
+      CREATE INDEX IF NOT EXISTS idx_articles_section ON articles(section, status, published_at);
+      CREATE INDEX IF NOT EXISTS idx_articles_featured ON articles(featured, status, published_at);
+      CREATE TABLE IF NOT EXISTS article_daily (
+        article_id INTEGER NOT NULL REFERENCES articles(id) ON DELETE CASCADE,
+        day TEXT NOT NULL,
+        views INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (article_id, day)
+      );
+      CREATE INDEX IF NOT EXISTS idx_article_daily_day ON article_daily(day);
+      CREATE TABLE IF NOT EXISTS app_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+    `
   }
 ];
 

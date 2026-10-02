@@ -9,8 +9,8 @@ export default defineConfig({
     port: 5173,
     host: true,
     proxy: {
-      '/api': { target: api },
-      '/uploads': { target: api }
+      '/api': { target: api, xfwd: true },
+      '/uploads': { target: api, xfwd: true }
     }
   },
   build: {

@@ -542,3 +542,5 @@ body:has(.app.is-chat) .toast-stack { bottom: calc(var(--safe-b) + 96px); }
   25% { opacity: 1; }
   100% { opacity: 0; transform: rotate(var(--angle)) translateY(-190px) scale(1.1); }
 }
+
+.boundary-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 14px; }

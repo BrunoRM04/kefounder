@@ -391,9 +391,14 @@ export function declineInterest(ctx, interest) {
 // Borra una cuenta con todo lo que depende de ella (la base borra en cascada) y sus archivos.
 export function deleteUserAccount(ctx, userId) {
   const { db, config, hub } = ctx;
-  const files = db.all('SELECT filename FROM uploads WHERE user_id = ?', [userId]);
+  // Las imágenes que usa alguna nota de la revista se conservan (quedan sin dueño).
+  const inRevista = (filename) => Boolean(db.get(
+    "SELECT 1 FROM articles WHERE cover = :url OR person_photo = :url OR instr(body, :url) > 0 LIMIT 1",
+    { url: `/uploads/${filename}` }
+  ));
+  const files = db.all('SELECT filename FROM uploads WHERE user_id = ?', [userId]).filter((f) => !inRevista(f.filename));
   db.tx(() => {
-    db.run('DELETE FROM uploads WHERE user_id = ?', [userId]);
+    for (const { filename } of files) db.run('DELETE FROM uploads WHERE filename = ?', [filename]);
     db.run('DELETE FROM users WHERE id = ?', [userId]);
   });
   hub?.disconnect?.(userId);

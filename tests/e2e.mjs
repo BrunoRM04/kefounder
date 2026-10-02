@@ -372,6 +372,64 @@ try {
     await context.close();
   });
 
+  // ---------- Revista ----------
+  await step('revista: desde la bienvenida, sin cuenta, se lee una nota', async () => {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, hasTouch: true, isMobile: true });
+    const page = await context.newPage();
+    watch(page, 'lector');
+    await page.goto(`${BASE}/bienvenida`);
+    await page.getByRole('link', { name: /Leé la Revista KeFounder!/ }).click();
+    await page.waitForURL(`${BASE}/revista`);
+    const lead = page.locator('.rv-hero-copy h1 a');
+    const title = (await lead.textContent()).trim();
+    await lead.click();
+    await page.getByRole('heading', { level: 1, name: title }).waitFor();
+    await page.locator('.rv-body .rv-b-q').first().waitFor();
+    await page.getByRole('button', { name: 'Copiar enlace' }).waitFor();
+    const wide = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
+    expect(!wide, 'la nota desborda horizontalmente en el celular');
+    await page.screenshot({ path: path.join(OUT, '13-revista-nota-mobile.png') });
+    await page.getByRole('link', { name: 'Startups' }).first().click();
+    await page.getByRole('heading', { level: 1, name: 'Startups' }).waitFor();
+    await context.close();
+  });
+
+  await step('revista en el panel: escribir, publicar y verla en la revista', async () => {
+    const { context, page } = await adminLogin({ width: 1366, height: 768 });
+    await page.getByRole('link', { name: 'Revista' }).click();
+    await page.getByRole('button', { name: 'Nueva nota' }).first().click();
+    await page.getByPlaceholder('Título de la nota').fill('Entrevista e2e: construir desde Montevideo');
+    await page.getByPlaceholder(/Bajada/).fill('Una nota de prueba escrita desde el panel.');
+    await page.getByRole('button', { name: 'Guardar borrador' }).click();
+    await page.waitForURL(/\/admin\/revista\/\d+/);
+    await page.getByLabel('Texto de la nota').fill('Una introducción.\n\nP: ¿Cómo empezó?\nR: Con una idea y muchas ganas.\n\n> Construir es elegir con quién.\n> — Founder e2e');
+    await page.getByLabel('Enlace de imagen para Foto principal').fill('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40');
+    await page.getByRole('button', { name: 'Usar' }).click();
+    // Con cambios sin guardar, salir pide confirmación; si se cancela, se queda en la nota.
+    let asked = false;
+    page.once('dialog', (dialog) => { asked = true; dialog.dismiss(); });
+    await page.locator('.adm-nav').getByRole('link', { name: 'Resumen' }).click();
+    await page.waitForTimeout(300);
+    expect(asked && /\/admin\/revista\/\d+/.test(page.url()), 'salir con cambios sin guardar no pidió confirmación');
+    await page.getByRole('tab', { name: 'Vista previa' }).click();
+    await page.locator('.adm-preview .rv-b-quote').waitFor();
+    await page.getByRole('button', { name: 'Guardar', exact: true }).click();
+    await page.getByText(/Guardada/).waitFor();
+    await page.getByRole('button', { name: 'Publicar' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Publicar ahora' }).click();
+    await page.locator('.adm-entity-pills .adm-status', { hasText: 'Publicada' }).waitFor();
+    await page.screenshot({ path: path.join(OUT, '14-admin-revista-editor.png') });
+    await context.close();
+
+    const reader = await browser.newContext({ viewport: { width: 1366, height: 768 } });
+    const view = await reader.newPage();
+    watch(view, 'lector');
+    await view.goto(`${BASE}/revista/entrevista-e2e-construir-desde-montevideo`);
+    await view.getByRole('heading', { level: 1, name: 'Entrevista e2e: construir desde Montevideo' }).waitFor();
+    await view.locator('.rv-b-quote cite', { hasText: 'Founder e2e' }).waitFor();
+    await reader.close();
+  });
+
   await browser.close();
 } catch (error) {
   console.error(error);

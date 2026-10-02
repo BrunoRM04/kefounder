@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, Bell, Bookmark, BriefcaseBusiness, Compass, Gem, MessageCircle, Settings } from 'lucide-react';
+import { ArrowLeft, Bell, Bookmark, BriefcaseBusiness, Compass, Gem, MessageCircle, Newspaper, Settings } from 'lucide-react';
 import { PLANS } from '../../shared/catalog.js';
 import { useApp } from '../lib/app.jsx';
 import { firstName } from '../lib/format.js';
@@ -36,6 +36,10 @@ export function Rail() {
         ))}
       </nav>
       <div className="rail-bottom">
+        <Link to="/revista" className="rail-link rail-small">
+          <span className="rail-icon"><Newspaper size={19} strokeWidth={1.8} /></span>
+          <span>Revista</span>
+        </Link>
         <Link to="/planes" className={cx('rail-link rail-small', path.startsWith('/planes') && 'is-active')}>
           <span className="rail-icon"><Gem size={19} strokeWidth={1.8} /></span>
           <span>{PLANS[me?.plan]?.name || 'Free'}</span>

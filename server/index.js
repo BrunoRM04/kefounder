@@ -7,6 +7,7 @@ import { config } from './config.js';
 import { openDb } from './db.js';
 import { migrateDemoAccounts, migrateLegacyDbFile } from './migrate.js';
 import { createHub } from './realtime.js';
+import { ensureSampleArticles } from './revista.js';
 import { isEmpty, seed } from './seed.js';
 
 if (migrateLegacyDbFile(config.dbPath)) console.log('✳ Base migrada: data/found.db → data/kefounder.db (la original quedó como found-legacy.db).');
@@ -16,6 +17,12 @@ if (isEmpty(db)) {
   console.log('✳ Base de datos creada con datos de demostración.');
 } else if (await migrateDemoAccounts(db)) {
   console.log('✳ Cuentas demo actualizadas al dominio @kefounder.demo.');
+}
+
+// Revista: en modo demo arranca con notas de ejemplo (una sola vez; si se borran, no vuelven).
+if (config.demo) {
+  const samples = ensureSampleArticles(db);
+  if (samples) console.log(`✳ Revista: ${samples} notas de ejemplo cargadas.`);
 }
 
 const hub = createHub();
@@ -38,6 +45,7 @@ const server = app.listen(config.port, config.host, () => {
   console.log(admins
     ? `  Panel:  http://localhost:${config.port}/admin (${admins} ${admins === 1 ? 'cuenta' : 'cuentas'} de administración)`
     : '  Panel:  sin cuentas de administración — creá una con: npm run admin -- crear --email <email>');
+  console.log(`  Revista: http://localhost:${config.port}/revista`);
   console.log(`  Bots de demo: ${config.bots ? 'activos' : 'apagados'}\n`);
 });
 

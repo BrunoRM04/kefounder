@@ -10,6 +10,8 @@ const dataDir = env('DATA_DIR') ? path.resolve(env('DATA_DIR')) : path.join(root
 export const config = {
   root,
   port: Number(process.env.PORT) || 3000,
+  // Detrás de un proxy (Nginx, Cloudflare…) indicá cuál es para leer la IP real: "1", "loopback", una IP…
+  trustProxy: env('TRUST_PROXY') || 'loopback',
   host: process.env.HOST || '0.0.0.0',
   dataDir,
   dbPath: path.join(dataDir, 'kefounder.db'),

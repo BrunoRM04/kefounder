@@ -312,14 +312,16 @@ export default function metricRoutes(router, ctx) {
   // Búsqueda global del panel: personas, proyectos y reportes (#id).
   router.get('/admin/search', (req, res) => {
     const q = searchTerm(req.query.q);
-    if (q.length < 2) return res.json({ users: [], projects: [], reports: [] });
+    if (q.length < 2) return res.json({ users: [], projects: [], reports: [], articles: [] });
     const term = likeTerm(q);
     const id = /^#?\d+$/.test(q) ? Number(q.replace('#', '')) : 0;
     const users = db.all("SELECT * FROM users WHERE id = :id OR name LIKE :q ESCAPE '\\' OR email LIKE :q ESCAPE '\\' ORDER BY (id = :id) DESC, last_active_at DESC LIMIT 6", { id, q: term }).map(mini);
     const projects = db.all("SELECT p.id, p.name, p.tagline, p.logo, p.accent, p.status, p.moderation, u.name AS owner FROM projects p JOIN users u ON u.id = p.owner_id WHERE p.id = :id OR p.name LIKE :q ESCAPE '\\' ORDER BY (p.id = :id) DESC, p.updated_at DESC LIMIT 6", { id, q: term })
       .map((p) => ({ id: p.id, name: p.name, tagline: p.tagline, logo: p.logo, accent: p.accent, status: p.status, moderation: p.moderation, owner: p.owner }));
     const reports = id ? db.all('SELECT id, reason, status, target_type FROM reports WHERE id = ?', [id]).map((r) => ({ id: r.id, reason: r.reason, status: r.status, targetType: r.target_type })) : [];
-    res.json({ users, projects, reports });
+    const articles = db.all("SELECT id, title, section, person_name FROM articles WHERE id = :id OR title LIKE :q ESCAPE '\\' OR person_name LIKE :q ESCAPE '\\' ORDER BY (id = :id) DESC, updated_at DESC LIMIT 4", { id, q: term })
+      .map((a) => ({ id: a.id, title: a.title, person: a.person_name }));
+    res.json({ users, projects, reports, articles });
   });
 }
 

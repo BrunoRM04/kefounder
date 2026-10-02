@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChartLine, ClipboardList, FolderKanban, LayoutDashboard, LogOut, Menu, ScrollText, Search, Server, ShieldAlert, Users, Wallet, X } from 'lucide-react';
+import { ChartLine, ClipboardList, FolderKanban, LayoutDashboard, LogOut, Menu, Newspaper, ScrollText, Search, Server, ShieldAlert, Users, Wallet, X } from 'lucide-react';
 import { Isotipo, Logotipo } from '../components/Brand.jsx';
 import { Avatar, IconButton, ProjectLogo, Spinner, cx } from '../components/ui.jsx';
 import { api } from '../lib/api.js';
@@ -19,6 +19,8 @@ const ProjectDetail = lazy(() => import('./screens/ProjectDetail.jsx'));
 const Moderation = lazy(() => import('./screens/Moderation.jsx'));
 const ReportDetail = lazy(() => import('./screens/ReportDetail.jsx'));
 const Tasks = lazy(() => import('./screens/Tasks.jsx'));
+const RevistaList = lazy(() => import('./screens/Revista.jsx'));
+const ArticleEditor = lazy(() => import('./screens/ArticleEditor.jsx'));
 const Audit = lazy(() => import('./screens/Audit.jsx'));
 const System = lazy(() => import('./screens/System.jsx'));
 
@@ -34,6 +36,9 @@ const ROUTES = [
   { path: '/admin/moderacion', Screen: Moderation, title: 'Moderación' },
   { path: '/admin/moderacion/reportes/:id', Screen: ReportDetail, title: 'Reporte' },
   { path: '/admin/seguimiento', Screen: Tasks, title: 'Seguimiento' },
+  { path: '/admin/revista', Screen: RevistaList, title: 'Revista' },
+  { path: '/admin/revista/nueva', Screen: ArticleEditor, title: 'Nueva nota' },
+  { path: '/admin/revista/:id', Screen: ArticleEditor, title: 'Nota', keyByPath: true },
   { path: '/admin/auditoria', Screen: Audit, title: 'Auditoría' },
   { path: '/admin/sistema', Screen: System, title: 'Sistema' }
 ];
@@ -49,6 +54,9 @@ const NAV = [
     { to: '/admin/proyectos', label: 'Proyectos', icon: FolderKanban },
     { to: '/admin/moderacion', label: 'Moderación', icon: ShieldAlert, badge: (b) => b.reports + b.identity },
     { to: '/admin/seguimiento', label: 'Seguimiento', icon: ClipboardList, badge: (b) => b.tasks }
+  ] },
+  { group: 'Contenido', items: [
+    { to: '/admin/revista', label: 'Revista', icon: Newspaper }
   ] },
   { group: 'Control', items: [
     { to: '/admin/auditoria', label: 'Auditoría', icon: ScrollText },
@@ -135,7 +143,7 @@ function GlobalSearch() {
       try {
         const data = await api.get(`/admin/search?q=${encodeURIComponent(text)}`);
         if (alive) setResults(data);
-      } catch { if (alive) setResults({ users: [], projects: [], reports: [] }); }
+      } catch { if (alive) setResults({ users: [], projects: [], reports: [], articles: [] }); }
     }, 220);
     return () => { alive = false; window.clearTimeout(t); };
   }, [q]);
@@ -149,6 +157,7 @@ function GlobalSearch() {
   const items = results ? [
     ...results.users.map((u) => ({ key: `u${u.id}`, to: `/admin/usuarios/${u.id}`, kind: 'Persona', title: u.name, sub: u.email, icon: <Avatar person={u} size={28} /> })),
     ...results.projects.map((p) => ({ key: `p${p.id}`, to: `/admin/proyectos/${p.id}`, kind: 'Proyecto', title: p.name, sub: `de ${p.owner}`, icon: <ProjectLogo project={p} size={28} /> })),
+    ...(results.articles || []).map((a) => ({ key: `a${a.id}`, to: `/admin/revista/${a.id}`, kind: 'Nota', title: a.title, sub: a.person || 'Revista', icon: <span className="adm-search-icon is-article"><Newspaper size={15} /></span> })),
     ...results.reports.map((r) => ({ key: `r${r.id}`, to: `/admin/moderacion/reportes/${r.id}`, kind: 'Reporte', title: `Reporte #${r.id}`, sub: r.reason, icon: <span className="adm-search-icon"><ShieldAlert size={15} /></span> }))
   ] : [];
   const go = (to) => { setOpen(false); setQ(''); input.current?.blur(); navigate(to); };
@@ -243,7 +252,7 @@ export default function AdminApp() {
           </header>
           <main className="adm-main" id="adm-main">
             <Suspense fallback={<div className="adm-page"><Spinner /></div>}>
-              <Screen key={route?.path || path} params={params} />
+              <Screen key={route?.keyByPath ? path : route?.path || path} params={params} />
             </Suspense>
           </main>
         </div>

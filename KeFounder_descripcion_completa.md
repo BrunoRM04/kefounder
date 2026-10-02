@@ -365,7 +365,17 @@ Los reportes llegan a la cola de **Moderación** del panel de administración, p
 
 El bloqueo restringe la interacción y la visibilidad correspondiente entre usuarios. Si ambas personas se bloquearon, una sola no puede revertir el bloqueo que mantiene la otra.
 
-### 4.18. Panel de administración
+### 4.18. Revista KeFounder!
+
+La revista es un diario online público en `/revista`: cualquiera la lee sin crear una cuenta. En la bienvenida se entra con el botón «Leé la Revista KeFounder!», debajo de las cuentas de demostración; con sesión iniciada aparece en la barra lateral (PC) y en «Mi perfil».
+
+Tiene su propia cabecera, con la fecha, la búsqueda y las secciones Portada, Entrevistas, Startups, Founders, Inversión y Ecosistema. La portada reúne la nota destacada, lo último, una frase destacada, las entrevistas, un bloque por sección y lo más leído de los últimos 30 días. Cada nota muestra sección, título, bajada, firma, fecha, tiempo de lectura, foto, ficha de la persona protagonista, el texto con preguntas y respuestas, citas e imágenes, los temas, el proyecto vinculado en KeFounder! (si tiene página pública), botones para compartir y notas relacionadas. Al compartir el enlace, la vista previa en WhatsApp, LinkedIn o X muestra el título, el resumen y la foto.
+
+Las notas se escriben y publican desde el panel de administración (Contenido → Revista). Se pueden guardar como borrador, ver con el diseño real antes de publicar, publicar al instante o programar para una fecha, poner en la portada, despublicar y eliminar con motivo. Cada nota registra sus lecturas por día: una por persona cada 6 horas, sin contar las visitas de administración.
+
+En modo demo hay diez notas de ejemplo sobre las personas y los proyectos ficticios de la demostración, marcadas como ejemplo; se pueden quitar todas juntas desde el panel.
+
+### 4.19. Panel de administración
 
 El panel vive en `/admin` y solo lo ve la cuenta de administración, que entra por la pantalla de ingreso normal y va directo ahí. Esa cuenta no tiene perfil público: no aparece en Descubrir ni puede recibir conexiones.
 
@@ -373,6 +383,7 @@ Tiene su propio menú lateral, agrupado en tres partes:
 
 - **Panorama**: Resumen (indicadores, tendencia, pendientes, activación, planes y últimos registros), Métricas (siete métricas diarias en 7, 30 o 90 días, embudo de activación y distribuciones) e Ingresos (MRR, ARR, ticket promedio, altas y bajas, ingreso por plan y movimientos).
 - **Gestión**: Usuarios (lista y ficha completa con acciones), Proyectos (lista, ficha y moderación), Moderación (reportes y verificación de identidad) y Seguimiento (tareas con vencimiento y notas internas).
+- **Contenido**: Revista (notas, entrevistas y noticias, con editor, programación y lecturas).
 - **Control**: Auditoría (registro de todas las acciones del panel) y Sistema (estado de la base, copias de seguridad, integridad y mantenimiento).
 
 Las listas se filtran, ordenan y paginan en el servidor; los filtros quedan en la dirección para poder guardarlos o compartirlos. Las métricas separan las cuentas reales de las de demostración. Cada acción que cambia algo pide un motivo cuando corresponde y queda en la auditoría. Las cuentas de administración se crean y administran desde la consola (`npm run admin`), y su contraseña nunca se guarda en archivos.
@@ -744,11 +755,11 @@ Para desactivar las funciones demo se utilizan valores `0`. Ocultar accesos o ap
 
 ## 12. Validaciones realizadas
 
-Con el panel de administración se completaron:
+Con el panel de administración y la revista se completaron:
 
 - Compilación del frontend con Vite.
-- **62 pruebas automáticas**, sin fallos: 43 de la API (incluida una matriz que recorre cada función de cada plan con las cuatro cuentas de ejemplo) y 19 del panel (permisos, suspensión, moderación, reportes, identidad, planes de cortesía, tareas, auditoría, exportación CSV, copias de seguridad y conservación de cuentas reales al reiniciar la demo).
-- **19 pasos de prueba en navegador**, sin fallos: 14 de la app y 5 del panel (creación de la cuenta por consola, resumen, plan de cortesía con motivo, tareas y búsqueda global, menú en celular).
+- **80 pruebas automáticas**, sin fallos: 43 de la API (incluida una matriz que recorre cada función de cada plan con las cuatro cuentas de ejemplo), 24 del panel (permisos, suspensión, moderación, reportes, identidad, planes de cortesía, tareas, auditoría, exportación CSV, copias de seguridad y conservación de cuentas reales al reiniciar la demo) y 13 de la revista (lectura sin cuenta, borradores, publicación y programación, portada, imágenes, formato seguro, lecturas, datos para compartir y notas de ejemplo).
+- **21 pasos de prueba en navegador**, sin fallos: 14 de la app, 5 del panel (creación de la cuenta por consola, resumen, plan de cortesía con motivo, tareas y búsqueda global, menú en celular) y 2 de la revista (entrar sin cuenta desde la bienvenida y leer una nota en el celular; escribir y publicar una nota desde el panel).
 - Capturas del panel en 320, 375, 390, 820, 1024, 1280, 1366, 1536 y 1920 px de ancho.
 - Capturas y revisión de desbordes horizontales en tamaños de celular y escritorio.
 - Comprobación de respuesta del frontend y backend mediante la dirección local de red.
@@ -795,7 +806,8 @@ En la tabla, `:id` representa el identificador de una persona, proyecto o conver
 | Notificaciones | `/notificaciones` | Autenticado. |
 | Planes | `/planes` | Autenticado. |
 | Configuración | `/configuracion` | Autenticado. |
-| Panel de administración | `/admin` y sus secciones (`/admin/metricas`, `/admin/ingresos`, `/admin/usuarios`, `/admin/proyectos`, `/admin/moderacion`, `/admin/seguimiento`, `/admin/auditoria`, `/admin/sistema`) | Solo la cuenta de administración. |
+| Revista | `/revista`, `/revista/seccion/:id`, `/revista/buscar` y `/revista/:nota` | Público, sin cuenta. |
+| Panel de administración | `/admin` y sus secciones (`/admin/metricas`, `/admin/ingresos`, `/admin/usuarios`, `/admin/proyectos`, `/admin/moderacion`, `/admin/seguimiento`, `/admin/revista`, `/admin/auditoria`, `/admin/sistema`) | Solo la cuenta de administración. |
 
 Las restricciones se controlan también en el backend; conocer una ruta no concede acceso a datos o acciones ajenas.
 

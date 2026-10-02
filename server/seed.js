@@ -2,6 +2,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { hashPassword, lockedPasswordHash } from './auth.js';
 import { openDb } from './db.js';
+import { ensureSampleArticles, removeSampleArticles } from './revista.js';
 import { DEMO_ACCOUNTS, DEMO_PASSWORD, PEOPLE, PROJECTS } from './seed-data.js';
 
 const TABLES = ['sessions', 'notifications', 'messages', 'matches', 'interests', 'saves', 'passes', 'views', 'blocks', 'reports', 'subscriptions', 'uploads', 'projects', 'users'];
@@ -33,6 +34,8 @@ export function resetDemo(db) {
   if (!kept) {
     db.exec('PRAGMA foreign_keys = OFF');
     for (const table of TABLES) db.exec(`DELETE FROM ${table}`);
+    // Sin claves foráneas activas, las notas propias se desvinculan a mano de los proyectos borrados.
+    db.exec('UPDATE articles SET project_id = NULL, created_by = NULL');
     db.exec("DELETE FROM sqlite_sequence WHERE name IN ('users', 'projects', 'views', 'interests', 'matches', 'messages', 'notifications', 'reports', 'subscriptions', 'uploads')");
     db.exec('PRAGMA foreign_keys = ON');
     return 0;
@@ -323,6 +326,10 @@ export async function seed(db, { reset = false } = {}) {
     note('rodrigo', 'interest', { actor: 'lautaro', project: 'Brote', data: { note: 'Hice apps offline-first para logística rural.' }, at: hoursAgo(2) });
     note('rodrigo', 'message', { actor: 'gonzalo', matchId: mRodrigoGonzalo, data: { preview: '¡Hola Rodrigo! Los conozco, están haciendo un gran trabajo.' }, at: minutesAgo(35) });
   });
+
+  // Revista: las notas de ejemplo se rehacen con la demo; las propias nunca se tocan.
+  if (reset) removeSampleArticles(db);
+  ensureSampleArticles(db, { force: reset });
 
   return ids;
 }

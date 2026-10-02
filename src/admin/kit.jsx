@@ -237,7 +237,8 @@ const TONES = {
   report: { open: ['warm', 'Nuevo'], reviewing: ['gold', 'En revisión'], resolved: ['accent', 'Resuelto'], dismissed: ['muted', 'Descartado'] },
   priority: { high: ['warm', 'Alta'], normal: ['default', 'Normal'], low: ['muted', 'Baja'] },
   task: { todo: ['default', 'Por hacer'], doing: ['gold', 'En curso'], done: ['accent', 'Hecha'] },
-  subscription: { active: ['accent', 'Activa'], replaced: ['muted', 'Reemplazada'], canceled: ['warm', 'Cancelada'] }
+  subscription: { active: ['accent', 'Activa'], replaced: ['muted', 'Reemplazada'], canceled: ['warm', 'Cancelada'] },
+  article: { published: ['accent', 'Publicada'], scheduled: ['gold', 'Programada'], draft: ['muted', 'Borrador'] }
 };
 export const toneLabel = (kind, value) => TONES[kind]?.[value]?.[1] || value;
 export const optionsOf = (kind) => Object.entries(TONES[kind]).map(([id, [, label]]) => ({ id, label }));
@@ -473,11 +474,21 @@ export const ACTIONS = {
   'system.check': 'Revisó la integridad de la base',
   'system.cleanup': 'Hizo mantenimiento de la base',
   'system.admin_create': 'Se creó la cuenta de administración',
-  'system.admin_password': 'Se cambió la contraseña de administración'
+  'system.admin_password': 'Se cambió la contraseña de administración',
+  'article.create': 'Creó una nota de la revista',
+  'article.update': 'Editó una nota de la revista',
+  'article.publish': 'Publicó una nota',
+  'article.schedule': 'Programó una nota',
+  'article.unpublish': 'Despublicó una nota',
+  'article.feature': 'Puso una nota en la portada',
+  'article.unfeature': 'Sacó una nota de la portada',
+  'article.delete': 'Eliminó una nota',
+  'article.samples_delete': 'Quitó las notas de ejemplo'
 };
 export const actionLabel = (action) => ACTIONS[action] || action;
 
-export const targetLink = (type, id) => (type === 'user' ? `/admin/usuarios/${id}` : type === 'project' ? `/admin/proyectos/${id}` : type === 'report' ? `/admin/moderacion/reportes/${id}` : null);
+const TARGET_PATHS = { user: '/admin/usuarios/', project: '/admin/proyectos/', report: '/admin/moderacion/reportes/', article: '/admin/revista/' };
+export const targetLink = (type, id) => (TARGET_PATHS[type] ? `${TARGET_PATHS[type]}${id}` : null);
 
 export function AuditList({ items, showTarget = false, empty = 'Todavía no hay acciones registradas.' }) {
   if (!items?.length) return <p className="adm-muted-line">{empty}</p>;

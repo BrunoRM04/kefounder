@@ -30,6 +30,9 @@ const Settings = lazy(() => import('./screens/Settings.jsx'));
 const NotFound = lazy(() => import('./screens/NotFound.jsx'));
 // El panel de administración va en su propio paquete: solo lo descarga la cuenta admin.
 const AdminApp = lazy(() => import('./admin/AdminApp.jsx'));
+// La revista es pública: la puede leer cualquiera, con o sin cuenta.
+const RevistaApp = lazy(() => import('./revista/RevistaApp.jsx'));
+const isRevista = (path) => path === '/revista' || path.startsWith('/revista/');
 
 // tab: pantalla principal con barra inferior en mobile · group: mantiene el estado entre rutas.
 const ROUTES = [
@@ -80,12 +83,13 @@ function Routes() {
   const { path, query } = useRouter();
 
   useEffect(() => {
-    if (path.startsWith('/admin') && me?.role === 'admin') return; // el panel pone su propio título
+    if ((path.startsWith('/admin') && me?.role === 'admin') || isRevista(path)) return; // ponen su propio título
     const found = TITLES.find(([prefix]) => path.startsWith(prefix));
     document.title = found ? `${found[1]} · KeFounder!` : 'KeFounder! — personas para construir';
   }, [path, me?.role]);
 
   if (me === undefined) return <Splash />;
+  if (isRevista(path)) return <RevistaApp />;
 
   const AuthScreen = AUTH_ROUTES[path];
   if (!me) {
@@ -127,12 +131,41 @@ function Routes() {
   );
 }
 
+// Si una pantalla falla, se muestra un aviso con salida en lugar de una página en blanco.
+// Al cambiar de dirección se vuelve a intentar.
+class ScreenBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { error: null }; }
+  static getDerivedStateFromError(error) { return { error }; }
+  componentDidUpdate(prev) { if (prev.path !== this.props.path && this.state.error) this.setState({ error: null }); }
+  componentDidCatch(error) { console.error('[pantalla]', error); }
+  render() {
+    if (!this.state.error) return this.props.children;
+    return (
+      <div className="splash">
+        <div className="empty">
+          <h3>Algo salió mal en esta pantalla</h3>
+          <p>Probá recargar. Si sigue pasando, volvé al inicio.</p>
+          <div className="boundary-actions">
+            <button type="button" className="btn btn-primary" onClick={() => window.location.reload()}>Recargar</button>
+            <a className="btn btn-secondary" href="/">Ir al inicio</a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+function SafeRoutes() {
+  const { path } = useRouter();
+  return <ScreenBoundary path={path}><Routes /></ScreenBoundary>;
+}
+
 export default function App() {
   return (
     <RouterProvider>
       <AppProvider>
         <Suspense fallback={<Splash />}>
-          <Routes />
+          <SafeRoutes />
         </Suspense>
         <Toasts />
         <NotificationBanner />

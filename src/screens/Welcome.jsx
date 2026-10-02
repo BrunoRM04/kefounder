@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Newspaper } from 'lucide-react';
 import { PLANS } from '../../shared/catalog.js';
 import { Button, cx } from '../components/ui.jsx';
 import { api } from '../lib/api.js';
@@ -44,6 +44,7 @@ export default function Welcome() {
     // Precarga las pantallas siguientes para que la transición no muestre el splash.
     import('./Auth.jsx');
     import('./Discover.jsx');
+    import('../revista/RevistaApp.jsx');
     return () => window.clearTimeout(timer.current);
   }, []);
 
@@ -107,6 +108,22 @@ export default function Welcome() {
             </div>
           </div>
         )}
+        <a
+          href="/revista"
+          className="landing-revista"
+          onClick={(e) => {
+            if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+            e.preventDefault();
+            go('/revista');
+          }}
+        >
+          <span className="landing-revista-icon" aria-hidden="true"><Newspaper size={18} /></span>
+          <span className="landing-revista-copy">
+            <strong>Leé la Revista KeFounder!</strong>
+            <small>Entrevistas y startups, sin registrarte</small>
+          </span>
+          <ArrowRight size={16} className="landing-revista-arrow" />
+        </a>
       </main>
 
       <footer className="landing-foot">© 2026 KeFounder!</footer>
