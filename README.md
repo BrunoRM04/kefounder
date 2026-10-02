@@ -181,6 +181,8 @@ La contraseña de administración necesita al menos 10 caracteres, con letras y 
 
 ## Marca
 
+La guía completa del negocio y del diseño de interfaz (colores, tipografías, medidas, componentes y cómo está hecho el frontend) está en [KeFounder_negocio_y_diseno.md](KeFounder_negocio_y_diseno.md).
+
 El **isotipo** es una K cuyo tronco es un signo de exclamación: el **!** de «¡Qué founder!». El punto terracota es el momento del match, donde dos personas se encuentran para construir. El **logotipo** es «KeFounder!» en Manrope ExtraBold convertida a trazos, con el mismo «!» de punto terracota.
 
 Los archivos están en `public/brand/` (también se sirven en `/brand/…`):
