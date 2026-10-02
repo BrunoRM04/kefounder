@@ -1,0 +1,156 @@
+/* KeFounder! — petróleo, salvia azulada, terracota y crema. */
+:root {
+  --bg: #F1EDE4;
+  --surface: #FBF8F2;
+  --surface-2: #F5F1E9;
+  --soft: #E9E9DF;
+  --ink: #252A2A;
+  --ink-2: #425859;
+  --muted: #5D6F70;
+  --muted-2: #5D6F70;
+  --line: #CFD8D2;
+  --line-soft: #DFE3DA;
+
+  --accent: #345F63;
+  --accent-strong: #294D51;
+  --accent-ink: #345F63;
+  --accent-soft: #E3EAE4;
+  --accent-soft-2: #D4E0DA;
+  --accent-muted: #78999A;
+  --accent-line: #B7CAC6;
+  --on-primary: #F1EDE4;
+  --on-primary-muted: #C9D8D6;
+
+  --warm: #C47F6A;
+  --warm-soft: #F0E1D8;
+  --warm-line: #E2C4B7;
+  --dot: #C47F6A;
+  --gold: #935A48;
+  --gold-soft: #F0E1D8;
+  --danger: #935A48;
+
+  --surface-glass: #FBF8F2EE;
+  --bg-glass: #F1EDE4EE;
+  --light-glass: #F1EDE4B3;
+  --light-faint: #F1EDE433;
+  --light-line: #F1EDE455;
+  --scrim: #252A2A66;
+  --overlay: #252A2A47;
+  --focus-ring: #78999A33;
+  --shadow-color: #345F632E;
+  --scrollbar: #B7CAC6;
+  --disabled-bg: #D4DEDA;
+  --disabled-ink: #68797A;
+
+  --font-body: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Manrope', 'DM Sans', system-ui, sans-serif;
+
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-md: 15px;
+  --fs-lg: 17px;
+  --fs-xl: 21px;
+
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 22px;
+
+  --shadow-sm: 0 1px 2px #252A2A0D, 0 1px 3px #252A2A0A;
+  --shadow: 0 10px 30px #345F6312;
+  --shadow-lg: 0 24px 60px #345F6324;
+
+  --rail-w: 88px;
+  --top-h: 64px;
+  --nav-h: 64px;
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --gutter: 16px;
+
+  color-scheme: light;
+  font-family: var(--font-body);
+  font-size: var(--fs-md);
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (min-width: 760px) {
+  :root { --gutter: 28px; --top-h: 72px; }
+}
+@media (min-width: 1200px) {
+  :root { --gutter: 40px; }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { background: var(--bg); }
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100dvh;
+  background: var(--bg);
+  overflow-x: hidden;
+}
+
+img { max-width: 100%; display: block; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; background: none; border: 0; padding: 0; }
+button:disabled { cursor: default; }
+a { color: inherit; text-decoration: none; }
+a, button { -webkit-tap-highlight-color: transparent; }
+h1, h2, h3, h4 { font-family: var(--font-display); margin: 0; letter-spacing: -0.02em; line-height: 1.2; color: var(--ink); }
+p { margin: 0; }
+ul { margin: 0; padding: 0; list-style: none; }
+::selection { background: var(--accent-soft-2); }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+
+.spin { animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pop { 0% { transform: scale(0.6); opacity: 0; } 70% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
+.muted { color: var(--muted); }
+.accent-dot { color: var(--accent-muted); }
+.spark { color: var(--accent-muted); }
+
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+}
+.kicker svg { color: var(--accent-ink); }
+
+.live-pip { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--accent-muted); box-shadow: 0 0 0 3px var(--accent-soft); }
+
+.splash {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+}
+.splash-mark { display: grid; place-items: center; animation: pop 0.5s ease both; }
+.splash-mark .isotipo-tile { box-shadow: 0 18px 40px var(--shadow-color); border-radius: 22.6%; }
+
+/* Marca: letras con currentColor; el punto del "!" siempre terracota. */
+.brand-dot { fill: var(--warm); }
+.isotipo, .logotipo, .isotipo-tile { display: inline-block; flex: none; vertical-align: middle; }
+.isotipo-tile-bg { fill: var(--accent); }
+.isotipo-tile-mark { color: var(--on-primary); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
