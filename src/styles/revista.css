@@ -121,7 +121,8 @@
 .rv-join-btn { grid-column: 1 / -1; justify-self: start; background: var(--on-primary); color: var(--accent-ink); box-shadow: none; }
 .rv-join-btn:hover:not(:disabled) { background: var(--surface); }
 .rv-join-mark { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--warm); color: var(--on-primary); font: 800 24px/1 var(--font-display); }
-.rv-join.is-band { grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 18px; margin: 48px 0 56px; padding: 24px 28px; }
+/* Invitación al final de cada página: a todo el ancho, separada del contenido y del pie. */
+.rv-join.is-band { grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 18px; margin: 56px 0 64px; padding: 26px 30px; }
 .rv-join.is-band .rv-join-btn { grid-column: auto; }
 @media (max-width: 759px) {
   .rv-join.is-band { grid-template-columns: auto minmax(0, 1fr); margin: 36px 0 40px; padding: 20px; }
@@ -175,10 +176,16 @@
 .rv-aside { position: sticky; top: 136px; display: flex; flex-direction: column; gap: 24px; }
 @media (max-width: 1099px) {
   .rv-columns { grid-template-columns: minmax(0, 1fr); gap: 40px; }
-  .rv-aside { position: static; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start; }
+  .rv-aside { position: static; display: block; }
+  .rv-aside .rv-most ol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 28px; }
+  .rv-aside .rv-most li:nth-child(2) { border-top: 0; }
 }
-@media (max-width: 699px) { .rv-aside { grid-template-columns: minmax(0, 1fr); } .rv-columns { padding-top: 28px; } .rv-main { gap: 36px; } }
-.rv-home + .rv-join, .rv-home .rv-join.is-band { margin-top: 48px; }
+@media (max-width: 699px) {
+  .rv-aside .rv-most ol { grid-template-columns: minmax(0, 1fr); }
+  .rv-aside .rv-most li:nth-child(2) { border-top: 1px solid var(--line-soft); }
+  .rv-columns { padding-top: 28px; }
+  .rv-main { gap: 36px; }
+}
 
 /* ---------- Secciones y búsqueda ---------- */
 .rv-list { padding-top: 34px; }

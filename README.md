@@ -105,9 +105,9 @@ Para volver los datos de demostración al estado inicial: `npm run seed` (con el
 
 ## Revista KeFounder!
 
-Un diario online público en **`/revista`**: se lee sin cuenta. Desde la bienvenida se entra con el botón «Leé la Revista KeFounder!» (debajo de las cuentas demo); con sesión iniciada está en la barra lateral y en el perfil.
+Un diario online público en **`/revista`**: se lee sin cuenta. Desde la bienvenida se entra con el botón «Leé la Revista KeFounder!» (debajo de las cuentas demo). Es el único acceso: dentro de la app no aparece.
 
-- **Portada**: nota destacada, «Lo último», frase destacada, entrevistas, un bloque por sección, «Lo más leído» (últimos 30 días) e invitación a crear una cuenta.
+- **Portada**: nota destacada, «Lo último», frase destacada, entrevistas, un bloque por sección, «Lo más leído» (últimos 30 días). Al final de cada página, a todo el ancho, una invitación a crear una cuenta.
 - **Secciones**: Entrevistas, Startups, Founders, Inversión y Ecosistema (`/revista/seccion/:id`), con «Ver más». También hay búsqueda (`/revista/buscar`).
 - **Cada nota** (`/revista/:dirección`): sección, título, bajada, firma, fecha, tiempo de lectura, foto de portada, ficha del protagonista, el texto (con preguntas y respuestas, citas, subtítulos, listas e imágenes), temas, enlace al proyecto en KeFounder! si lo tiene, botones para compartir (enlace, WhatsApp, LinkedIn, X) y «Seguí leyendo».
 - **Al compartir** en WhatsApp, LinkedIn o X, el enlace muestra el título, el resumen y la foto de la nota (el servidor los agrega a la página).

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, BarChart3, Bookmark, Check, Eye, Gem, Github, Globe, Heart, Linkedin, LogOut, MapPin, MessageCircle, Pencil, Settings, UserRound, Newspaper } from 'lucide-react';
+import { ArrowRight, BarChart3, Bookmark, Check, Eye, Gem, Github, Globe, Heart, Linkedin, LogOut, MapPin, MessageCircle, Pencil, Settings, UserRound } from 'lucide-react';
 import { PLANS } from '../../shared/catalog.js';
 import { ColumnChart, StatTile, dayData } from '../components/Charts.jsx';
 import { Page, TopBar } from '../components/Shell.jsx';
@@ -86,7 +86,6 @@ export default function Profile() {
             <div className="me-links">
               <Link to="/interesados" className="settings-link"><Heart size={18} /> Interesados en vos <ArrowRight size={16} /></Link>
               <Link to="/notificaciones" className="settings-link"><Eye size={18} /> Notificaciones <ArrowRight size={16} /></Link>
-              <Link to="/revista" className="settings-link"><Newspaper size={18} /> Revista KeFounder! <ArrowRight size={16} /></Link>
               <Link to="/configuracion" className="settings-link"><Settings size={18} /> Configuración <ArrowRight size={16} /></Link>
               <button type="button" className="settings-link is-danger" onClick={logout}><LogOut size={18} /> Cerrar sesión</button>
             </div>

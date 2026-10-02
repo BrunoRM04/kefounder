@@ -140,9 +140,9 @@ function Home() {
         </div>
         <aside className="rv-aside">
           <MostRead items={mostRead} />
-          <JoinCta />
         </aside>
       </div>
+      <JoinCta variant="band" />
     </div>
   );
 }
