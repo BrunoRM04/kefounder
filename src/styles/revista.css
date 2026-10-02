@@ -54,6 +54,8 @@
 .rv-kicker a { color: var(--accent-ink); }
 .rv-kicker a:hover { color: var(--warm); }
 .rv-kicker em { font-style: normal; color: var(--muted); }
+.rv-promo { display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 999px; background: var(--warm-soft); color: var(--gold); font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.rv-promo-note { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 18px; font-size: 13px; color: var(--muted); }
 .rv-kicker em::before { content: ''; display: inline-block; width: 4px; height: 4px; margin: 0 8px 2px 0; border-radius: 50%; background: var(--warm); vertical-align: middle; }
 .rv-byline { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-size: 12.5px; color: var(--muted); }
 .rv-byline > span:not(:last-child)::after { content: '·'; margin-left: 12px; color: var(--muted-2); opacity: 0.6; }

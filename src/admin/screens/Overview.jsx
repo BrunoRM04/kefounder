@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Activity, BadgeCheck, CircleCheck, ClipboardList, Gem, HeartHandshake, ShieldAlert, UserPlus, Users } from 'lucide-react';
+import { Activity, BadgeCheck, CircleCheck, ClipboardList, Gem, Megaphone, HeartHandshake, ShieldAlert, UserPlus, Users } from 'lucide-react';
 import { BarList, ColumnChart } from '../../components/Charts.jsx';
 import { Avatar } from '../../components/ui.jsx';
 import { Link } from '../../lib/router.jsx';
@@ -33,7 +33,8 @@ function Queue({ queue }) {
   const rows = [
     { to: '/admin/moderacion', icon: <ShieldAlert size={17} />, label: 'Reportes por revisar', value: counts.reports },
     { to: '/admin/moderacion?tab=identidad', icon: <BadgeCheck size={17} />, label: 'Identidades por verificar', value: counts.identity },
-    { to: '/admin/seguimiento', icon: <ClipboardList size={17} />, label: 'Tareas vencidas o para hoy', value: counts.tasks }
+    { to: '/admin/seguimiento', icon: <ClipboardList size={17} />, label: 'Tareas vencidas o para hoy', value: counts.tasks },
+    { to: '/admin/difusion', icon: <Megaphone size={17} />, label: 'Pedidos de difusión', value: counts.press || 0 }
   ];
   const clear = rows.every((r) => !r.value);
   return (
@@ -48,7 +49,7 @@ function Queue({ queue }) {
         ))}
       </ul>
       {clear && !queue.tasks.length ? (
-        <Empty icon={<CircleCheck size={18} />} title="Todo al día" text="No hay reportes, verificaciones ni tareas pendientes." />
+        <Empty icon={<CircleCheck size={18} />} title="Todo al día" text="No hay reportes, verificaciones, tareas ni pedidos de difusión pendientes." />
       ) : queue.tasks.length > 0 && (
         <div className="adm-queue-tasks">
           <span className="adm-mini-title">Próximas tareas</span>

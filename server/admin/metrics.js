@@ -183,7 +183,8 @@ export function badges(db) {
   return {
     reports: db.get("SELECT COUNT(*) AS n FROM reports WHERE status IN ('open', 'reviewing')").n,
     identity: db.get("SELECT COUNT(*) AS n FROM users WHERE json_extract(settings, '$.identity.status') = 'pending' AND identity_verified = 0").n,
-    tasks: db.get("SELECT COUNT(*) AS n FROM admin_tasks WHERE status != 'done' AND due_at IS NOT NULL AND due_at <= ?", [todayKey()]).n
+    tasks: db.get("SELECT COUNT(*) AS n FROM admin_tasks WHERE status != 'done' AND due_at IS NOT NULL AND due_at <= ?", [todayKey()]).n,
+    press: db.get("SELECT COUNT(*) AS n FROM press_requests WHERE status = 'pending'").n
   };
 }
 

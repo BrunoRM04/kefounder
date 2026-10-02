@@ -816,6 +816,7 @@ Todo Plus más:
 - Mensajes directos limitados sin match.
 - Hasta 3 proyectos activos.
 - Perfil destacado dentro de determinadas búsquedas.
+- **Mención de la startup en la Revista KeFounder! y en el Instagram de KeFounder! (1 por semestre).**
 
 Ejemplo de estadísticas:
 
@@ -840,6 +841,7 @@ Equipos y startups que necesitan incorporar varias personas.
 
 Todo Pro más:
 
+- **Nota propia en la Revista KeFounder! + publicación en el feed de Instagram (1 por trimestre).**
 - Hasta 5 proyectos o búsquedas activas.
 - Perfil de equipo.
 - Varios integrantes.
@@ -853,7 +855,35 @@ Todo Pro más:
 
 ---
 
-# 27. Tabla de suscripciones
+# 27. Difusión en la Revista e Instagram
+
+KeFounder! también se encarga de dar a conocer a las startups de la comunidad: las publica en la **Revista KeFounder!** (el diario online público del sitio) y en el **Instagram** de KeFounder!. Para la startup es reconocimiento y alcance. Para KeFounder!, contenido real para la revista y una razón concreta para elegir un plan pago.
+
+La difusión va en los dos planes pensados para quienes construyen activamente:
+
+| Plan | Qué incluye | Frecuencia |
+|---|---|---|
+| **Pro** | **Mención:** la startup aparece en una nota colectiva de la revista (por ejemplo, «Startups que buscan equipo») y en las historias de Instagram. | 1 por semestre |
+| **Startup** | **Nota propia:** una entrevista o un perfil dedicado a la startup en la revista y una publicación en el feed de Instagram. | 1 por trimestre (4 por año) |
+
+Por qué en estos planes:
+
+- **Pro** es el plan de quien busca activamente: una mención suma visibilidad sin cargar al equipo editorial con una nota por cada cuenta.
+- **Startup** es el plan de los equipos que están creciendo: una nota propia cada trimestre justifica su precio y les da algo para mostrar a inversores, clientes y futuros integrantes.
+- **Free y Plus** ven la invitación y el beneficio aparece como motivo para mejorar el plan.
+
+Cómo funciona:
+
+1. Desde **Mis proyectos**, la startup elige un proyecto publicado, cuenta qué quiere comunicar y deja su vocero, su Instagram, su web y un contacto.
+2. El pedido llega a **Difusión** en el panel de administración, por orden de llegada.
+3. El equipo lo toma, arma la nota (el panel crea el borrador en la revista con los datos del pedido), la publica, sube el posteo a Instagram y guarda el enlace.
+4. La startup recibe un aviso con el enlace a la nota y al posteo.
+
+Si un pedido se rechaza (con motivo) o la startup lo cancela antes de que se tome, el cupo vuelve a estar disponible. Por transparencia con los lectores, estas notas llevan en la revista la marca **«Difusión»**.
+
+---
+
+# 28. Tabla de suscripciones
 
 | Función | Free | Plus | Pro | Startup |
 |---|---:|---:|---:|---:|
@@ -869,12 +899,13 @@ Todo Pro más:
 | Analytics | No | No | Sí | Sí |
 | Proyectos activos | 1 | 1 | 3 | 5 |
 | Visibilidad prioritaria | No | No | Sí | Sí |
+| Difusión en la Revista e Instagram | No | No | Mención (1 por semestre) | Nota propia + feed (1 por trimestre) |
 | Mensaje sin match | No | No | Limitado | Sí |
 | Perfil de equipo | No | No | No | Sí |
 
 ---
 
-# 28. Suscripciones anuales
+# 29. Suscripciones anuales
 
 También deberían existir planes anuales.
 
@@ -896,7 +927,7 @@ La diferencia debe comunicarse como ahorro respecto al pago mensual.
 
 ---
 
-# 29. Pantalla de suscripción
+# 30. Pantalla de suscripción
 
 La pantalla no debería parecer agresiva.
 
@@ -940,7 +971,7 @@ Botones:
 
 ---
 
-# 30. Cuándo mostrar el paywall
+# 31. Cuándo mostrar el paywall
 
 No debe aparecer apenas el usuario ingresa.
 
@@ -980,7 +1011,7 @@ Esto convierte mejor porque el usuario entiende inmediatamente qué valor está 
 
 ---
 
-# 31. Diseño general
+# 32. Diseño general
 
 La identidad debería ser ultra minimalista.
 
@@ -1019,7 +1050,7 @@ Ejemplos de estilo:
 
 ---
 
-# 32. Filosofía UX
+# 33. Filosofía UX
 
 Cada pantalla debe responder una sola pregunta.
 
@@ -1049,7 +1080,7 @@ Evitar dashboards llenos de información innecesaria.
 
 ---
 
-# 33. Navegación
+# 34. Navegación
 
 ## Desktop
 
@@ -1080,7 +1111,7 @@ La aplicación debe diseñarse principalmente pensando en mobile.
 
 ---
 
-# 34. MVP recomendado
+# 35. MVP recomendado
 
 La primera versión debería contener solamente lo necesario para probar si las personas realmente quieren utilizar el producto.
 
@@ -1122,7 +1153,7 @@ Primero hay que validar el comportamiento principal:
 
 ---
 
-# 35. Métricas importantes
+# 36. Métricas importantes
 
 Las métricas principales deberían ser:
 
@@ -1162,7 +1193,7 @@ La métrica más importante a largo plazo:
 
 ---
 
-# 36. Posicionamiento
+# 37. Posicionamiento
 
 KeFounder! no debería comunicarse como una bolsa de trabajo.
 
@@ -1182,7 +1213,7 @@ O:
 
 ---
 
-# 37. Diferencia frente a otras plataformas
+# 38. Diferencia frente a otras plataformas
 
 LinkedIn está orientado a redes profesionales.
 
@@ -1209,7 +1240,7 @@ El verdadero producto es el sistema de compatibilidad entre:
 
 ---
 
-# 38. Visión futura
+# 39. Visión futura
 
 Aunque inicialmente el negocio se base únicamente en suscripciones, la plataforma puede evolucionar hasta convertirse en una infraestructura de creación de equipos.
 
@@ -1233,7 +1264,7 @@ Sino como:
 
 ---
 
-# 39. Resumen del negocio
+# 40. Resumen del negocio
 
 ## Producto
 

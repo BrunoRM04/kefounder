@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BarChart3, BriefcaseBusiness, Check, Copy, Eye, Heart, Lock, MessageCircle, MoreHorizontal, Pause, Pencil, Plus, Share2, Trash2, Users } from 'lucide-react';
 import { PLANS } from '../../shared/catalog.js';
+import PressPanel from '../components/PressPanel.jsx';
 import { ConfirmSheet } from '../components/Sheets.jsx';
 import { Page, PageHeading, TopBar } from '../components/Shell.jsx';
 import { ActionMenu, Button, Cover, EmptyState, ErrorState, IconButton, Pill, ProjectLogo, Skeleton, cx } from '../components/ui.jsx';
@@ -137,6 +138,7 @@ export default function MyProjects() {
                 <button type="button" className="link-btn" onClick={() => navigate('/planes')}>Ver planes</button>
               </div>
             )}
+            <PressPanel />
             {items.length ? (
               <div className="owned-list">
                 {items.map((p) => <OwnedProject key={p.id} project={p} onChange={onChange} onDelete={setToDelete} />)}

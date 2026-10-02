@@ -5,7 +5,7 @@ import { openDb } from './db.js';
 import { ensureSampleArticles, removeSampleArticles } from './revista.js';
 import { DEMO_ACCOUNTS, DEMO_PASSWORD, PEOPLE, PROJECTS } from './seed-data.js';
 
-const TABLES = ['sessions', 'notifications', 'messages', 'matches', 'interests', 'saves', 'passes', 'views', 'blocks', 'reports', 'subscriptions', 'uploads', 'projects', 'users'];
+const TABLES = ['press_requests', 'sessions', 'notifications', 'messages', 'matches', 'interests', 'saves', 'passes', 'views', 'blocks', 'reports', 'subscriptions', 'uploads', 'projects', 'users'];
 
 const minutesAgo = (m) => new Date(Date.now() - m * 60000).toISOString();
 const hoursAgo = (h) => minutesAgo(h * 60);
@@ -330,6 +330,16 @@ export async function seed(db, { reset = false } = {}) {
   // Revista: las notas de ejemplo se rehacen con la demo; las propias nunca se tocan.
   if (reset) removeSampleArticles(db);
   ensureSampleArticles(db, { force: reset });
+
+  // Difusión: Martín (Pro) pidió una mención para Formo; queda pendiente en el panel.
+  const formo = db.get("SELECT id, name, website FROM projects WHERE owner_id = ? AND name = 'Formo'", [ids.martin]);
+  if (formo) {
+    const at = new Date(Date.now() - 26 * 3600000).toISOString();
+    db.run(
+      "INSERT INTO press_requests (user_id, project_id, project_name, kind, plan, status, pitch, spokesperson, spokesperson_role, instagram, website, created_at, updated_at) VALUES (?, ?, ?, 'mencion', 'pro', 'pending', ?, 'Martín López', 'Founder', '@formo.app', ?, ?, ?)",
+      [ids.martin, formo.id, formo.name, 'Formo completa solo los formularios de trámites de las pymes. Ya lo usan tres estudios contables y buscamos alguien de growth para llegar a más. Nos encantaría aparecer en una nota de startups que buscan equipo.', formo.website || '', at, at]
+    );
+  }
 
   return ids;
 }

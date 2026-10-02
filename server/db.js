@@ -343,6 +343,37 @@ const MIGRATIONS = [
       CREATE INDEX IF NOT EXISTS idx_article_daily_day ON article_daily(day);
       CREATE TABLE IF NOT EXISTS app_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
     `
+  },
+  {
+    // Difusión: pedidos de las startups (planes Pro y Startup) para salir en la Revista e Instagram.
+    id: '2026-10-03-difusion',
+    up: `
+      CREATE TABLE IF NOT EXISTS press_requests (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        project_id INTEGER REFERENCES projects(id) ON DELETE SET NULL,
+        project_name TEXT NOT NULL DEFAULT '',
+        kind TEXT NOT NULL,
+        plan TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending',
+        pitch TEXT NOT NULL,
+        spokesperson TEXT NOT NULL DEFAULT '',
+        spokesperson_role TEXT NOT NULL DEFAULT '',
+        instagram TEXT NOT NULL DEFAULT '',
+        website TEXT NOT NULL DEFAULT '',
+        contact TEXT NOT NULL DEFAULT '',
+        article_id INTEGER REFERENCES articles(id) ON DELETE SET NULL,
+        instagram_url TEXT NOT NULL DEFAULT '',
+        response TEXT NOT NULL DEFAULT '',
+        handled_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        published_at TEXT
+      );
+      CREATE INDEX IF NOT EXISTS idx_press_status ON press_requests(status, created_at);
+      CREATE INDEX IF NOT EXISTS idx_press_user ON press_requests(user_id, created_at);
+      ALTER TABLE articles ADD COLUMN promoted INTEGER NOT NULL DEFAULT 0;
+    `
   }
 ];
 

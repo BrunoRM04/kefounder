@@ -127,6 +127,7 @@ export default function ArticlePage({ slug }) {
           )}
 
           <Share article={a} />
+          {a.promoted && <p className="rv-promo-note"><span className="rv-promo">Difusión</span> Esta nota es parte de la difusión que KeFounder! incluye en sus planes Pro y Startup.</p>}
           {a.sample && config.demo && <p className="rv-sample-note">Nota de ejemplo con personas y proyectos ficticios de la demo de KeFounder!.</p>}
         </div>
         <aside className="rv-article-aside">

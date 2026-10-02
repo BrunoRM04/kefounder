@@ -42,6 +42,7 @@ export function Kicker({ article, withFormat = true }) {
     <span className="rv-kicker">
       <Link to={sectionHref(article.section)}>{article.sectionLabel}</Link>
       {withFormat && article.formatLabel && <em>{article.formatLabel}</em>}
+      {article.promoted && <span className="rv-promo" title="Nota incluida en un plan de difusión de KeFounder!">Difusión</span>}
     </span>
   );
 }

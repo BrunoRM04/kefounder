@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChartLine, ClipboardList, FolderKanban, LayoutDashboard, LogOut, Menu, Newspaper, ScrollText, Search, Server, ShieldAlert, Users, Wallet, X } from 'lucide-react';
+import { ChartLine, ClipboardList, FolderKanban, LayoutDashboard, LogOut, Megaphone, Menu, Newspaper, ScrollText, Search, Server, ShieldAlert, Users, Wallet, X } from 'lucide-react';
 import { Isotipo, Logotipo } from '../components/Brand.jsx';
 import { Avatar, IconButton, ProjectLogo, Spinner, cx } from '../components/ui.jsx';
 import { api } from '../lib/api.js';
@@ -21,6 +21,8 @@ const ReportDetail = lazy(() => import('./screens/ReportDetail.jsx'));
 const Tasks = lazy(() => import('./screens/Tasks.jsx'));
 const RevistaList = lazy(() => import('./screens/Revista.jsx'));
 const ArticleEditor = lazy(() => import('./screens/ArticleEditor.jsx'));
+const PressList = lazy(() => import('./screens/Press.jsx'));
+const PressDetail = lazy(() => import('./screens/PressDetail.jsx'));
 const Audit = lazy(() => import('./screens/Audit.jsx'));
 const System = lazy(() => import('./screens/System.jsx'));
 
@@ -39,6 +41,8 @@ const ROUTES = [
   { path: '/admin/revista', Screen: RevistaList, title: 'Revista' },
   { path: '/admin/revista/nueva', Screen: ArticleEditor, title: 'Nueva nota' },
   { path: '/admin/revista/:id', Screen: ArticleEditor, title: 'Nota', keyByPath: true },
+  { path: '/admin/difusion', Screen: PressList, title: 'Difusión' },
+  { path: '/admin/difusion/:id', Screen: PressDetail, title: 'Pedido de difusión' },
   { path: '/admin/auditoria', Screen: Audit, title: 'Auditoría' },
   { path: '/admin/sistema', Screen: System, title: 'Sistema' }
 ];
@@ -56,7 +60,8 @@ const NAV = [
     { to: '/admin/seguimiento', label: 'Seguimiento', icon: ClipboardList, badge: (b) => b.tasks }
   ] },
   { group: 'Contenido', items: [
-    { to: '/admin/revista', label: 'Revista', icon: Newspaper }
+    { to: '/admin/revista', label: 'Revista', icon: Newspaper },
+    { to: '/admin/difusion', label: 'Difusión', icon: Megaphone, badge: (b) => b.press || 0 }
   ] },
   { group: 'Control', items: [
     { to: '/admin/auditoria', label: 'Auditoría', icon: ScrollText },
@@ -198,7 +203,7 @@ function GlobalSearch() {
 
 export default function AdminApp() {
   const { path } = useRouter();
-  const [badges, setBadges] = useState({ reports: 0, identity: 0, tasks: 0 });
+  const [badges, setBadges] = useState({ reports: 0, identity: 0, tasks: 0, press: 0 });
   const [scope, setScope] = usePersisted('kefounder:admin:scope', 'real');
   const [drawer, setDrawer] = useState(false);
 

@@ -6,24 +6,24 @@ import { ActionMenu, Button, IconButton, ProjectLogo, TagInput, cx } from '../..
 import { api } from '../../lib/api.js';
 import { useApp } from '../../lib/app.jsx';
 import { imageSrc, uploadImage } from '../../lib/media.js';
-import { useRouter } from '../../lib/router.jsx';
+import { Link, useRouter } from '../../lib/router.jsx';
 import { ArticleBody } from '../../revista/ArticleBody.jsx';
 import { ActionSheet, Failed, FollowUp, Loading, PageHeader, Panel, Status, Tabs, ago, chartData, dateTime, num, useAdmin } from '../kit.jsx';
 
 const EMPTY = {
   title: '', dek: '', body: '', section: 'entrevistas', format: 'entrevista', slug: '', author: 'Redacción KeFounder!',
-  cover: '', coverCredit: '', person: { name: '', role: '', company: '', photo: '' }, projectId: null, project: null, tags: []
+  cover: '', coverCredit: '', person: { name: '', role: '', company: '', photo: '' }, projectId: null, project: null, tags: [], promoted: false
 };
 
 const fromArticle = (a) => ({
   title: a.title, dek: a.dek, body: a.body, section: a.section, format: a.format, slug: a.slug, author: a.author,
-  cover: a.cover, coverCredit: a.coverCredit, person: { ...EMPTY.person, ...a.person }, projectId: a.projectId, project: a.project, tags: a.tags
+  cover: a.cover, coverCredit: a.coverCredit, person: { ...EMPTY.person, ...a.person }, projectId: a.projectId, project: a.project, tags: a.tags, promoted: Boolean(a.promoted)
 });
 
 const payloadOf = (f) => ({
   title: f.title.trim(), dek: f.dek.trim(), body: f.body, section: f.section, format: f.format, slug: f.slug.trim(), author: f.author.trim(),
   cover: f.cover, coverCredit: f.coverCredit.trim(), person: { name: f.person.name.trim(), role: f.person.role.trim(), company: f.person.company.trim(), photo: f.person.photo },
-  projectId: f.projectId || null, tags: f.tags
+  projectId: f.projectId || null, tags: f.tags, promoted: Boolean(f.promoted)
 });
 
 // Fecha y hora local para <input type="datetime-local">.
@@ -351,6 +351,10 @@ export default function ArticleEditor({ params }) {
               </div>
               <label className="field"><span className="field-label">Firma</span>
                 <input className="input" value={form.author} maxLength={80} onChange={(e) => set('author')(e.target.value)} />
+              </label>
+              <label className="adm-check">
+                <input type="checkbox" checked={form.promoted} onChange={(e) => set('promoted')(e.target.checked)} />
+                <span><strong>Nota de difusión</strong><small>Es parte de un plan (Pro o Startup): en la revista se marca como «Difusión».{article?.press ? ' ' : ''}{article?.press && <Link to={`/admin/difusion/${article.press.id}`} className="adm-link">Ver pedido #{article.press.id}</Link>}</small></span>
               </label>
               <label className="field"><span className="field-label">Dirección <em>Opcional</em></span>
                 <span className="adm-slug"><span>/revista/</span><input value={form.slug} onChange={(e) => set('slug')(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-'))} placeholder={suggestedSlug || 'se-arma-con-el-titulo'} maxLength={80} aria-label="Dirección de la nota" /></span>

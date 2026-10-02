@@ -26,7 +26,8 @@ export function articleCard(a) {
     person: person(a),
     readingMinutes: a.reading_minutes,
     publishedAt: a.published_at,
-    featured: Boolean(a.featured)
+    featured: Boolean(a.featured),
+    promoted: Boolean(a.promoted)
   };
 }
 

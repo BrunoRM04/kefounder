@@ -125,30 +125,53 @@ export const PLANS = {
   free: {
     id: 'free', name: 'Free', monthly: 0, yearly: 0, tagline: 'Para descubrir KeFounder!',
     limits: { connectionsPerDay: 10, saves: 10, activeProjects: 1, directMessagesPerMonth: 0 },
-    features: { seeInterested: false, advancedFilters: false, history: false, analytics: false, priority: false, advancedCompat: false, candidatesPanel: false, teamProfile: false },
+    features: { seeInterested: false, advancedFilters: false, history: false, analytics: false, priority: false, advancedCompat: false, candidatesPanel: false, teamProfile: false, pressMention: false, pressFeature: false },
     benefits: ['Perfil y descubrimiento', '10 conexiones por día', 'Match y chat', 'Filtros básicos', 'Hasta 10 guardados', '1 proyecto activo']
   },
   plus: {
     id: 'plus', name: 'Plus', monthly: 4.99, yearly: 49, tagline: 'Para conectar sin límites.',
     limits: { connectionsPerDay: null, saves: null, activeProjects: 1, directMessagesPerMonth: 0 },
-    features: { seeInterested: true, advancedFilters: true, history: true, analytics: false, priority: false, advancedCompat: false, candidatesPanel: false, teamProfile: false },
+    features: { seeInterested: true, advancedFilters: true, history: true, analytics: false, priority: false, advancedCompat: false, candidatesPanel: false, teamProfile: false, pressMention: false, pressFeature: false },
     benefits: ['Conexiones ilimitadas', 'Ver quién está interesado en vos', 'Ver quién guardó tu perfil', 'Filtros avanzados', 'Guardados ilimitados', 'Historial de perfiles']
   },
   pro: {
     id: 'pro', name: 'Pro', monthly: 9.99, yearly: 99, tagline: 'Para buscar activamente.', recommended: true,
     limits: { connectionsPerDay: null, saves: null, activeProjects: 3, directMessagesPerMonth: 5 },
-    features: { seeInterested: true, advancedFilters: true, history: true, analytics: true, priority: true, advancedCompat: true, candidatesPanel: false, teamProfile: false },
-    benefits: ['Todo lo de Plus', 'Mayor visibilidad y recomendaciones prioritarias', 'Estadísticas de perfil y proyecto', 'Compatibilidad avanzada', '5 mensajes directos sin match por mes', 'Hasta 3 proyectos activos']
+    features: { seeInterested: true, advancedFilters: true, history: true, analytics: true, priority: true, advancedCompat: true, candidatesPanel: false, teamProfile: false, pressMention: true, pressFeature: false },
+    benefits: ['Todo lo de Plus', 'Mayor visibilidad y recomendaciones prioritarias', 'Estadísticas de perfil y proyecto', 'Compatibilidad avanzada', '5 mensajes directos sin match por mes', 'Hasta 3 proyectos activos', 'Tu startup mencionada en la Revista e Instagram (1 por semestre)']
   },
   startup: {
     id: 'startup', name: 'Startup', monthly: 19.99, yearly: 199, tagline: 'Para construir un equipo.',
     limits: { connectionsPerDay: null, saves: null, activeProjects: 5, directMessagesPerMonth: null },
-    features: { seeInterested: true, advancedFilters: true, history: true, analytics: true, priority: true, advancedCompat: true, candidatesPanel: true, teamProfile: true },
-    benefits: ['Todo lo de Pro', 'Hasta 5 proyectos o búsquedas activas', 'Perfil de equipo', 'Panel de candidatos', 'Mensajes sin match', 'Prioridad en resultados']
+    features: { seeInterested: true, advancedFilters: true, history: true, analytics: true, priority: true, advancedCompat: true, candidatesPanel: true, teamProfile: true, pressMention: true, pressFeature: true },
+    benefits: ['Todo lo de Pro', 'Nota propia en la Revista + publicación en nuestro Instagram (1 por trimestre)', 'Hasta 5 proyectos o búsquedas activas', 'Perfil de equipo', 'Panel de candidatos', 'Mensajes sin match', 'Prioridad en resultados']
   }
 };
 
 export const PLAN_ORDER = ['free', 'plus', 'pro', 'startup'];
+
+// Difusión: KeFounder! se encarga de mostrar la startup en la Revista y en su Instagram.
+// Pro: una mención en una nota colectiva y en las historias. Startup: una nota propia y una publicación en el feed.
+export const PRESS = {
+  pro: {
+    kind: 'mencion',
+    label: 'Mención',
+    title: 'Mención en la Revista e Instagram',
+    detail: 'Tu startup aparece en una nota colectiva de la Revista KeFounder! (como «Startups que buscan equipo») y en nuestras historias de Instagram.',
+    everyDays: 182,
+    period: 'semestre'
+  },
+  startup: {
+    kind: 'nota',
+    label: 'Nota propia',
+    title: 'Nota propia en la Revista + Instagram',
+    detail: 'Una entrevista o perfil de tu startup en la Revista KeFounder! y una publicación en el feed de nuestro Instagram.',
+    everyDays: 91,
+    period: 'trimestre'
+  }
+};
+export const PRESS_KINDS = { mencion: 'Mención', nota: 'Nota propia' };
+export const pressFor = (plan) => PRESS[plan] || null;
 
 export const PIPELINE = [
   { id: 'new', label: 'Nuevo' },
@@ -170,7 +193,8 @@ export const PAYWALL_COPY = {
   directMessages: { title: 'Mensajes sin match', message: 'Escribile a alguien sin esperar el match. Pro incluye 5 por mes; Startup, sin límite.' },
   projects: { title: 'Más proyectos activos', message: 'Pro permite hasta 3 proyectos activos y Startup hasta 5.' },
   candidatesPanel: { title: 'Panel de candidatos', message: 'Organizá a los interesados por etapa y gestioná tu búsqueda en equipo. Disponible con Startup.' },
-  teamProfile: { title: 'Perfil de equipo', message: 'Mostrá a todo el equipo en tus proyectos. Disponible con Startup.' }
+  teamProfile: { title: 'Perfil de equipo', message: 'Mostrá a todo el equipo en tus proyectos. Disponible con Startup.' },
+  pressMention: { title: 'Difusión en la Revista e Instagram', message: 'Con Pro tu startup aparece en las notas de la Revista KeFounder! y en nuestras historias de Instagram. Con Startup, una nota propia y una publicación en el feed cada trimestre.' }
 };
 
 export const labelOf = (list, id, key = 'label') => {

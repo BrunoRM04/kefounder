@@ -119,6 +119,21 @@ export function serializeNotification(db, viewer, row) {
       body = data.reason ? `No aparece en Descubrir. Motivo: ${data.reason}` : 'No aparece en Descubrir mientras lo revisamos.';
       link = '/proyectos';
       break;
+    case 'press_in_progress':
+      title = `Estamos preparando la difusión de ${data.project || 'tu startup'}`;
+      body = data.kind === 'nota' ? 'El equipo de KeFounder! ya está escribiendo tu nota para la Revista y el Instagram.' : 'El equipo de KeFounder! ya está preparando tu mención en la Revista y en Instagram.';
+      link = '/proyectos';
+      break;
+    case 'press_published':
+      title = `¡${data.project || 'Tu startup'} salió en la Revista KeFounder!!`;
+      body = data.slug ? 'Mirá la nota y compartila. También está en nuestro Instagram.' : 'Ya está publicada en nuestro Instagram.';
+      link = data.slug ? `/revista/${data.slug}` : '/proyectos';
+      break;
+    case 'press_rejected':
+      title = `No pudimos publicar la difusión de ${data.project || 'tu startup'}`;
+      body = data.reason ? `Motivo: ${data.reason}. Tu cupo sigue disponible.` : 'Tu cupo sigue disponible: podés volver a pedirla.';
+      link = '/proyectos';
+      break;
     case 'project_restored':
       title = project ? `${project.name} vuelve a estar visible` : 'Tu proyecto vuelve a estar visible';
       body = 'Ya aparece de nuevo en Descubrir.';

@@ -29,7 +29,7 @@ export default function Revista() {
         <ArticleThumb src={a.cover} />
         <span className="adm-cell-copy">
           <strong>{a.title}</strong>
-          <small>{[a.person, a.sectionLabel].filter(Boolean).join(' · ')}{a.sample ? ' · Ejemplo' : ''}</small>
+          <small>{[a.person, a.sectionLabel].filter(Boolean).join(' · ')}{a.promoted ? ' · Difusión' : ''}{a.sample ? ' · Ejemplo' : ''}</small>
         </span>
       </Link>
     ) },

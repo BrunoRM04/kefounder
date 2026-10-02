@@ -76,6 +76,7 @@ El negocio es **freemium con suscripciones**: hay un plan gratuito y tres pagos.
 | Filtros avanzados e historial | No | Sí | Sí | Sí |
 | Estadísticas y compatibilidad avanzada | No | No | Sí | Sí |
 | Visibilidad prioritaria | No | No | Sí | Sí |
+| Difusión en la Revista e Instagram | No | No | Mención, 1 por semestre | Nota propia + feed, 1 por trimestre |
 | Mensajes sin match | No | No | 5 por mes | Ilimitados |
 | Proyectos activos | 1 | 1 | 3 | 5 |
 | Panel de candidatos y perfil de equipo | No | No | No | Sí |
@@ -88,6 +89,13 @@ Cada plan apunta a un tipo de uso distinto:
 - **Startup:** para armar un equipo.
 
 El aviso de mejorar el plan (*paywall*) aparece solo cuando hay intención: al llegar a un límite o al tocar una función paga.
+
+**Difusión:** KeFounder! se encarga de dar a conocer a las startups en su Revista y en su Instagram.
+
+- **Pro:** una mención de la startup en una nota colectiva y en las historias, 1 por semestre.
+- **Startup:** una nota propia (entrevista o perfil) y una publicación en el feed, 1 por trimestre.
+
+La startup la pide desde «Mis proyectos» y el equipo la gestiona desde el panel. En la revista, esas notas llevan la marca «Difusión».
 
 **Estado actual:** el cobro es de demostración y no cobra de verdad. Para producción se conecta Stripe o Mercado Pago. Los correos tampoco se envían todavía: en modo demo, el código de verificación se muestra en pantalla.
 

@@ -375,7 +375,18 @@ Las notas se escriben y publican desde el panel de administración (Contenido �
 
 En modo demo hay diez notas de ejemplo sobre las personas y los proyectos ficticios de la demostración, marcadas como ejemplo; se pueden quitar todas juntas desde el panel.
 
-### 4.19. Panel de administración
+### 4.19. Difusión en la Revista e Instagram
+
+Los planes Pro y Startup incluyen difusión: KeFounder! publica a la startup en su revista y en su Instagram.
+
+- **Pro:** una mención en una nota colectiva y en las historias, una vez por semestre.
+- **Startup:** una nota propia (entrevista o perfil) y una publicación en el feed, una vez por trimestre.
+
+La startup la pide desde «Mis proyectos». Elige uno de sus proyectos publicados y cuenta qué quiere comunicar, quién habla, su Instagram, su web y un contacto. Ahí mismo sigue cada pedido: pendiente, en preparación, publicado (con los enlaces a la nota y al posteo) o rechazado (con el motivo).
+
+Si un pedido se rechaza o se cancela antes de que se tome, el cupo vuelve. El equipo gestiona los pedidos desde la sección Difusión del panel de administración, que puede crear el borrador de la nota con los datos del pedido. En la revista, esas notas llevan la marca «Difusión».
+
+### 4.20. Panel de administración
 
 El panel vive en `/admin` y solo lo ve la cuenta de administración, que entra por la pantalla de ingreso normal y va directo ahí. Esa cuenta no tiene perfil público: no aparece en Descubrir ni puede recibir conexiones.
 
@@ -383,7 +394,7 @@ Tiene su propio menú lateral, agrupado en tres partes:
 
 - **Panorama**: Resumen (indicadores, tendencia, pendientes, activación, planes y últimos registros), Métricas (siete métricas diarias en 7, 30 o 90 días, embudo de activación y distribuciones) e Ingresos (MRR, ARR, ticket promedio, altas y bajas, ingreso por plan y movimientos).
 - **Gestión**: Usuarios (lista y ficha completa con acciones), Proyectos (lista, ficha y moderación), Moderación (reportes y verificación de identidad) y Seguimiento (tareas con vencimiento y notas internas).
-- **Contenido**: Revista (notas, entrevistas y noticias, con editor, programación y lecturas).
+- **Contenido**: Revista (notas, entrevistas y noticias, con editor, programación y lecturas) y Difusión (pedidos de las startups para salir en la revista e Instagram).
 - **Control**: Auditoría (registro de todas las acciones del panel) y Sistema (estado de la base, copias de seguridad, integridad y mantenimiento).
 
 Las listas se filtran, ordenan y paginan en el servidor; los filtros quedan en la dirección para poder guardarlos o compartirlos. Las métricas separan las cuentas reales de las de demostración. Cada acción que cambia algo pide un motivo cuando corresponde y queda en la auditoría. Las cuentas de administración se crean y administran desde la consola (`npm run admin`), y su contraseña nunca se guarda en archivos.
@@ -755,11 +766,11 @@ Para desactivar las funciones demo se utilizan valores `0`. Ocultar accesos o ap
 
 ## 12. Validaciones realizadas
 
-Con el panel de administración y la revista se completaron:
+Con el panel de administración, la revista y la difusión se completaron:
 
 - Compilación del frontend con Vite.
-- **80 pruebas automáticas**, sin fallos: 43 de la API (incluida una matriz que recorre cada función de cada plan con las cuatro cuentas de ejemplo), 24 del panel (permisos, suspensión, moderación, reportes, identidad, planes de cortesía, tareas, auditoría, exportación CSV, copias de seguridad y conservación de cuentas reales al reiniciar la demo) y 13 de la revista (lectura sin cuenta, borradores, publicación y programación, portada, imágenes, formato seguro, lecturas, datos para compartir y notas de ejemplo).
-- **21 pasos de prueba en navegador**, sin fallos: 14 de la app, 5 del panel (creación de la cuenta por consola, resumen, plan de cortesía con motivo, tareas y búsqueda global, menú en celular) y 2 de la revista (entrar sin cuenta desde la bienvenida y leer una nota en el celular; escribir y publicar una nota desde el panel).
+- **88 pruebas automáticas**, sin fallos: 43 de la API (incluida una matriz que recorre cada función de cada plan con las cuatro cuentas de ejemplo), 24 del panel (permisos, suspensión, moderación, reportes, identidad, planes de cortesía, tareas, auditoría, exportación CSV, copias de seguridad y conservación de cuentas reales al reiniciar la demo) y 13 de la revista (lectura sin cuenta, borradores, publicación y programación, portada, imágenes, formato seguro, lecturas, datos para compartir y notas de ejemplo) y 8 de la difusión (beneficio por plan, cupos, pedido, cancelación, borrador, publicación, rechazo y avisos).
+- **22 pasos de prueba en navegador**, sin fallos: 14 de la app, 5 del panel (creación de la cuenta por consola, resumen, plan de cortesía con motivo, tareas y búsqueda global, menú en celular) y 2 de la revista (entrar sin cuenta desde la bienvenida y leer una nota en el celular; escribir y publicar una nota desde el panel) y 1 de la difusión (pedirla desde Mis proyectos en el celular y tomarla desde el panel).
 - Capturas del panel en 320, 375, 390, 820, 1024, 1280, 1366, 1536 y 1920 px de ancho.
 - Capturas y revisión de desbordes horizontales en tamaños de celular y escritorio.
 - Comprobación de respuesta del frontend y backend mediante la dirección local de red.

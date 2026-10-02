@@ -88,6 +88,7 @@ export default function revistaAdminRoutes(router, ctx) {
       }
     }
     if (has('tags')) cols.tags = JSON.stringify(strList(body.tags, { max: 6, itemMax: 30 }));
+    if (has('promoted')) cols.promoted = body.promoted ? 1 : 0;
     return cols;
   }
 
@@ -108,6 +109,7 @@ export default function revistaAdminRoutes(router, ctx) {
     format: a.format,
     state: stateOf(a, at),
     featured: Boolean(a.featured),
+    promoted: Boolean(a.promoted),
     sample: Boolean(a.is_sample),
     person: a.person_name || '',
     author: a.author,
@@ -140,6 +142,8 @@ export default function revistaAdminRoutes(router, ctx) {
         tags: parseJson(a.tags, []),
         state: stateOf(a, at),
         featured: Boolean(a.featured),
+        promoted: Boolean(a.promoted),
+        press: db.get('SELECT id, status FROM press_requests WHERE article_id = ? ORDER BY id DESC LIMIT 1', [a.id]) || null,
         sample: Boolean(a.is_sample),
         readingMinutes: a.reading_minutes,
         views: a.views,

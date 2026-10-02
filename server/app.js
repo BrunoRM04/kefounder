@@ -11,6 +11,7 @@ import matchRoutes from './routes/matches.js';
 import notificationRoutes from './routes/notifications.js';
 import peopleRoutes from './routes/people.js';
 import profileRoutes from './routes/profile.js';
+import pressRoutes from './routes/press.js';
 import projectRoutes from './routes/projects.js';
 import revistaRoutes from './routes/revista.js';
 import uploadRoutes, { isInlineImage } from './routes/uploads.js';
@@ -77,7 +78,7 @@ export function createApp(ctx, { serveDist = false } = {}) {
   api.use(sessionMiddleware(db));
   api.use((_req, res, next) => { res.setHeader('Cache-Control', 'no-store'); next(); });
 
-  for (const register of [authRoutes, profileRoutes, discoverRoutes, peopleRoutes, projectRoutes, interestRoutes, matchRoutes, notificationRoutes, billingRoutes, uploadRoutes, revistaRoutes, adminRoutes]) {
+  for (const register of [authRoutes, profileRoutes, discoverRoutes, peopleRoutes, projectRoutes, interestRoutes, matchRoutes, notificationRoutes, billingRoutes, uploadRoutes, revistaRoutes, pressRoutes, adminRoutes]) {
     register(api, ctx);
   }
   api.use((_req, _res, next) => next(new HttpError(404, 'Ruta no encontrada.')));

@@ -122,6 +122,20 @@ Las notas se escriben desde el panel, en **Contenido → Revista**:
 
 En modo demo la revista arranca con **10 notas de ejemplo** sobre los founders y proyectos ficticios de la demo (marcadas «Ejemplo» en el panel y con una aclaración al pie). Se quitan todas juntas con «Quitar notas de ejemplo» y no vuelven a aparecer; `npm run seed` las rehace junto con la demo sin tocar las notas propias.
 
+## Difusión en la Revista e Instagram
+
+KeFounder! se encarga de dar a conocer a las startups: las publica en la revista y en su Instagram. Viene incluido en dos planes:
+
+| Plan | Qué incluye | Cada cuánto |
+|---|---|---|
+| **Pro** | Mención en una nota colectiva de la revista y en las historias de Instagram | 1 por semestre |
+| **Startup** | Nota propia (entrevista o perfil) en la revista y publicación en el feed de Instagram | 1 por trimestre |
+
+- **Pedido:** la startup lo hace desde **Mis proyectos** (tarjeta «Difusión en la Revista e Instagram»). Elige el proyecto y cuenta qué quiere comunicar, quién habla, su Instagram, su web y un contacto. Ahí mismo ve el estado de cada pedido y el enlace a la nota y al posteo cuando salen.
+- **Cupo:** si un pedido se rechaza o la startup lo cancela mientras está pendiente, el cupo vuelve.
+- **Free y Plus:** ven la invitación y el aviso de mejorar el plan.
+- **Gestión:** el equipo trabaja los pedidos en **Panel → Contenido → Difusión**. Las notas que salen de un plan se marcan en la revista como «Difusión», para que los lectores lo sepan.
+
 ## Panel de administración
 
 Se entra por `/ingresar` con una cuenta de administración y se va directo a **`/admin`**. Esa cuenta usa solo el panel: no tiene perfil público, no aparece en Descubrir y no puede recibir conexiones.
@@ -135,6 +149,7 @@ Se entra por `/ingresar` con una cuenta de administración y se va directo a **`
 | **Proyectos** | Lista y ficha con rendimiento; ocultar o volver a mostrar con motivo (el founder recibe el aviso). |
 | **Moderación** | Cola de reportes por orden de llegada, con los últimos mensajes cuando se reporta una conversación, y verificación de identidad con la foto del documento (aprobar o rechazar con motivo). |
 | **Seguimiento** | Tareas con vencimiento y prioridad, vinculadas a cuentas, proyectos, reportes o notas de la revista, y notas internas en cada ficha. |
+| **Difusión** | Pedidos de las startups (Pro y Startup) para salir en la revista e Instagram: tomar, crear el borrador de la nota con los datos del pedido, vincular el posteo de Instagram, publicar o rechazar con motivo. La startup recibe un aviso en cada paso. |
 | **Revista** | Notas, entrevistas y noticias públicas: borradores, publicación programada, portada, lecturas y vista previa (ver «Revista KeFounder!» arriba). |
 | **Auditoría** | Registro de cada acción hecha desde el panel (quién, cuándo, sobre qué y el motivo). No se edita ni se borra. |
 | **Sistema** | Tamaño y filas de la base, versión del esquema, sesiones, archivos, copia de seguridad con un clic, chequeo de integridad y mantenimiento. |
@@ -226,8 +241,8 @@ Colores: petróleo `#345F63`, terracota `#C47F6A`, crema `#F1EDE4`, tinta `#252A
 ## Pruebas
 
 ```bash
-npm test           # 80 pruebas: API (reglas de negocio, planes, permisos, tiempo real, uploads, marca), panel de administración y revista
-npm run build && npm run test:e2e   # recorrido completo en Chrome (app, panel y revista) con un servidor y base temporales
+npm test           # 88 pruebas: API (reglas de negocio, planes, permisos, tiempo real, uploads, marca), panel de administración, revista y difusión
+npm run build && npm run test:e2e   # recorrido completo en Chrome (app, panel, revista y difusión) con un servidor y base temporales
 node tests/shots.mjs --out capturas --routes /,/matches --sizes small,mobile,hd,win,fhd --metrics 1   # capturas, desbordes y scroll/ancho usado por pantalla
 ```
 

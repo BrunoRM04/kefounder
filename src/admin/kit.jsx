@@ -238,7 +238,8 @@ const TONES = {
   priority: { high: ['warm', 'Alta'], normal: ['default', 'Normal'], low: ['muted', 'Baja'] },
   task: { todo: ['default', 'Por hacer'], doing: ['gold', 'En curso'], done: ['accent', 'Hecha'] },
   subscription: { active: ['accent', 'Activa'], replaced: ['muted', 'Reemplazada'], canceled: ['warm', 'Cancelada'] },
-  article: { published: ['accent', 'Publicada'], scheduled: ['gold', 'Programada'], draft: ['muted', 'Borrador'] }
+  article: { published: ['accent', 'Publicada'], scheduled: ['gold', 'Programada'], draft: ['muted', 'Borrador'] },
+  press: { pending: ['warm', 'Pendiente'], in_progress: ['gold', 'En preparación'], published: ['accent', 'Publicada'], rejected: ['muted', 'Rechazada'], canceled: ['muted', 'Cancelada'] }
 };
 export const toneLabel = (kind, value) => TONES[kind]?.[value]?.[1] || value;
 export const optionsOf = (kind) => Object.entries(TONES[kind]).map(([id, [, label]]) => ({ id, label }));
@@ -483,11 +484,17 @@ export const ACTIONS = {
   'article.feature': 'Puso una nota en la portada',
   'article.unfeature': 'Sacó una nota de la portada',
   'article.delete': 'Eliminó una nota',
-  'article.samples_delete': 'Quitó las notas de ejemplo'
+  'article.samples_delete': 'Quitó las notas de ejemplo',
+  'press.take': 'Tomó un pedido de difusión',
+  'press.draft': 'Creó el borrador de una difusión',
+  'press.publish': 'Publicó una difusión',
+  'press.reject': 'Rechazó un pedido de difusión',
+  'press.reopen': 'Reabrió un pedido de difusión',
+  'press.update': 'Editó un pedido de difusión'
 };
 export const actionLabel = (action) => ACTIONS[action] || action;
 
-const TARGET_PATHS = { user: '/admin/usuarios/', project: '/admin/proyectos/', report: '/admin/moderacion/reportes/', article: '/admin/revista/' };
+const TARGET_PATHS = { user: '/admin/usuarios/', project: '/admin/proyectos/', report: '/admin/moderacion/reportes/', article: '/admin/revista/', press: '/admin/difusion/' };
 export const targetLink = (type, id) => (TARGET_PATHS[type] ? `${TARGET_PATHS[type]}${id}` : null);
 
 export function AuditList({ items, showTarget = false, empty = 'Todavía no hay acciones registradas.' }) {

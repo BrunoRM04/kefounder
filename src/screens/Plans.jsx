@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Check, Gem, Minus } from 'lucide-react';
-import { PLANS, PLAN_ORDER, planRank } from '../../shared/catalog.js';
+import { PLANS, PLAN_ORDER, PRESS, planRank } from '../../shared/catalog.js';
 import { CheckoutSheet } from '../components/Overlays.jsx';
 import { ConfirmSheet } from '../components/Sheets.jsx';
 import { Page, TopBar } from '../components/Shell.jsx';
@@ -25,6 +25,7 @@ const COMPARE = [
   ['Estadísticas de perfil y proyecto', ...feature('analytics')],
   ['Compatibilidad avanzada', ...feature('advancedCompat')],
   ['Visibilidad prioritaria', ...PLAN_ORDER.map((id) => ({ pro: 'Alta', startup: 'Máxima' })[id] || false)],
+  ['Difusión en la Revista e Instagram', ...PLAN_ORDER.map((id) => (PRESS[id] ? `${PRESS[id].label}, 1 por ${PRESS[id].period}` : false))],
   ['Mensajes sin match', ...limit('directMessagesPerMonth', (v) => (v === null ? 'Ilimitados' : v ? `${v} por mes` : false))],
   ['Proyectos activos', ...limit('activeProjects', count('Ilimitados'))],
   ['Candidatos de tus proyectos', ...feature('seeInterested')],

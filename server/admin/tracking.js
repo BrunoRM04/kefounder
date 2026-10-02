@@ -11,7 +11,7 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 // Nombre legible del elemento vinculado (en lote, sin una consulta por fila).
 function targetLabels(db, rows) {
-  const ids = { user: new Set(), project: new Set(), report: new Set(), article: new Set() };
+  const ids = { user: new Set(), project: new Set(), report: new Set(), article: new Set(), press: new Set() };
   for (const r of rows) if (r.target_type && ids[r.target_type]) ids[r.target_type].add(r.target_id);
   const labels = new Map();
   const load = (type, sql, label) => {
@@ -23,6 +23,7 @@ function targetLabels(db, rows) {
   load('project', 'SELECT id, name FROM projects WHERE id IN (?)', (r) => r.name);
   load('report', 'SELECT id, reason FROM reports WHERE id IN (?)', (r) => `Reporte #${r.id} · ${r.reason}`);
   load('article', 'SELECT id, title FROM articles WHERE id IN (?)', (r) => `Nota: ${r.title}`);
+  load('press', 'SELECT id, project_name FROM press_requests WHERE id IN (?)', (r) => `Difusión: ${r.project_name || `#${r.id}`}`);
   return (type, id) => (type ? { type, id, label: labels.get(`${type}:${id}`) || null } : null);
 }
 
@@ -69,7 +70,7 @@ function targetOf(db, body) {
   const type = oneOfOr(body?.targetType, TARGET_TYPES);
   if (!type) return { type: null, id: null };
   const id = idParam(body.targetId);
-  const table = { user: 'users', project: 'projects', report: 'reports', article: 'articles' }[type];
+  const table = { user: 'users', project: 'projects', report: 'reports', article: 'articles', press: 'press_requests' }[type];
   if (!db.get(`SELECT 1 FROM ${table} WHERE id = ?`, [id])) throw notFound('No encontramos el elemento vinculado.');
   return { type, id };
 }
@@ -194,7 +195,7 @@ export default function trackingRoutes(router, ctx) {
   // ---------- Auditoría ----------
   router.get('/admin/audit', (req, res) => {
     const where = conditions();
-    const area = oneOfOr(req.query.area, ['user', 'identity', 'project', 'report', 'article', 'task', 'note', 'system']);
+    const area = oneOfOr(req.query.area, ['user', 'identity', 'project', 'report', 'article', 'press', 'task', 'note', 'system']);
     if (area) where.add("a.action LIKE :area ESCAPE '\\'", { area: `${area}.%` });
     const type = oneOfOr(req.query.targetType, TARGET_TYPES);
     if (type) {

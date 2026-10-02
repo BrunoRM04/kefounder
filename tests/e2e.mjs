@@ -430,6 +430,31 @@ try {
     await reader.close();
   });
 
+  // ---------- Difusión (planes Pro y Startup) ----------
+  await step('difusión: una startup la pide desde Mis proyectos y el panel la recibe', async () => {
+    const rodrigo = await loginContext(browser, 'rodrigo@kefounder.demo');
+    await rodrigo.page.goto(`${BASE}/proyectos`);
+    await rodrigo.page.locator('.press-card').getByRole('button', { name: 'Pedir difusión' }).click();
+    const sheet = rodrigo.page.getByRole('dialog', { name: 'Pedir difusión' });
+    await sheet.getByLabel('¿Qué querés contar?').fill('Brote ayuda a los productores a regar solo lo necesario. Queremos contar cómo armamos el equipo de datos.');
+    await sheet.getByLabel('Instagram de la startup').fill('@brote.agro');
+    await sheet.getByRole('button', { name: 'Enviar pedido' }).click();
+    await rodrigo.page.locator('.press-list .pill', { hasText: 'Pendiente' }).first().waitFor();
+    const wide = await rodrigo.page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
+    expect(!wide, 'Mis proyectos desborda en el celular');
+    await rodrigo.page.screenshot({ path: path.join(OUT, '15-difusion-mobile.png') });
+    await rodrigo.context.close();
+
+    const { context, page } = await adminLogin({ width: 1366, height: 768 });
+    await page.locator('.adm-nav').getByRole('link', { name: /Difusión/ }).click();
+    await page.locator('.adm-table tbody tr', { hasText: 'Brote' }).first().click();
+    await page.waitForURL(/\/admin\/difusion\/\d+/);
+    await page.getByRole('button', { name: 'Tomar' }).click();
+    await page.locator('.adm-entity-pills .adm-status', { hasText: 'En preparación' }).waitFor();
+    await page.screenshot({ path: path.join(OUT, '16-admin-difusion.png') });
+    await context.close();
+  });
+
   await browser.close();
 } catch (error) {
   console.error(error);
