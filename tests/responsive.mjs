@@ -124,6 +124,7 @@ const USER_ROUTES = [
   { path: '/chat/:match', name: '/chat/:match · adjuntar', click: { name: 'Adjuntar o compartir' }, when: (vp) => vp.width < 760 },
   { path: '/u/:person', name: '/u/:person · más opciones', click: { name: 'Más opciones' } },
   { path: '/planes', name: '/planes · checkout', click: { name: /^(Elegir|Cambiar a) Plus$/ } },
+  { path: '/configuracion', name: '/configuracion · cambiar contraseña', click: { name: 'Cambiar contraseña' } },
   { path: '/interesados', name: '/interesados · paywall', click: { name: 'Ver quiénes son con Plus' }, accounts: ['sol'] }
 ];
 
@@ -173,6 +174,7 @@ const CHECKS = {
   text: 'Texto que se sale de su caja o queda cortado',
   errors: 'Errores de JS, consola o API',
   action: 'No se pudo abrir la hoja o el menú',
+  modal: 'Modal fuera de pantalla o que no se puede cerrar',
   tap: 'Botones chicos para el dedo (< 28 px) — aviso',
   select: 'Selectores donde la opción elegida no entra entera — aviso'
 };
@@ -710,6 +712,25 @@ async function runJob(browser, { vp, group, account, routes, cookie, ids }) {
       T.push(Date.now());
       const bottom = await page.evaluate((o) => window.__kfCheck.bottom(o), { vw: vp.width, vh: vp.height });
       T.push(Date.now());
+      if (spec.click && await page.locator('.sheet').count()) {
+        const bounds = await page.locator('.sheet').evaluate((element) => {
+          const rect = element.getBoundingClientRect();
+          const close = element.querySelector('.sheet-close')?.getBoundingClientRect();
+          return { x: rect.x, y: rect.y, width: rect.width, height: rect.height, closeVisible: Boolean(close && close.width >= 28 && close.height >= 28 && close.top >= 0 && close.bottom <= innerHeight) };
+        });
+        if (Math.abs(bounds.x) > 2 || Math.abs(bounds.y) > 2 || Math.abs(bounds.width - vp.width) > 2 || Math.abs(bounds.height - vp.height) > 2 || !bounds.closeVisible) {
+          add('modal', [{ key: 'pantalla completa', msg: `modal ${Math.round(bounds.width)}×${Math.round(bounds.height)} en ${vp.name}; cierre visible: ${bounds.closeVisible}` }]);
+        }
+        await page.locator('.sheet-close').click();
+        await page.locator('.sheet').waitFor({ state: 'hidden', timeout: 3000 }).catch(() => add('modal', [{ key: 'cerrar', msg: 'el botón Cerrar no cierra el modal' }]));
+        if (!await page.locator('.sheet').count()) {
+          const { role = 'button', name } = spec.click;
+          await page.getByRole(role, { name, exact: typeof name === 'string' }).first().click();
+          await page.locator('.sheet').waitFor({ state: 'visible', timeout: 3000 });
+          await page.keyboard.press('Escape');
+          await page.locator('.sheet').waitFor({ state: 'hidden', timeout: 3000 }).catch(() => add('modal', [{ key: 'escape', msg: 'Escape no cierra el modal' }]));
+        }
+      }
       if (args.debug) console.log(`${vp.name} ${account} ${spec.name}: ${T.slice(1).map((t, i) => t - T[i]).join(' / ')} ms`);
       add('reach', bottom.reach);
       if (wantsShot(vp) && vp.touch && await page.evaluate(() => window.__kfCheck.scrollable())) await shot(page, vp, account, spec.name, 'bottom');

@@ -228,30 +228,49 @@ export function TagInput({ label, hint, value = [], onChange, suggestions = [], 
 
 export function Sheet({ open, onClose, title, subtitle, children, footer, size = 'md', className, hideClose }) {
   const panel = useRef(null);
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
   useLockBody(open);
   useEffect(() => {
     if (!open) return undefined;
-    const onKey = (e) => { if (e.key === 'Escape') onClose?.(); };
+    const previousFocus = document.activeElement;
+    const onKey = (e) => {
+      if (document.querySelector('.celebration')) return;
+      if (e.key === 'Escape') { e.preventDefault(); closeRef.current?.(); return; }
+      if (e.key !== 'Tab' || !panel.current) return;
+      const focusable = [...panel.current.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')]
+        .filter((element) => element.getClientRects().length > 0);
+      if (!focusable.length) { e.preventDefault(); panel.current.focus(); return; }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && (document.activeElement === first || !panel.current.contains(document.activeElement))) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && (document.activeElement === last || !panel.current.contains(document.activeElement))) { e.preventDefault(); first.focus(); }
+    };
     window.addEventListener('keydown', onKey);
-    const t = window.setTimeout(() => panel.current?.querySelector('[data-autofocus]')?.focus(), 60);
-    return () => { window.removeEventListener('keydown', onKey); window.clearTimeout(t); };
-  }, [open, onClose]);
+    const t = window.setTimeout(() => (panel.current?.querySelector('[data-autofocus]') || panel.current?.querySelector('.sheet-close') || panel.current)?.focus(), 60);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.clearTimeout(t);
+      if (previousFocus?.isConnected) previousFocus.focus();
+    };
+  }, [open]);
   if (!open) return null;
   return createPortal(
     <div className="sheet-layer" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose?.(); }}>
-      <div className={cx('sheet', `sheet-${size}`, className)} role="dialog" aria-modal="true" aria-label={title} ref={panel}>
-        <div className="sheet-grip" aria-hidden="true" />
+      <div className={cx('sheet', `sheet-${size}`, className)} role="dialog" aria-modal="true" aria-label={title || 'Ventana'} tabIndex={-1} ref={panel}>
         {(title || !hideClose) && (
           <header className="sheet-head">
-            <div>
-              {title && <h2>{title}</h2>}
-              {subtitle && <p>{subtitle}</p>}
+            <div className="sheet-head-inner">
+              <div>
+                {title && <h2>{title}</h2>}
+                {subtitle && <p>{subtitle}</p>}
+              </div>
+              {!hideClose && <IconButton label="Cerrar" className="sheet-close" onClick={onClose}><X size={20} /></IconButton>}
             </div>
-            {!hideClose && <IconButton label="Cerrar" className="sheet-close" onClick={onClose}><X size={18} /></IconButton>}
           </header>
         )}
-        <div className="sheet-body">{children}</div>
-        {footer && <footer className="sheet-foot">{footer}</footer>}
+        <div className="sheet-body"><div className="sheet-body-inner">{children}</div></div>
+        {footer && <footer className="sheet-foot"><div className="sheet-foot-inner">{footer}</div></footer>}
       </div>
     </div>,
     document.body

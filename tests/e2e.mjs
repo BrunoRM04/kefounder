@@ -88,6 +88,20 @@ try {
   const p = await ctxNew.newPage();
   mainPage = p;
   watch(p, 'nuevo');
+  const dismissCelebration = async () => {
+    if (await p.locator('.celebration').count()) {
+      await p.locator('.celebration').getByRole('button', { name: 'Cerrar' }).click();
+      await p.locator('.celebration').waitFor({ state: 'hidden' });
+    }
+  };
+  const clickPastCelebration = async (locator, options = {}) => {
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+      await dismissCelebration();
+      try { await locator.click({ ...options, timeout: 3000 }); return; }
+      catch (error) { if (!await p.locator('.celebration').count()) throw error; }
+    }
+    throw new Error('Un match inesperado impidió completar la acción');
+  };
 
   await step('bienvenida → registro → onboarding completo', async () => {
     await p.goto(BASE);
@@ -167,21 +181,22 @@ try {
   });
 
   await step('filtro avanzado muestra el paywall de Plus y el checkout activa el plan', async () => {
-    await p.getByRole('button', { name: 'Filtros y orden' }).click();
-    await p.locator('.filter-advanced-body').click({ position: { x: 20, y: 20 } });
+    await clickPastCelebration(p.getByRole('button', { name: 'Filtros y orden' }));
+    await clickPastCelebration(p.locator('.filter-advanced-body'), { position: { x: 20, y: 20 } });
     await p.locator('.paywall h2', { hasText: 'Filtros avanzados' }).waitFor();
-    await p.getByRole('button', { name: 'Elegir Plus' }).click();
-    await p.getByRole('button', { name: 'Confirmar Plus' }).click();
+    await clickPastCelebration(p.getByRole('button', { name: 'Elegir Plus' }));
+    await clickPastCelebration(p.getByRole('button', { name: 'Confirmar Plus' }));
     await p.locator('.checkout-done').waitFor();
-    await p.getByRole('button', { name: 'Empezar a usarlo' }).click();
-    await p.keyboard.press('Escape');
+    await clickPastCelebration(p.getByRole('button', { name: 'Empezar a usarlo' }));
+    await dismissCelebration();
+    if (await p.locator('.sheet').count()) await clickPastCelebration(p.locator('.sheet-close'));
     const plan = await p.evaluate(async () => (await (await fetch('/api/auth/me')).json()).user.plan);
     expect(plan === 'plus', `el plan quedó en ${plan}`);
   });
 
   await step('conectar con un proyecto: el founder de demo acepta y escribe (tiempo real)', async () => {
-    await p.keyboard.press('Escape');
-    await p.getByRole('tab', { name: /Proyectos/ }).click();
+    await dismissCelebration();
+    await clickPastCelebration(p.getByRole('tab', { name: /Proyectos/ }));
     await p.locator('.deck-card.is-top').waitFor();
     // Hasta 3 intentos: los perfiles demo aceptan ~80% de las veces.
     let matched = false;
@@ -199,11 +214,6 @@ try {
   });
 
   // Un reintento de conexión puede generar otro match más tarde: se cierra su celebración.
-  const dismissCelebration = async () => {
-    await p.waitForTimeout(300);
-    if (await p.locator('.celebration').count()) await p.locator('.celebration').getByRole('button', { name: 'Seguir descubriendo' }).click();
-  };
-
   await step('chat: enviar mensaje, ver "escribiendo…" y recibir respuesta', async () => {
     await dismissCelebration();
     const before = await p.locator('.msg:not(.is-mine)').count();
@@ -290,6 +300,8 @@ try {
     await sol.page.locator('.deck-card.is-top').waitFor();
     await sol.page.getByRole('button', { name: 'Conectar', exact: true }).click();
     await sol.page.locator('.celebration').waitFor({ timeout: 4000 });
+    await sol.page.locator('.celebration').getByRole('button', { name: 'Cerrar' }).click();
+    await sol.page.locator('.celebration').waitFor({ state: 'hidden' });
     await sol.context.close();
   });
 

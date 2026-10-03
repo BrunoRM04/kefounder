@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowRight, Check, CheckCircle2, Heart, Sparkles, X } from 'lucide-react';
 import { PLANS } from '../../shared/catalog.js';
 import { api } from '../lib/api.js';
 import { useApp } from '../lib/app.jsx';
 import { firstName, money } from '../lib/format.js';
+import { useLockBody } from '../lib/hooks.js';
 import { useRouter } from '../lib/router.jsx';
 import { Avatar, Button, Segmented, Sheet, cx } from './ui.jsx';
 
@@ -139,11 +140,38 @@ export function PaywallSheet() {
 export function MatchCelebration() {
   const { celebration, closeCelebration, me } = useApp();
   const { navigate } = useRouter();
+  const dialogRef = useRef(null);
+  const closeButtonRef = useRef(null);
+  const closeRef = useRef(closeCelebration);
+  closeRef.current = closeCelebration;
+  const showing = Boolean(celebration);
+  useLockBody(showing);
+  useEffect(() => {
+    if (!showing) return undefined;
+    const previousFocus = document.activeElement;
+    const onKey = (event) => {
+      if (event.key === 'Escape') { event.preventDefault(); closeRef.current(); return; }
+      if (event.key !== 'Tab' || !dialogRef.current) return;
+      const buttons = [...dialogRef.current.querySelectorAll('button:not([disabled])')];
+      const first = buttons[0];
+      const last = buttons[buttons.length - 1];
+      if (event.shiftKey && (document.activeElement === first || !dialogRef.current.contains(document.activeElement))) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && (document.activeElement === last || !dialogRef.current.contains(document.activeElement))) { event.preventDefault(); first.focus(); }
+    };
+    window.addEventListener('keydown', onKey);
+    const timer = window.setTimeout(() => closeButtonRef.current?.focus(), 60);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.clearTimeout(timer);
+      if (previousFocus?.isConnected) previousFocus.focus();
+    };
+  }, [showing]);
   if (!celebration) return null;
   const other = celebration.other;
   const project = celebration.project;
   return createPortal(
-    <div className="celebration" role="dialog" aria-modal="true" aria-label="Nuevo match">
+    <div className="celebration" role="dialog" aria-modal="true" aria-label="Nuevo match" ref={dialogRef}>
+      <button type="button" className="icon-btn celebration-close" aria-label="Cerrar" onClick={closeCelebration} ref={closeButtonRef}><X size={22} /></button>
       <div className="celebration-card">
         <span className="kicker">Nuevo match</span>
         <h2>¡Es un match!</h2>

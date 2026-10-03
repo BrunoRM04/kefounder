@@ -65,11 +65,18 @@ export function useDebounced(value, delay = 250) {
   return debounced;
 }
 
+let bodyLocks = 0;
+let bodyOverflowBeforeLock = '';
+
 export function useLockBody(active) {
   useEffect(() => {
     if (!active) return undefined;
-    const { overflow } = document.body.style;
+    if (bodyLocks === 0) bodyOverflowBeforeLock = document.body.style.overflow;
+    bodyLocks += 1;
     document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = overflow; };
+    return () => {
+      bodyLocks -= 1;
+      if (bodyLocks === 0) document.body.style.overflow = bodyOverflowBeforeLock;
+    };
   }, [active]);
 }
