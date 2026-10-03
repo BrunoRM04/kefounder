@@ -4,9 +4,9 @@ import { api } from '../../lib/api.js';
 import { useApp } from '../../lib/app.jsx';
 import { Link } from '../../lib/router.jsx';
 import { Failed, FollowUp, KeyValue, Loading, PageHeader, Panel, Status, ago, dateTime, useAdmin, useAdminData } from '../kit.jsx';
-import { targetHref } from './Moderation.jsx';
+import { TARGET_KIND as KIND, targetHref } from './Moderation.jsx';
 
-const KIND = { person: 'Perfil', project: 'Proyecto', match: 'Conversación' };
+const isHelp = (target) => target.type === 'help' || target.type === 'help_answer';
 
 function Decision({ report, onDone }) {
   const { toast, fail } = useApp();
@@ -17,7 +17,10 @@ function Decision({ report, onDone }) {
   useEffect(() => { setResolution(report.resolution || ''); }, [report.id, report.resolution]);
   const closed = report.status === 'resolved' || report.status === 'dismissed';
   const canSuspend = Boolean(report.target.user) && report.target.user.role !== 'admin' && report.target.user.status !== 'suspended';
-  const canHide = report.target.type === 'project' && report.target.project && report.target.project.moderation !== 'hidden';
+  const canHide = (report.target.type === 'project' && report.target.project && report.target.project.moderation !== 'hidden')
+    || (isHelp(report.target) && report.target.help && !report.target.help.hidden);
+  const hideLabel = report.target.type === 'help' ? 'Ocultar el pedido de ayuda' : report.target.type === 'help_answer' ? 'Ocultar la solución' : 'Ocultar el proyecto';
+  const hideText = isHelp(report.target) ? 'Deja de verse y no suma puntos; quien lo publicó recibe el motivo.' : 'Deja de aparecer en Descubrir; su founder recibe el motivo.';
 
   const submit = async (status) => {
     setError('');
@@ -48,7 +51,7 @@ function Decision({ report, onDone }) {
           </button>
           {canHide && (
             <button type="button" role="radio" aria-checked={action === 'hide'} className={action === 'hide' ? 'is-active' : ''} onClick={() => setAction('hide')}>
-              <strong>Ocultar el proyecto</strong><small>Deja de aparecer en Descubrir; su founder recibe el motivo.</small>
+              <strong>{hideLabel}</strong><small>{hideText}</small>
             </button>
           )}
           {canSuspend && (
@@ -93,12 +96,20 @@ export default function ReportDetail({ params }) {
       <div className="adm-detail-grid">
         <div className="adm-col">
           <Panel title="Qué se reportó">
+            {r.target.exists && isHelp(r.target) && (
+              <div className="adm-reported-text">
+                <span className="adm-mini-title">{r.target.type === 'help' ? 'Pedido' : `Solución a «Necesito ayuda con ${r.target.help.title}»`}</span>
+                {r.target.type === 'help' && <strong>Necesito ayuda con {r.target.help.title}</strong>}
+                <p>{r.target.help.body}</p>
+                {r.target.help.hidden && <span className="adm-muted">Ya está oculto.</span>}
+              </div>
+            )}
             {r.target.exists ? (
-              <Link to={href || '#'} className="adm-owner">
+              <Link to={(isHelp(r.target) ? (r.target.user && `/admin/usuarios/${r.target.user.id}`) : href) || '#'} className="adm-owner">
                 {r.target.type === 'project' ? <ProjectLogo project={r.target.project} size={40} /> : <Avatar person={r.target.user} size={40} />}
                 <span className="adm-li-copy">
                   <strong>{r.target.type === 'project' ? r.target.project.name : r.target.user?.name}</strong>
-                  <small>{r.target.type === 'project' ? `Proyecto de ${r.target.user?.name || 'cuenta eliminada'}` : r.target.type === 'match' ? 'Conversación con quien reportó' : r.target.user?.email}</small>
+                  <small>{r.target.type === 'project' ? `Proyecto de ${r.target.user?.name || 'cuenta eliminada'}` : r.target.type === 'match' ? 'Conversación con quien reportó' : isHelp(r.target) ? `Lo publicó · ${r.target.user?.email || ''}` : r.target.user?.email}</small>
                 </span>
                 {r.target.user && <Status kind="userStatus" value={r.target.user.status} />}
               </Link>
@@ -107,7 +118,8 @@ export default function ReportDetail({ params }) {
               ['Motivo', r.reason],
               ['Detalle', r.details || 'Sin detalle'],
               ['Reportó', r.reporter ? <Link to={`/admin/usuarios/${r.reporter.id}`} className="adm-link">{r.reporter.name}</Link> : 'Cuenta eliminada'],
-              ['Recibido', dateTime(r.createdAt)]
+              ['Recibido', dateTime(r.createdAt)],
+              ...(isHelp(r.target) && r.target.help ? [['En el panel', <Link key="h" to={`/admin/ayuda/${r.target.help.requestId}`} className="adm-link">Pedido de ayuda #{r.target.help.requestId}</Link>]] : [])
             ]} />
           </Panel>
           {related.length > 0 && (

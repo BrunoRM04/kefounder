@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowRight, BarChart3, Bookmark, Check, Eye, Gem, Github, Globe, Heart, Linkedin, LogOut, MapPin, MessageCircle, Pencil, Settings, UserRound } from 'lucide-react';
 import { PLANS } from '../../shared/catalog.js';
 import { ColumnChart, StatTile, dayData } from '../components/Charts.jsx';
+import { MyRecognitions } from '../components/HelpParts.jsx';
 import { Page, TopBar } from '../components/Shell.jsx';
 import { Avatar, Button, Pill, PlanBadge, Progress, ProjectLogo, Skeleton } from '../components/ui.jsx';
 import { api } from '../lib/api.js';
@@ -92,6 +93,7 @@ export default function Profile() {
           </div>
 
           <div className="me-main">
+            <MyRecognitions />
             <section className="me-activity">
               <div className="section-title"><h2><BarChart3 size={17} /> Tu actividad</h2></div>
               <ProfileStats />

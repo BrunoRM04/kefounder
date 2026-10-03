@@ -6,9 +6,11 @@ import { createBots } from './bots.js';
 import { config } from './config.js';
 import { openDb } from './db.js';
 import { migrateDemoAccounts, migrateLegacyDbFile } from './migrate.js';
+import { closeWeeks, ensureSampleHelp } from './help.js';
 import { createHub } from './realtime.js';
 import { ensureSampleArticles } from './revista.js';
 import { isEmpty, seed } from './seed.js';
+import { notify } from './services.js';
 
 if (migrateLegacyDbFile(config.dbPath)) console.log('✳ Base migrada: data/found.db → data/kefounder.db (la original quedó como found-legacy.db).');
 const db = openDb(config.dbPath);
@@ -23,12 +25,25 @@ if (isEmpty(db)) {
 if (config.demo) {
   const samples = ensureSampleArticles(db);
   if (samples) console.log(`✳ Revista: ${samples} notas de ejemplo cargadas.`);
+  const help = ensureSampleHelp(db);
+  if (help) console.log(`✳ Necesito ayuda con…: ${help} pedidos de ejemplo cargados.`);
 }
 
 const hub = createHub();
 const ctx = { db, hub, config };
 ctx.bots = createBots(ctx, { enabled: config.bots });
 ctx.bots.startAmbient();
+
+// Ranking semanal de «Necesito ayuda con…»: al empezar cada semana se guarda el podio de la anterior.
+const closeHelpWeeks = () => {
+  try {
+    closeWeeks(db, { onAward: (a) => notify(ctx, a.userId, 'help_award', { data: { place: a.place, week: a.week, points: a.points } }) });
+  } catch (error) {
+    console.error('[ayuda] no se pudo cerrar la semana', error);
+  }
+};
+closeHelpWeeks();
+setInterval(closeHelpWeeks, 30 * 60 * 1000).unref();
 
 const serveDist = fs.existsSync(path.join(config.distDir, 'index.html'));
 const app = createApp(ctx, { serveDist });

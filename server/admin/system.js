@@ -10,7 +10,8 @@ const TABLES = [
   ['users', 'Cuentas'], ['projects', 'Proyectos'], ['interests', 'Conexiones'], ['matches', 'Conversaciones'], ['messages', 'Mensajes'],
   ['notifications', 'Notificaciones'], ['views', 'Visitas'], ['saves', 'Guardados'], ['passes', 'Descartes'], ['blocks', 'Bloqueos'],
   ['reports', 'Reportes'], ['subscriptions', 'Suscripciones'], ['uploads', 'Archivos'], ['sessions', 'Sesiones'],
-  ['articles', 'Notas de la revista'], ['article_daily', 'Lecturas por día'], ['admin_audit', 'Auditoría'], ['admin_notes', 'Notas internas'], ['admin_tasks', 'Tareas']
+  ['articles', 'Notas de la revista'], ['article_daily', 'Lecturas por día'], ['press_requests', 'Pedidos de difusión'],
+  ['help_requests', 'Pedidos de ayuda'], ['help_answers', 'Soluciones'], ['help_votes', 'Votos «Me sirvió»'], ['help_awards', 'Reconocimientos'], ['admin_audit', 'Auditoría'], ['admin_notes', 'Notas internas'], ['admin_tasks', 'Tareas']
 ];
 
 const startedAt = new Date().toISOString();

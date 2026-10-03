@@ -12,7 +12,15 @@ const CATEGORY = {
   interest: 'interests', interests_summary: 'interests',
   match: 'matches',
   message: 'messages', direct: 'messages',
-  saved_project: 'activity', saved_profile: 'activity', project_views: 'activity', recommendations: 'activity'
+  saved_project: 'activity', saved_profile: 'activity', project_views: 'activity', recommendations: 'activity',
+  help_answer: 'help', help_accepted: 'help', help_award: 'help'
+};
+
+const PLACE = { 1: '1.º', 2: '2.º', 3: '3.º' };
+const weekLabel = (key) => {
+  if (!key) return '';
+  const [y, m, d] = key.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('es-UY', { day: 'numeric', month: 'long' });
 };
 
 export function counts(db, userId) {
@@ -25,7 +33,16 @@ export function counts(db, userId) {
     [userId, userId, userId]
   ).n;
   const interests = db.get("SELECT COUNT(*) AS n FROM interests i JOIN users u ON u.id = i.from_user_id WHERE i.to_user_id = ? AND i.status = 'pending' AND u.status = 'active'", [userId]).n;
-  return { notifications, messages, interests };
+  // «Necesito ayuda con…»: pedidos abiertos de otras personas publicados desde tu última visita.
+  const help = db.get(
+    `SELECT COUNT(*) AS n FROM help_requests r JOIN users u ON u.id = r.user_id
+     WHERE r.hidden = 0 AND r.status = 'open' AND u.status = 'active' AND r.user_id != :me
+       AND r.created_at > COALESCE((SELECT json_extract(CASE WHEN json_valid(settings) THEN settings ELSE '{}' END, '$.helpSeenAt') FROM users WHERE id = :me), :since)
+       AND NOT EXISTS (SELECT 1 FROM help_answers a WHERE a.request_id = r.id AND a.user_id = :me)
+       AND NOT EXISTS (SELECT 1 FROM blocks b WHERE (b.user_id = :me AND b.blocked_id = r.user_id) OR (b.user_id = r.user_id AND b.blocked_id = :me))`,
+    { me: userId, since: new Date(Date.now() - 7 * 86400000).toISOString() }
+  ).n;
+  return { notifications, messages, interests, help };
 }
 
 export const pushCounts = (ctx, userId) => ctx.hub.send(userId, 'counts', counts(ctx.db, userId));
@@ -134,6 +151,26 @@ export function serializeNotification(db, viewer, row) {
       body = data.reason ? `Motivo: ${data.reason}. Tu cupo sigue disponible.` : 'Tu cupo sigue disponible: podés volver a pedirla.';
       link = '/proyectos';
       break;
+    case 'help_answer':
+      title = data.count > 1 ? `${data.count} soluciones nuevas a tu pedido de ayuda` : `${name} te propuso una solución`;
+      body = `Necesito ayuda con ${data.title || 'tu pedido'}`;
+      link = data.requestId ? `/ayuda/${data.requestId}` : '/ayuda';
+      break;
+    case 'help_accepted':
+      title = `${name} eligió tu solución`;
+      body = `Sumaste puntos para el ranking semanal · Necesito ayuda con ${data.title || 'un pedido'}`;
+      link = data.requestId ? `/ayuda/${data.requestId}` : '/ayuda';
+      break;
+    case 'help_award':
+      title = `¡Terminaste ${PLACE[data.place] || 'en el podio'} en el ranking semanal!`;
+      body = `Semana del ${weekLabel(data.week)} · ${data.points} puntos. El reconocimiento ya está en tu perfil.`;
+      link = '/perfil';
+      break;
+    case 'help_hidden':
+      title = data.kind === 'answer' ? 'Ocultamos una de tus soluciones' : 'Ocultamos tu pedido de ayuda';
+      body = data.reason ? `Motivo: ${data.reason}` : 'No cumple las reglas de la comunidad.';
+      link = data.requestId ? `/ayuda/${data.requestId}` : '/ayuda';
+      break;
     case 'project_restored':
       title = project ? `${project.name} vuelve a estar visible` : 'Tu proyecto vuelve a estar visible';
       body = 'Ya aparece de nuevo en Descubrir.';
@@ -162,12 +199,15 @@ export function serializeNotification(db, viewer, row) {
   };
 }
 
-export function notify(ctx, userId, type, { actorId = null, projectId = null, matchId = null, data = {} } = {}) {
+// mergeOn: campo de `data` que agrupa avisos sin leer del mismo tipo (p. ej. varias soluciones al mismo pedido).
+export function notify(ctx, userId, type, { actorId = null, projectId = null, matchId = null, data = {}, mergeOn = null } = {}) {
   const { db, hub } = ctx;
   const recipient = parseUser(db.get('SELECT * FROM users WHERE id = ?', [userId]));
   if (!recipient) return null;
   const category = CATEGORY[type];
   if (category && recipient.settings?.notifications?.[category] === false) return null;
+  // Entre personas bloqueadas no hay avisos.
+  if (actorId && actorId !== userId && isBlocked(db, actorId, userId)) return null;
 
   let id;
   if (type === 'message' && matchId) {
@@ -176,6 +216,16 @@ export function notify(ctx, userId, type, { actorId = null, projectId = null, ma
       const prev = parseJson(existing.data, {});
       const merged = { ...prev, ...data, count: (prev.count || 1) + 1 };
       db.run('UPDATE notifications SET data = ?, created_at = ? WHERE id = ?', [JSON.stringify(merged), now(), existing.id]);
+      id = existing.id;
+    }
+  }
+  if (!id && mergeOn && data[mergeOn] !== undefined) {
+    const existing = db.get(`SELECT * FROM notifications WHERE user_id = ? AND type = ? AND read_at IS NULL AND json_extract(data, '$.${mergeOn}') = ?`, [userId, type, data[mergeOn]]);
+    if (existing) {
+      const prev = parseJson(existing.data, {});
+      // Si la misma persona vuelve a hacer lo mismo (por ejemplo, borra y publica otra vez), no suma.
+      const count = (prev.count || 1) + (existing.actor_id === actorId ? 0 : 1);
+      db.run('UPDATE notifications SET data = ?, actor_id = ?, created_at = ? WHERE id = ?', [JSON.stringify({ ...prev, ...data, count }), actorId, now(), existing.id]);
       id = existing.id;
     }
   }

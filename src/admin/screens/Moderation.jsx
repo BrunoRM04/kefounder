@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
-import { BadgeCheck, BriefcaseBusiness, CircleCheck, MessageSquare, ShieldAlert, UserRound } from 'lucide-react';
+import { BadgeCheck, BriefcaseBusiness, CircleCheck, LifeBuoy, MessageSquare, ShieldAlert, UserRound } from 'lucide-react';
 import { Avatar, Button } from '../../components/ui.jsx';
 import { api } from '../../lib/api.js';
 import { useApp } from '../../lib/app.jsx';
 import { Link, useRouter } from '../../lib/router.jsx';
 import { ActionSheet, DataTable, Empty, Failed, FilterSelect, Loading, PageHeader, Pagination, Status, Tabs, ago, dateTime, num, useAdmin, useAdminData, useQueryState } from '../kit.jsx';
 
-const TARGET_ICON = { person: <UserRound size={15} />, project: <BriefcaseBusiness size={15} />, match: <MessageSquare size={15} /> };
-const TARGET_KIND = { person: 'Perfil', project: 'Proyecto', match: 'Conversación' };
+const TARGET_ICON = { person: <UserRound size={15} />, project: <BriefcaseBusiness size={15} />, match: <MessageSquare size={15} />, help: <LifeBuoy size={15} />, help_answer: <LifeBuoy size={15} /> };
+export const TARGET_KIND = { person: 'Perfil', project: 'Proyecto', match: 'Conversación', help: 'Pedido de ayuda', help_answer: 'Solución' };
 
 export function targetHref(target) {
   if (target.type === 'project' && target.project) return `/admin/proyectos/${target.project.id}`;
+  if ((target.type === 'help' || target.type === 'help_answer') && target.help) return `/admin/ayuda/${target.help.requestId}`;
   if (target.user) return `/admin/usuarios/${target.user.id}`;
   return null;
 }
@@ -46,7 +47,7 @@ function Reports({ values, set }) {
           { id: 'dismissed', label: 'Descartados', count: data ? counts.dismissed || 0 : null },
           { id: 'all', label: 'Todos' }
         ]} />
-        <FilterSelect label="Sobre" value={values.type} onChange={(type) => set({ type })} options={[{ id: 'person', label: 'Perfiles' }, { id: 'project', label: 'Proyectos' }, { id: 'match', label: 'Conversaciones' }]} />
+        <FilterSelect label="Sobre" value={values.type} onChange={(type) => set({ type })} options={[{ id: 'person', label: 'Perfiles' }, { id: 'project', label: 'Proyectos' }, { id: 'match', label: 'Conversaciones' }, { id: 'help', label: 'Pedidos de ayuda' }, { id: 'help_answer', label: 'Soluciones' }]} />
       </div>
       {error ? <Failed error={error} onRetry={reload} /> : (
         <DataTable
@@ -54,7 +55,7 @@ function Reports({ values, set }) {
           rows={data?.items}
           loading={loading}
           onRowClick={(r) => navigate(`/admin/moderacion/reportes/${r.id}`)}
-          empty={<Empty icon={<CircleCheck size={18} />} title={values.status === 'pending' ? 'No hay reportes pendientes' : 'No hay reportes acá'} text={values.status === 'pending' ? 'Cuando alguien reporte un perfil, proyecto o conversación, aparece en esta cola por orden de llegada.' : undefined} />}
+          empty={<Empty icon={<CircleCheck size={18} />} title={values.status === 'pending' ? 'No hay reportes pendientes' : 'No hay reportes acá'} text={values.status === 'pending' ? 'Cuando alguien reporte un perfil, proyecto, conversación o contenido de «Necesito ayuda con…», aparece en esta cola por orden de llegada.' : undefined} />}
         />
       )}
       <Pagination data={data} onChange={set} />

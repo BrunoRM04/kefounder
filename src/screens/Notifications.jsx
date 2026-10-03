@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bell, Bookmark, Eye, Gem, Heart, Lock, MessageCircle, Sparkles, Trash2, Users, X } from 'lucide-react';
+import { Bell, Bookmark, Eye, Gem, Heart, LifeBuoy, Lock, MessageCircle, Sparkles, Trash2, Trophy, Users, X } from 'lucide-react';
 import { ConfirmSheet } from '../components/Sheets.jsx';
 import { Page, PageHeading, TopBar } from '../components/Shell.jsx';
 import { Avatar, Button, EmptyState, ErrorState, Skeleton, cx } from '../components/ui.jsx';
@@ -12,7 +12,8 @@ import { useRouter } from '../lib/router.jsx';
 const ICONS = {
   interest: <Heart size={17} />, interests_summary: <Users size={17} />, match: <Sparkles size={17} />, message: <MessageCircle size={17} />,
   direct: <MessageCircle size={17} />, saved_project: <Bookmark size={17} />, saved_profile: <Bookmark size={17} />, project_views: <Eye size={17} />,
-  recommendations: <Sparkles size={17} />, plan: <Gem size={17} />, welcome: <Sparkles size={17} />
+  recommendations: <Sparkles size={17} />, plan: <Gem size={17} />, welcome: <Sparkles size={17} />,
+  help_answer: <LifeBuoy size={17} />, help_accepted: <LifeBuoy size={17} />, help_award: <Trophy size={17} />, help_hidden: <LifeBuoy size={17} />
 };
 
 const groupOf = (iso) => {

@@ -6,6 +6,7 @@ import { sessionMiddleware } from './auth.js';
 import authRoutes from './routes/auth.js';
 import billingRoutes from './routes/billing.js';
 import discoverRoutes from './routes/discover.js';
+import helpRoutes from './routes/help.js';
 import interestRoutes from './routes/interests.js';
 import matchRoutes from './routes/matches.js';
 import notificationRoutes from './routes/notifications.js';
@@ -78,7 +79,7 @@ export function createApp(ctx, { serveDist = false } = {}) {
   api.use(sessionMiddleware(db));
   api.use((_req, res, next) => { res.setHeader('Cache-Control', 'no-store'); next(); });
 
-  for (const register of [authRoutes, profileRoutes, discoverRoutes, peopleRoutes, projectRoutes, interestRoutes, matchRoutes, notificationRoutes, billingRoutes, uploadRoutes, revistaRoutes, pressRoutes, adminRoutes]) {
+  for (const register of [authRoutes, profileRoutes, discoverRoutes, peopleRoutes, projectRoutes, interestRoutes, matchRoutes, notificationRoutes, billingRoutes, uploadRoutes, revistaRoutes, pressRoutes, helpRoutes, adminRoutes]) {
     register(api, ctx);
   }
   api.use((_req, _res, next) => next(new HttpError(404, 'Ruta no encontrada.')));

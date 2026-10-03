@@ -59,6 +59,7 @@ La **compatibilidad** se calcula en el servidor. Considera objetivos, roles comp
 
 Además, el producto tiene:
 
+- **Necesito ayuda con…** (`/ayuda`): la comunidad propone soluciones a los problemas de cada persona. Quienes ayudan suman puntos para un ranking semanal y el podio queda en su perfil. Se entra desde la barra superior (no ocupa lugar en el menú) y sirve para que la gente vuelva cada semana.
 - **Revista KeFounder!** (`/revista`): un diario online público con entrevistas, startups, founders, inversión y ecosistema. Se lee sin cuenta y se entra desde la pantalla de bienvenida.
 - **Panel de administración** (`/admin`): métricas, ingresos, usuarios, proyectos, moderación, seguimiento interno, edición de la revista, auditoría y sistema.
 
@@ -127,7 +128,7 @@ A futuro, la plataforma puede convertirse en la herramienta con la que se arma u
 | **Logotipo** | «KeFounder!» en **Manrope ExtraBold** convertida a trazos, con un «!» propio cuyo punto también es terracota. |
 | **Colores de uso** | Petróleo sobre fondos claros, crema sobre petróleo. El punto es siempre terracota. |
 | **Dónde aparece** | Isotipo en crema en la barra lateral de PC; logotipo en la barra superior, la bienvenida, el ingreso, el registro y la página pública de proyectos; isotipo en un cuadro petróleo en la pantalla de carga, el favicon y los íconos de instalación. |
-| **Archivos** | `public/brand/`: hoja de marca `kefounder-marca.png` e íconos. Además, isotipo y logotipo por separado en 8 variantes de color (color, negativo, negativo blanco, tinta y monocromos petróleo, negro, blanco y crema), en PNG sin fondo de varios tamaños y en SVG: `public/brand/isotipo/` y `public/brand/logotipo/`, con la hoja `kefounder-variantes.png`. |
+| **Archivos** | `public/brand/`: hoja de marca `kefounder-marca.png` e íconos. Además, isotipo y logotipo por separado en 8 variantes de color (color, negativo, negativo blanco, tinta y monocromos petróleo, negro, blanco y crema), en PNG sin fondo de varios tamaños y en SVG: `public/brand/isotipo/` y `public/brand/logotipo/`, con la hoja `kefounder-variantes.png`. La Revista tiene su isotipo (la K! con «REVISTA» debajo) y su logotipo («KeFounder! | REVISTA») en las mismas variantes, en `public/brand/revista/`. |
 | **En el código** | `src/components/Brand.jsx` (`Isotipo`, `IsotipoTile`, `Logotipo`). Las letras toman el color del texto (`currentColor`) y el punto usa `--warm`. |
 
 ### 2.3. Colores
@@ -167,6 +168,8 @@ La paleta combina **verde petróleo, salvia azulada, terracota y crema**, con te
 **Versiones transparentes:** se usan para barras con desenfoque, oscurecer el fondo detrás de una hoja y sombras. Por ejemplo, `#F1EDE4EE` (barra superior), `#252A2A66` (fondo detrás de un modal) y `#345F632E` (sombra de marca). Son los mismos colores con transparencia, no una familia nueva.
 
 **Acentos de avatares y portadas sin foto:** `#D4E0DA`, `#E8D5CC`, `#C9D8D6`, `#F0E1D8`, `#E3EAE4` y `#DFE3DA`, definidos en `shared/theme.js`. Sobre ellos se muestran las iniciales o el «!».
+
+**Medallas del ranking semanal** (`src/styles/help.css`): oro `#B8862F` sobre `#F4E7C9`, plata `#6F8587` sobre `#E3EAE8` y bronce `#A8624B` sobre `#F0E1D8`. Son tonos apagados que conviven con la paleta. Se usan solo en el podio, los reconocimientos y la etiqueta «Top».
 
 **Etiquetas de plan:**
 
@@ -266,7 +269,7 @@ Variables de tamaño: `--fs-xs` 12 px, `--fs-sm` 13 px, `--fs-md` 15 px, `--fs-l
 
 | Tamaño | Navegación |
 |---|---|
-| **Celular (hasta 759 px)** | Barra superior con el logotipo, notificaciones y perfil. **Barra inferior** con Descubrir, Matches, Guardados, Proyectos y Perfil; la opción activa va en petróleo con una línea arriba. Las opciones y menús se abren como **hojas que suben desde abajo**. |
+| **Celular (hasta 759 px)** | Barra superior con el logotipo, «Necesito ayuda con…» (ícono de salvavidas), notificaciones y perfil. **Barra inferior** con Descubrir, Matches, Guardados, Proyectos y Perfil; la opción activa va en petróleo con una línea arriba. Las opciones y menús se abren como **hojas que suben desde abajo**. |
 | **Tablet y PC (desde 760 px)** | **Barra lateral petróleo** de 88 px con el isotipo en crema. Arriba: Descubrir, Matches, Guardados, Mis proyectos y Perfil. Abajo: Plan y Ajustes. La opción activa va en crema con texto petróleo. Los menús son ventanas flotantes. |
 | **PC grande (desde 1100 px)** | Cada sección pasa a **pantalla completa en columnas** (`src/styles/desktop.css`). Descubrir ocupa exactamente la altura de la ventana. El chat suma un panel lateral con los datos de la otra persona desde 1400 px. |
 
@@ -388,6 +391,7 @@ Comparten los mismos colores y tipografías, pero tienen su propia estructura y 
 | `inbox.css` | Matches y chat. |
 | `screens.css` | Bienvenida, ingreso, registro y pasos del onboarding. |
 | `pages.css` | Perfil, proyectos, estadísticas, planes, guardados, notificaciones y configuración. |
+| `help.css` | «Necesito ayuda con…»: pedidos, soluciones, ranking, podio, medallas y reconocimientos. |
 | `desktop.css` | Modo de pantalla completa para PC (desde 1100 px). |
 | `admin.css` | Panel de administración (`adm-`). |
 | `revista.css` | Revista (`rv-`). |

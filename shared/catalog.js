@@ -173,6 +173,39 @@ export const PRESS = {
 export const PRESS_KINDS = { mencion: 'Mención', nota: 'Nota propia' };
 export const pressFor = (plan) => PRESS[plan] || null;
 
+// «Necesito ayuda con…»: alguien cuenta un problema, la comunidad propone soluciones y quienes
+// ayudan suman puntos para el ranking semanal (de lunes a domingo). El podio queda en el perfil.
+export const HELP_CATEGORIES = [
+  { id: 'producto', label: 'Producto' },
+  { id: 'tecnologia', label: 'Tecnología' },
+  { id: 'diseno', label: 'Diseño' },
+  { id: 'marketing', label: 'Marketing y growth' },
+  { id: 'ventas', label: 'Ventas' },
+  { id: 'inversion', label: 'Inversión' },
+  { id: 'finanzas', label: 'Finanzas' },
+  { id: 'legal', label: 'Legal' },
+  { id: 'equipo', label: 'Equipo y socios' },
+  { id: 'otro', label: 'Otro tema' }
+];
+
+export const HELP_POINTS = {
+  answer: 2, // por publicar una solución
+  answerWeeklyCap: 10, // lo que suman tus propias soluciones en una semana
+  helpful: 5, // cada «Me sirvió» de otra persona
+  accepted: 20, // cuando quien pidió ayuda elige tu solución
+  perPersonWeeklyCap: 30, // lo que una misma persona te puede dar en una semana
+  podiumMin: 15, // puntos mínimos para entrar al podio
+  podiumGivers: 2 // y que vengan de al menos dos personas distintas
+};
+
+export const HELP_RULES = [
+  { id: 'answer', points: `+${HELP_POINTS.answer}`, label: 'Por cada solución que publicás', hint: `Suman hasta ${HELP_POINTS.answerWeeklyCap} por semana.` },
+  { id: 'helpful', points: `+${HELP_POINTS.helpful}`, label: 'Cada «Me sirvió» de otra persona', hint: 'Votan quienes leen tu solución y les resulta útil.' },
+  { id: 'accepted', points: `+${HELP_POINTS.accepted}`, label: 'Si eligen tu solución', hint: 'Lo decide quien pidió ayuda.' }
+];
+
+export const PLACE_LABELS = { 1: '1.º puesto', 2: '2.º puesto', 3: '3.º puesto' };
+
 export const PIPELINE = [
   { id: 'new', label: 'Nuevo' },
   { id: 'contacted', label: 'En conversación' },

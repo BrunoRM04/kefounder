@@ -9,6 +9,7 @@ import './styles/detail.css';
 import './styles/inbox.css';
 import './styles/screens.css';
 import './styles/pages.css';
+import './styles/help.css';
 import './styles/desktop.css';
 
 // Preferencias guardadas con el nombre anterior (FOUND) pasan a las claves de KeFounder!.

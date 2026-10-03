@@ -74,6 +74,28 @@ function reportTarget(db, r) {
       label: p ? p.name : 'Proyecto eliminado'
     };
   }
+  if (r.target_type === 'help') {
+    const h = db.get('SELECT * FROM help_requests WHERE id = ?', [r.target_id]);
+    const author = h ? db.get('SELECT * FROM users WHERE id = ?', [h.user_id]) : null;
+    return {
+      type: 'help',
+      exists: Boolean(h),
+      help: h ? { id: h.id, requestId: h.id, title: h.title, body: h.body, hidden: Boolean(h.hidden) } : null,
+      user: person(author),
+      label: h ? `Necesito ayuda con ${h.title}` : 'Pedido eliminado'
+    };
+  }
+  if (r.target_type === 'help_answer') {
+    const a = db.get('SELECT a.*, r.title FROM help_answers a JOIN help_requests r ON r.id = a.request_id WHERE a.id = ?', [r.target_id]);
+    const author = a ? db.get('SELECT * FROM users WHERE id = ?', [a.user_id]) : null;
+    return {
+      type: 'help_answer',
+      exists: Boolean(a),
+      help: a ? { id: a.id, requestId: a.request_id, title: a.title, body: a.body, hidden: Boolean(a.hidden) } : null,
+      user: person(author),
+      label: a ? `Solución de ${author?.name || 'cuenta eliminada'}` : 'Solución eliminada'
+    };
+  }
   const m = db.get('SELECT * FROM matches WHERE id = ?', [r.target_id]);
   // La persona reportada es la otra parte de la conversación de quien reportó.
   const member = m && r.reporter_id && (m.user_a === r.reporter_id || m.user_b === r.reporter_id);
@@ -199,7 +221,7 @@ export default function contentRoutes(router, ctx) {
     const status = oneOfOr(req.query.status, ['open', 'reviewing', 'resolved', 'dismissed', 'pending', 'all'], 'pending');
     if (status === 'pending') where.add("r.status IN ('open', 'reviewing')");
     else if (status !== 'all') where.add('r.status = :status', { status });
-    const type = oneOfOr(req.query.type, ['person', 'project', 'match']);
+    const type = oneOfOr(req.query.type, ['person', 'project', 'match', 'help', 'help_answer']);
     if (type) where.add('r.target_type = :type', { type });
     const page = paging(req.query);
     const total = db.get(`SELECT COUNT(*) AS n FROM reports r ${where.sql}`, where.params).n;
@@ -253,7 +275,16 @@ export default function contentRoutes(router, ctx) {
           audit(ctx, req, 'user.suspend', { type: 'user', id: u.id, summary: `${u.name} · ${u.email} — Reporte #${report.id}: ${resolution}` });
         }
       }
-      if (status === 'resolved' && action === 'hide') {
+      if (status === 'resolved' && action === 'hide' && (target.type === 'help' || target.type === 'help_answer')) {
+        if (!target.help) throw badRequest('Lo reportado ya no existe.');
+        const table = target.type === 'help' ? 'help_requests' : 'help_answers';
+        if (!target.help.hidden) {
+          const reason = resolution.slice(0, 300);
+          db.run(`UPDATE ${table} SET hidden = 1, hidden_reason = ?, updated_at = ? WHERE id = ?`, [reason, now(), target.help.id]);
+          notify(ctx, target.user?.id, 'help_hidden', { data: { kind: target.type === 'help' ? 'request' : 'answer', requestId: target.help.requestId, reason } });
+          audit(ctx, req, target.type === 'help' ? 'help.hide' : 'help.hide_answer', { type: 'help', id: target.help.requestId, summary: `${target.label} — Reporte #${report.id}: ${resolution}`, data: { answerId: target.type === 'help_answer' ? target.help.id : undefined } });
+        }
+      } else if (status === 'resolved' && action === 'hide') {
         const p = target.project && db.get('SELECT * FROM projects WHERE id = ?', [target.project.id]);
         if (!p) throw badRequest('Solo se pueden ocultar proyectos reportados.');
         if (p.moderation !== 'hidden') moderate(req, p, 'hidden', resolution);

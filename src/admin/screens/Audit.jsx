@@ -5,9 +5,9 @@ import { DataTable, Empty, Failed, FilterSelect, PageHeader, Pagination, Tabs, a
 const DEFAULTS = { area: '', since: '', page: '1', pageSize: '50' };
 const AREAS = [
   { id: 'user', label: 'Cuentas' }, { id: 'identity', label: 'Identidad' }, { id: 'project', label: 'Proyectos' }, { id: 'report', label: 'Reportes' },
-  { id: 'article', label: 'Revista' }, { id: 'press', label: 'Difusión' }, { id: 'task', label: 'Tareas' }, { id: 'note', label: 'Notas internas' }, { id: 'system', label: 'Sistema' }
+  { id: 'article', label: 'Revista' }, { id: 'press', label: 'Difusión' }, { id: 'help', label: 'Ayuda' }, { id: 'task', label: 'Tareas' }, { id: 'note', label: 'Notas internas' }, { id: 'system', label: 'Sistema' }
 ];
-const TARGET = { user: 'Cuenta', project: 'Proyecto', report: 'Reporte', article: 'Nota', press: 'Difusión' };
+const TARGET = { user: 'Cuenta', project: 'Proyecto', report: 'Reporte', article: 'Nota', press: 'Difusión', help: 'Ayuda' };
 
 export default function Audit() {
   const { values, set, apiQuery } = useQueryState(DEFAULTS);

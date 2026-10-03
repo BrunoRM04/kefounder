@@ -20,7 +20,7 @@ export default function Projects() {
     { key: 'moderation', label: 'Moderación', render: (p) => (p.moderation === 'hidden' ? <Status kind="moderation" value="hidden" /> : <span className="adm-muted">Visible</span>) },
     { key: 'stage', label: 'Etapa', mobileHide: true, render: (p) => stageLabel(p.stage) },
     { key: 'views', label: 'Visitas', align: 'right', render: (p) => num(p.views) },
-    { key: 'interests', label: 'Interesados', align: 'right', render: (p) => num(p.interests) },
+    { key: 'interests', label: 'Interesados', align: 'right', className: 'is-tablet-hide', render: (p) => num(p.interests) },
     { key: 'reports', label: 'Reportes', align: 'right', mobileHide: true, render: (p) => (p.openReports ? <strong className="adm-alert-num">{p.openReports}</strong> : '—') },
     { key: 'created', label: 'Creado', sort: 'created', render: (p) => dateShort(p.createdAt) }
   ];

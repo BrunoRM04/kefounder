@@ -1,6 +1,7 @@
 import { requireAdmin } from '../auth.js';
 import { createCache } from './common.js';
 import contentRoutes from './content.js';
+import helpAdminRoutes from './help.js';
 import metricRoutes from './metrics.js';
 import pressAdminRoutes from './press.js';
 import revistaAdminRoutes from './revista.js';
@@ -15,5 +16,5 @@ export default function adminRoutes(router, ctx) {
     res.setHeader('X-Robots-Tag', 'noindex');
     next();
   });
-  for (const register of [metricRoutes, userRoutes, contentRoutes, revistaAdminRoutes, pressAdminRoutes, trackingRoutes, systemRoutes]) register(router, ctx);
+  for (const register of [metricRoutes, userRoutes, contentRoutes, revistaAdminRoutes, pressAdminRoutes, helpAdminRoutes, trackingRoutes, systemRoutes]) register(router, ctx);
 }

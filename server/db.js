@@ -374,6 +374,70 @@ const MIGRATIONS = [
       CREATE INDEX IF NOT EXISTS idx_press_user ON press_requests(user_id, created_at);
       ALTER TABLE articles ADD COLUMN promoted INTEGER NOT NULL DEFAULT 0;
     `
+  },
+  {
+    // «Necesito ayuda con…»: pedidos de ayuda, soluciones, votos «Me sirvió» y el podio semanal.
+    // Los puntos no se guardan: salen de estas tablas, así ocultar o borrar algo los descuenta solo.
+    id: '2026-10-04-ayuda',
+    up: `
+      CREATE TABLE IF NOT EXISTS help_requests (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        category TEXT NOT NULL,
+        title TEXT NOT NULL,
+        body TEXT NOT NULL DEFAULT '',
+        status TEXT NOT NULL DEFAULT 'open',
+        accepted_answer_id INTEGER REFERENCES help_answers(id) ON DELETE SET NULL,
+        accepted_at TEXT,
+        hidden INTEGER NOT NULL DEFAULT 0,
+        hidden_reason TEXT NOT NULL DEFAULT '',
+        is_sample INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        last_activity_at TEXT NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_help_requests_list ON help_requests(hidden, status, last_activity_at);
+      CREATE INDEX IF NOT EXISTS idx_help_requests_user ON help_requests(user_id, created_at);
+      CREATE INDEX IF NOT EXISTS idx_help_requests_accepted ON help_requests(accepted_at);
+      CREATE INDEX IF NOT EXISTS idx_help_requests_answer ON help_requests(accepted_answer_id);
+      CREATE TABLE IF NOT EXISTS help_answers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        request_id INTEGER NOT NULL REFERENCES help_requests(id) ON DELETE CASCADE,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        body TEXT NOT NULL,
+        hidden INTEGER NOT NULL DEFAULT 0,
+        hidden_reason TEXT NOT NULL DEFAULT '',
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        edited_at TEXT,
+        UNIQUE (request_id, user_id)
+      );
+      CREATE INDEX IF NOT EXISTS idx_help_answers_user ON help_answers(user_id, created_at);
+      CREATE INDEX IF NOT EXISTS idx_help_answers_created ON help_answers(created_at);
+      CREATE TABLE IF NOT EXISTS help_votes (
+        answer_id INTEGER NOT NULL REFERENCES help_answers(id) ON DELETE CASCADE,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        created_at TEXT NOT NULL,
+        removed_at TEXT,
+        PRIMARY KEY (answer_id, user_id)
+      );
+      CREATE INDEX IF NOT EXISTS idx_help_votes_created ON help_votes(created_at);
+      CREATE INDEX IF NOT EXISTS idx_help_votes_user ON help_votes(user_id);
+      CREATE TABLE IF NOT EXISTS help_awards (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        week TEXT NOT NULL,
+        place INTEGER NOT NULL,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        points INTEGER NOT NULL,
+        accepted INTEGER NOT NULL DEFAULT 0,
+        helpful INTEGER NOT NULL DEFAULT 0,
+        revoked_at TEXT,
+        revoked_reason TEXT NOT NULL DEFAULT '',
+        created_at TEXT NOT NULL,
+        UNIQUE (week, place)
+      );
+      CREATE INDEX IF NOT EXISTS idx_help_awards_user ON help_awards(user_id, week);
+    `
   }
 ];
 

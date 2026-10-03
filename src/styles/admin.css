@@ -273,10 +273,13 @@
 .adm-kpi.is-button { cursor: pointer; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
 .adm-kpi.is-button:hover { border-color: var(--accent-line); }
 .adm-kpi.is-active { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); background: var(--accent-soft); }
-.adm-kpi-label { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 500; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.adm-kpi-label svg { flex: none; color: var(--accent-muted); }
+/* En bloque (no flex) para que el "…" funcione: en flex la etiqueta se cortaba seco en tarjetas angostas. */
+.adm-kpi-label { display: block; font-size: 12.5px; font-weight: 500; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.adm-kpi-label svg { display: inline-block; vertical-align: -3px; margin-right: 6px; color: var(--accent-muted); }
 .adm-kpi-value { font: 700 23px/1.15 var(--font-display); letter-spacing: -0.7px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .adm-kpis.is-7 .adm-kpi-value { font-size: 21px; }
+/* En el celular más angosto la cifra se achica un poco para no quedar cortada ("US$ 419,…"). */
+@media (max-width: 399px) { .adm-kpi-value, .adm-kpis.is-7 .adm-kpi-value { font-size: clamp(18px, 5.6vw, 21px); } }
 .adm-kpi-delta { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .adm-kpi-delta small { font-weight: 500; color: var(--muted); }
 .adm-kpi-delta.is-up { color: var(--accent); }
@@ -363,11 +366,22 @@
 .adm-table tr.is-muted td { color: var(--muted); }
 .adm-table tr.is-muted .avatar, .adm-table tr.is-muted .project-logo { filter: grayscale(0.7); }
 .adm-table tr.is-alert td:first-child { box-shadow: inset 3px 0 0 var(--warm); }
-/* Tablet: se ocultan las columnas secundarias para que la tabla entre sin desplazar. */
-@media (min-width: 760px) and (max-width: 1099px) {
-  .adm-table .is-mobile-hide { display: none; }
+/* La descripción larga de la primera columna no ensancha la tabla: se corta con "…" en el lugar que quede. */
+@media (min-width: 760px) { .adm-table td.is-primary .adm-cell-copy { width: 0; flex: 1 1 auto; } }
+@media (min-width: 760px) and (max-width: 1499px) {
   .adm-table th, .adm-table td { padding-left: 10px; padding-right: 10px; }
+}
+/* Tablet y notebooks (desde 1100 px el menú lateral completo deja menos lugar que en tablet):
+   se ocultan las columnas secundarias para que la tabla entre sin desplazar. */
+@media (min-width: 760px) and (max-width: 1365px) {
+  .adm-table .is-mobile-hide { display: none; }
   .adm-table td.is-primary { min-width: 190px; }
+}
+/* Tablet: además, los textos pueden ir en dos líneas y se oculta alguna columna más. */
+@media (min-width: 760px) and (max-width: 1099px) {
+  .adm-table th, .adm-table td { padding-left: 8px; padding-right: 8px; white-space: normal; }
+  .adm-table td.is-primary { min-width: 160px; }
+  .adm-table .is-tablet-hide { display: none; }
 }
 .adm-table .adm-skeleton-row td { padding: 14px; }
 .adm-sort { display: inline-flex; align-items: center; gap: 5px; font: inherit; color: inherit; }
@@ -408,6 +422,8 @@
   .adm-filter select { flex: 1; min-width: 0; max-width: none; }
   .adm-export { margin-left: 0; }
 }
+/* Celular angosto: de a uno por fila, si no "Moderación · Todos" no entraba y el valor se cortaba. */
+@media (max-width: 359px) { .adm-filter { flex-basis: 100%; } }
 
 .adm-cell { display: flex; align-items: center; gap: 10px; min-width: 0; color: inherit; }
 .adm-cell .avatar, .adm-cell .project-logo { flex: none; }
@@ -420,9 +436,10 @@ a.adm-cell:hover strong { color: var(--accent-ink); text-decoration: underline; 
 .adm-link:hover { text-decoration: underline; text-underline-offset: 3px; }
 .adm-muted { color: var(--muted); }
 .adm-alert-num { display: inline-flex; align-items: center; min-width: 22px; height: 22px; padding: 0 7px; border-radius: 999px; background: var(--warm-soft); color: var(--danger); font-size: 12px; font-weight: 700; justify-content: center; }
-.adm-target { display: inline-flex; align-items: center; gap: 6px; max-width: 280px; }
+.adm-target { display: inline-flex; align-items: center; gap: 6px; max-width: min(280px, 100%); }
 .adm-target svg { flex: none; color: var(--accent-muted); }
-.adm-target-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* min-width: 0 para que se achique con "…": en las tarjetas del celular pisaba la columna de al lado. */
+.adm-target-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .adm-status { height: 24px; font-size: 12px; }
 .adm-status .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; display: inline-block; }
 .adm-plan { font-size: 11.5px; }
@@ -476,6 +493,13 @@ a.adm-cell:hover strong { color: var(--accent-ink); text-decoration: underline; 
 .adm-compare td.is-up { color: var(--accent); font-weight: 600; }
 .adm-compare td.is-down { color: var(--danger); font-weight: 600; }
 @media (max-width: 759px) { .adm-compare th, .adm-compare td { padding-left: 12px; padding-right: 12px; } }
+/* Celular angosto: menos aire entre columnas; si igual no entra, la tabla se desplaza en vez de cortarse. */
+@media (max-width: 379px) {
+  .adm-compare th, .adm-compare td { padding-left: 8px; padding-right: 8px; }
+  .adm-compare th:first-child, .adm-compare td:first-child { padding-left: 12px; }
+  .adm-compare th:last-child, .adm-compare td:last-child { padding-right: 12px; }
+}
+.adm-panel.is-flush:has(> .adm-compare) { overflow-x: auto; }
 
 .adm-funnel { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
 .adm-funnel-top { display: flex; align-items: baseline; gap: 8px; font-size: 13px; }
@@ -714,3 +738,31 @@ td .adm-task-check { width: 22px; height: 22px; }
 .adm-project-search button:hover { background: var(--surface-2); }
 .adm-project-search .project-logo { flex: none; }
 .adm-editor-side .tag-input { min-height: 42px; }
+
+/* ---------- Necesito ayuda con… ---------- */
+.adm-owner.is-plain { margin: 0; padding: 0; }
+a.adm-owner.is-plain:hover { background: none; }
+a.adm-owner.is-plain:hover strong { text-decoration: underline; text-underline-offset: 3px; }
+.adm-tag { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 8px; border-radius: 999px; background: var(--soft); color: var(--ink-2); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.adm-tag.is-accent { background: var(--accent-soft); color: var(--accent-ink); }
+.adm-help-answers { display: flex; flex-direction: column; }
+.adm-help-answers > li { display: flex; flex-direction: column; gap: 8px; padding: 12px 0; border-bottom: 1px solid var(--line-soft); }
+.adm-help-answers > li:first-child { padding-top: 0; }
+.adm-help-answers > li:last-child { border-bottom: 0; padding-bottom: 0; }
+.adm-help-answers > li.is-hidden { opacity: 0.7; }
+.adm-help-answers .adm-bio { margin-bottom: 0; }
+.adm-help-answer-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.adm-help-answer-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.adm-reported-text { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; padding: 12px 14px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line-soft); }
+.adm-reported-text .adm-mini-title { margin: 0; }
+.adm-reported-text strong { font-size: 14px; }
+.adm-reported-text p { font-size: 13.5px; line-height: 1.5; color: var(--ink-2); white-space: pre-line; overflow-wrap: anywhere; }
+.adm-rank-podium { display: inline-grid; place-items: center; min-width: 36px; height: 24px; padding: 0 6px; border-radius: 999px; font-size: 12.5px; }
+.adm-rank-podium.is-1 { background: #F4E7C9; color: #6E4F12; }
+.adm-rank-podium.is-2 { background: #E3EAE8; color: #3D4E50; }
+.adm-rank-podium.is-3 { background: #F0E1D8; color: #74402F; }
+.adm-podiums { display: flex; flex-direction: column; gap: 6px; }
+.adm-podiums .adm-mini-title { margin-top: 6px; }
+.adm-podium-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+.adm-podium-row .adm-li-copy { flex: 1; min-width: 0; }
+.adm-podium-row.is-revoked .adm-li-copy strong { text-decoration: line-through; color: var(--muted); }

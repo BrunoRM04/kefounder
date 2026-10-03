@@ -118,7 +118,9 @@
 .dc-name h2 { color: var(--on-primary); font-size: 27px; font-weight: 700; letter-spacing: -0.8px; line-height: 1.15; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @container (max-width: 380px) { .dc-name h2 { font-size: 24px; } .dc-name h2 span { font-size: 19px; } }
 .dc-name h2 span { font-size: 21px; font-weight: 500; opacity: 0.88; }
-.dc-name p { display: flex; align-items: center; gap: 5px; margin-top: 6px; font-size: 13px; color: #F1EDE4E0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dc-name p { margin-top: 6px; font-size: 13px; color: #F1EDE4E0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* En bloque (no flex) para que una ubicación larga termine en "…" en lugar de cortarse seco. */
+.dc-name p svg { display: inline-block; vertical-align: -2px; margin-right: 5px; }
 .dc-name-project { display: flex; align-items: center; gap: 12px; }
 .dc-name-project .project-logo { box-shadow: 0 0 0 3px #F1EDE440; }
 .dc-name-project > div { min-width: 0; }

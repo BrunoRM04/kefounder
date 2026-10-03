@@ -27,6 +27,9 @@ const ProfileEdit = lazy(() => import('./screens/ProfileEdit.jsx'));
 const Notifications = lazy(() => import('./screens/Notifications.jsx'));
 const Plans = lazy(() => import('./screens/Plans.jsx'));
 const Settings = lazy(() => import('./screens/Settings.jsx'));
+const Help = lazy(() => import('./screens/Help.jsx'));
+const HelpDetail = lazy(() => import('./screens/HelpDetail.jsx'));
+const HelpRanking = lazy(() => import('./screens/HelpRanking.jsx'));
 const NotFound = lazy(() => import('./screens/NotFound.jsx'));
 // El panel de administración va en su propio paquete: solo lo descarga la cuenta admin.
 const AdminApp = lazy(() => import('./admin/AdminApp.jsx'));
@@ -51,6 +54,10 @@ const ROUTES = [
   { path: '/notificaciones', Screen: Notifications },
   { path: '/planes', Screen: Plans },
   { path: '/configuracion', Screen: Settings },
+  // «Necesito ayuda con…»: se entra desde la barra superior y desde Perfil (no ocupa lugar en el menú).
+  { path: '/ayuda', Screen: Help },
+  { path: '/ayuda/ranking', Screen: HelpRanking },
+  { path: '/ayuda/:id', Screen: HelpDetail },
   { path: '/u/:id', Screen: PersonDetail, className: 'is-detail' },
   { path: '/p/:id', Screen: ProjectDetail, className: 'is-detail' }
 ];
@@ -74,7 +81,7 @@ function Splash() {
 const TITLES = [
   ['/matches', 'Matches'], ['/chat/', 'Chat'], ['/interesados', 'Interesados'], ['/guardados', 'Guardados'],
   ['/proyectos/nuevo', 'Crear proyecto'], ['/proyectos', 'Mis proyectos'], ['/perfil', 'Tu perfil'], ['/notificaciones', 'Notificaciones'],
-  ['/planes', 'Planes'], ['/configuracion', 'Configuración'], ['/u/', 'Perfil'], ['/p/', 'Proyecto'], ['/onboarding', 'Tu perfil'],
+  ['/planes', 'Planes'], ['/configuracion', 'Configuración'], ['/ayuda/ranking', 'Ranking semanal'], ['/ayuda', 'Necesito ayuda con…'], ['/u/', 'Perfil'], ['/p/', 'Proyecto'], ['/onboarding', 'Tu perfil'],
   ['/ingresar', 'Ingresar'], ['/registro', 'Crear cuenta']
 ];
 

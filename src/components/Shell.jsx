@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, Bell, Bookmark, BriefcaseBusiness, Compass, Gem, MessageCircle, Settings } from 'lucide-react';
+import { ArrowLeft, Bell, Bookmark, BriefcaseBusiness, Compass, Gem, LifeBuoy, MessageCircle, Settings } from 'lucide-react';
 import { PLANS } from '../../shared/catalog.js';
 import { useApp } from '../lib/app.jsx';
 import { firstName } from '../lib/format.js';
@@ -106,6 +106,11 @@ export function TopBar({ title, back, backLabel, onBack, actions, note, transpar
           {actions}
           {back === undefined && me && (
             <>
+              {/* «Necesito ayuda con…» vive fuera del menú: se entra desde acá. El punto marca pedidos nuevos. */}
+              <Link to="/ayuda" className="topbar-help" aria-label={counts.help > 0 ? `Necesito ayuda con…: ${counts.help} ${counts.help === 1 ? 'pedido nuevo' : 'pedidos nuevos'}` : 'Necesito ayuda con… y ranking semanal'} title="Necesito ayuda con… · ranking semanal">
+                <span className="topbar-help-icon"><LifeBuoy size={19} strokeWidth={1.8} />{counts.help > 0 && <span className="dot" />}</span>
+                <span className="topbar-help-label">Ayuda</span>
+              </Link>
               <IconButton label="Notificaciones" badge={counts.notifications} onClick={() => router.navigate('/notificaciones')}>
                 <Bell size={20} strokeWidth={1.8} />
               </IconButton>

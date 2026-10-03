@@ -111,6 +111,12 @@ a.team-member:hover { background: var(--surface); }
 .facts > div > span { grid-row: span 2; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 9px; background: var(--soft); color: var(--accent-strong); font-size: 14px; }
 .facts dt { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted-2); }
 .facts dd { margin: 0; font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+/* Celular angosto: en dos columnas "COMPENSACIÓN" y "DISPONIBILIDAD" pisaban la columna de al lado
+   (y la barra de "Roles complementarios" pisaba el texto). */
+@media (max-width: 359px) {
+  .facts { grid-template-columns: 1fr; }
+  .compat-bar { grid-template-columns: minmax(0, 1fr) 70px 38px; }
+}
 .aside-actions { display: none; }
 .aside-note { display: none; align-self: center; }
 @media (min-width: 900px) {

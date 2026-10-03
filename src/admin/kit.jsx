@@ -239,7 +239,8 @@ const TONES = {
   task: { todo: ['default', 'Por hacer'], doing: ['gold', 'En curso'], done: ['accent', 'Hecha'] },
   subscription: { active: ['accent', 'Activa'], replaced: ['muted', 'Reemplazada'], canceled: ['warm', 'Cancelada'] },
   article: { published: ['accent', 'Publicada'], scheduled: ['gold', 'Programada'], draft: ['muted', 'Borrador'] },
-  press: { pending: ['warm', 'Pendiente'], in_progress: ['gold', 'En preparación'], published: ['accent', 'Publicada'], rejected: ['muted', 'Rechazada'], canceled: ['muted', 'Cancelada'] }
+  press: { pending: ['warm', 'Pendiente'], in_progress: ['gold', 'En preparación'], published: ['accent', 'Publicada'], rejected: ['muted', 'Rechazada'], canceled: ['muted', 'Cancelada'] },
+  help: { open: ['default', 'Abierto'], solved: ['accent', 'Resuelto'], closed: ['muted', 'Cerrado'], hidden: ['warm', 'Oculto'] }
 };
 export const toneLabel = (kind, value) => TONES[kind]?.[value]?.[1] || value;
 export const optionsOf = (kind) => Object.entries(TONES[kind]).map(([id, [, label]]) => ({ id, label }));
@@ -490,11 +491,17 @@ export const ACTIONS = {
   'press.publish': 'Publicó una difusión',
   'press.reject': 'Rechazó un pedido de difusión',
   'press.reopen': 'Reabrió un pedido de difusión',
-  'press.update': 'Editó un pedido de difusión'
+  'press.update': 'Editó un pedido de difusión',
+  'help.hide': 'Ocultó un pedido de ayuda',
+  'help.restore': 'Volvió a mostrar un pedido de ayuda',
+  'help.hide_answer': 'Ocultó una solución',
+  'help.restore_answer': 'Volvió a mostrar una solución',
+  'help.revoke_award': 'Anuló un reconocimiento del podio',
+  'help.restore_award': 'Devolvió un reconocimiento del podio'
 };
 export const actionLabel = (action) => ACTIONS[action] || action;
 
-const TARGET_PATHS = { user: '/admin/usuarios/', project: '/admin/proyectos/', report: '/admin/moderacion/reportes/', article: '/admin/revista/', press: '/admin/difusion/' };
+const TARGET_PATHS = { user: '/admin/usuarios/', project: '/admin/proyectos/', report: '/admin/moderacion/reportes/', article: '/admin/revista/', press: '/admin/difusion/', help: '/admin/ayuda/' };
 export const targetLink = (type, id) => (TARGET_PATHS[type] ? `${TARGET_PATHS[type]}${id}` : null);
 
 export function AuditList({ items, showTarget = false, empty = 'Todavía no hay acciones registradas.' }) {

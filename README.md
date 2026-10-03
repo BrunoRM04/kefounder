@@ -136,6 +136,30 @@ KeFounder! se encarga de dar a conocer a las startups: las publica en la revista
 - **Free y Plus:** ven la invitación y el aviso de mejorar el plan.
 - **Gestión:** el equipo trabaja los pedidos en **Panel → Contenido → Difusión**. Las notas que salen de un plan se marcan en la revista como «Difusión», para que los lectores lo sepan.
 
+## Necesito ayuda con… (ranking semanal)
+
+Un espacio para que la comunidad se ayude: alguien cuenta en qué está trabado y los demás proponen soluciones. Quienes ayudan suman puntos para un ranking semanal, y el podio queda en su perfil. Le da a la gente un motivo para volver todas las semanas.
+
+No ocupa lugar en el menú. Se entra desde el ícono de salvavidas de la barra superior, que muestra un punto cuando hay pedidos nuevos desde tu última visita, y desde la tarjeta «Reconocimientos» del Perfil.
+
+- **Pedir ayuda** (`/ayuda`): se elige el tema y se completa «Necesito ayuda con…» y el contexto. Hasta 3 pedidos por día. Mientras nadie respondió se puede editar o borrar; después, solo cerrar.
+- **Soluciones** (`/ayuda/:id`): una por persona y por pedido. Quien lee marca «Me sirvió», y quien pidió ayuda elige la solución que le sirvió (y puede deshacer la elección). Los pedidos y las soluciones se pueden reportar.
+- **Lista:** pestañas Abiertos, Sin respuesta, Resueltos y Míos, con filtro por tema y búsqueda.
+
+| Acción | Puntos |
+|---|---|
+| Publicar una solución | +2 (hasta 10 por semana) |
+| Cada «Me sirvió» de otra persona | +5 |
+| Que elijan tu solución | +20 |
+
+Una misma persona te puede dar hasta 30 puntos por semana, así nadie infla el puntaje de un amigo, y para el podio los puntos tienen que venir de al menos dos personas distintas. Los puntos no se guardan aparte: salen de las soluciones, los votos y las elecciones de la semana. Por eso, si algo se oculta o se borra, sus puntos se descuentan solos.
+
+- **Ranking semanal** (`/ayuda/ranking`): va de lunes a domingo, en la hora del servidor. Muestra el podio, la lista, tu posición y cuántos puntos te faltan para el podio.
+- **Reconocimientos:** al cerrar la semana, las tres personas con más puntos (mínimo 15, de al menos dos personas) ganan el 1.º, 2.º o 3.º puesto y reciben un aviso. El reconocimiento queda en su perfil y en el que ven los demás. Durante cuatro semanas, además, aparece una medalla «Top» junto a su nombre en los pedidos y las soluciones.
+- **Panel → Contenido → Ayuda:** todos los pedidos con sus soluciones (también las ocultas) y sus reportes. Desde ahí se oculta o se vuelve a mostrar con motivo, y quien publicó recibe el aviso. También muestra el ranking en vivo y los podios entregados, con la opción de anular un reconocimiento si hubo trampa. Los reportes llegan a Moderación como el resto.
+
+En modo demo arranca con 8 pedidos de ejemplo. La semana pasada ya cerró con podio (Federico, Diego y Martín, así que Martín muestra su reconocimiento en el perfil) y la semana en curso tiene su ranking parcial.
+
 ## Panel de administración
 
 Se entra por `/ingresar` con una cuenta de administración y se va directo a **`/admin`**. Esa cuenta usa solo el panel: no tiene perfil público, no aparece en Descubrir y no puede recibir conexiones.
@@ -147,9 +171,10 @@ Se entra por `/ingresar` con una cuenta de administración y se va directo a **`
 | **Ingresos** | MRR, ARR, suscripciones pagas, ticket promedio, altas y bajas del mes, ingreso por plan, ventas por día y todos los movimientos (filtrables y exportables). |
 | **Usuarios** | Lista con búsqueda, filtros y orden; ficha con actividad, proyectos, suscripciones, reportes, identidad y seguimiento. Acciones: plan de cortesía, suspender/reactivar, verificar email, cerrar sesiones, cambiar segmento y eliminar (escribiendo el email para confirmar). |
 | **Proyectos** | Lista y ficha con rendimiento; ocultar o volver a mostrar con motivo (el founder recibe el aviso). |
-| **Moderación** | Cola de reportes por orden de llegada, con los últimos mensajes cuando se reporta una conversación, y verificación de identidad con la foto del documento (aprobar o rechazar con motivo). |
+| **Moderación** | Cola de reportes por orden de llegada (perfiles, proyectos, conversaciones y contenido de «Necesito ayuda con…»), con los últimos mensajes cuando se reporta una conversación, y verificación de identidad con la foto del documento (aprobar o rechazar con motivo). |
 | **Seguimiento** | Tareas con vencimiento y prioridad, vinculadas a cuentas, proyectos, reportes o notas de la revista, y notas internas en cada ficha. |
 | **Difusión** | Pedidos de las startups (Pro y Startup) para salir en la revista e Instagram: tomar, crear el borrador de la nota con los datos del pedido, vincular el posteo de Instagram, publicar o rechazar con motivo. La startup recibe un aviso en cada paso. |
+| **Ayuda** | Pedidos de «Necesito ayuda con…» con sus soluciones y reportes: ocultar o volver a mostrar con motivo, ranking semanal en vivo y podios entregados (con la opción de anular un reconocimiento). |
 | **Revista** | Notas, entrevistas y noticias públicas: borradores, publicación programada, portada, lecturas y vista previa (ver «Revista KeFounder!» arriba). |
 | **Auditoría** | Registro de cada acción hecha desde el panel (quién, cuándo, sobre qué y el motivo). No se edita ni se borra. |
 | **Sistema** | Tamaño y filas de la base, versión del esquema, sesiones, archivos, copia de seguridad con un clic, chequeo de integridad y mantenimiento. |
@@ -185,6 +210,7 @@ La contraseña de administración necesita al menos 10 caracteres, con letras y 
 - **Mis proyectos**: asistente de 8 pasos, edición completa (portada, logo, historia, perfiles buscados con equity, stack, equipo, tracción), publicar/pausar/duplicar/eliminar, **estadísticas** (Pro) y **panel de candidatos** por etapa (Startup).
 - **Perfil** con indicador de completitud y señales de confianza; **notificaciones** en vivo; **planes** Free/Plus/Pro/Startup con precios mensuales y anuales; **configuración** (notificaciones, privacidad, bloqueados, contraseña, eliminar cuenta).
 - Página pública para compartir proyectos (`/p/:id`) sin necesidad de cuenta.
+- **Necesito ayuda con…** (`/ayuda`): pedidos de ayuda, soluciones de la comunidad, «Me sirvió», ranking semanal con puntos y reconocimientos en el perfil.
 - **Revista** pública (`/revista`) con entrevistas, startups, founders, inversión y ecosistema.
 - Diseño mobile-first tipo app: barra inferior en mobile, barra lateral en desktop, se instala en la pantalla de inicio (manifest + íconos). En PC (≥1100 px) cada sección pasa a pantalla completa en columnas, con poco scroll (`src/styles/desktop.css`).
 
@@ -234,6 +260,17 @@ Tamaños:
 
 Se generan desde la geometría oficial de la marca. Si algún día cambia, se vuelven a crear todos con `npm run marca`.
 
+### Marca de la Revista
+
+La Revista KeFounder! tiene su propio isotipo y logotipo, con la palabra «REVISTA» en Manrope ExtraBold espaciada:
+
+- **Isotipo de la Revista:** la K! con «REVISTA» debajo, del mismo ancho. Entra completo en un recorte circular, así que sirve como foto de perfil (por ejemplo, para el Instagram de la Revista). En tamaños de 64 px o menos conviene el isotipo solo, porque «REVISTA» ya no se lee.
+- **Logotipo de la Revista:** «KeFounder!», una línea divisoria y «REVISTA», centrado en la altura de las mayúsculas.
+
+Están en `public/brand/revista/isotipo/` y `public/brand/revista/logotipo/`, en las mismas **8 variantes**, tamaños y formatos (PNG sin fondo y SVG). La hoja `public/brand/revista/kefounder-revista-variantes.png` las muestra todas. Por ejemplo, `kefounder-revista-isotipo-color-1024.png` o `kefounder-revista-logotipo-negativo-1500.png`.
+
+«REVISTA» va en terracota oscuro `#935A48` sobre fondos claros (variantes color y tinta), en terracota claro `#E2C4B7` sobre petróleo (negativo) y en terracota `#C47F6A` sobre tinta (negativo blanco). En los monocromos va del mismo color que el resto. También se generan con `npm run marca`.
+
 En la app, la marca sale de `src/components/Brand.jsx` (`Isotipo`, `IsotipoTile`, `Logotipo`), que dibuja la misma geometría en SVG (`brand-geometry.js`): las letras toman `currentColor` y el punto siempre es terracota (`--warm`).
 
 Colores: petróleo `#345F63`, terracota `#C47F6A`, crema `#F1EDE4`, tinta `#252A2A`.
@@ -241,8 +278,9 @@ Colores: petróleo `#345F63`, terracota `#C47F6A`, crema `#F1EDE4`, tinta `#252A
 ## Pruebas
 
 ```bash
-npm test           # 88 pruebas: API (reglas de negocio, planes, permisos, tiempo real, uploads, marca), panel de administración, revista y difusión
-npm run build && npm run test:e2e   # recorrido completo en Chrome (app, panel, revista y difusión) con un servidor y base temporales
+npm test           # 107 pruebas: API (reglas de negocio, planes, permisos, tiempo real, uploads, marca), panel de administración, revista, difusión y «Necesito ayuda con…»
+npm run build && npm run test:e2e   # recorrido completo en Chrome (app, panel, revista, difusión y ayuda) con un servidor y base temporales
+npm run build && npm run test:responsive   # todas las pantallas (app, revista y panel) en 16 tamaños, de 320 px a 2560 px: desbordes, controles cortados, contenido tapado por barras, textos que no entran y errores
 node tests/shots.mjs --out capturas --routes /,/matches --sizes small,mobile,hd,win,fhd --metrics 1   # capturas, desbordes y scroll/ancho usado por pantalla
 ```
 
@@ -252,9 +290,10 @@ node tests/shots.mjs --out capturas --routes /,/matches --sizes small,mobile,hd,
 shared/catalog.js      opciones, planes, límites y textos de paywall (compartido front/back)
 shared/revista.js      secciones de la revista y el formato seguro de las notas (compartido front/back)
 server/                Express 5 + SQLite (node:sqlite)
-  routes/              auth, perfil, descubrir, personas, proyectos, interesados, matches, notificaciones, planes, uploads, revista
+  routes/              auth, perfil, descubrir, personas, proyectos, interesados, matches, notificaciones, planes, uploads, revista, difusión, ayuda
   admin/               panel: métricas, cuentas, contenido y moderación, revista, seguimiento, sistema
   revista.js           revista: notas publicadas, lecturas por día, datos para compartir y notas de ejemplo
+  help.js              «Necesito ayuda con…»: semanas, ranking con topes, cierre semanal con podio y pedidos de ejemplo
   admin-cli.js         consola de cuentas de administración (npm run admin)
   db.js                esquema y migraciones versionadas
   services.js          conexiones, matches, mensajes y notificaciones

@@ -30,6 +30,9 @@ server.stdout.on('data', (d) => { serverLog += d; });
 server.stderr.on('data', (d) => { serverLog += d; });
 
 const results = [];
+// Página principal de la prueba: si un paso falla, se guarda una captura para ver qué pasó.
+let mainPage = null;
+let failures = 0;
 const step = async (name, fn) => {
   const start = Date.now();
   try {
@@ -38,7 +41,11 @@ const step = async (name, fn) => {
     console.log(`  ✓ ${name} (${Date.now() - start} ms)`);
   } catch (error) {
     results.push({ name, ok: false, error: error.message });
-    console.log(`  ✗ ${name}\n      ${error.message.split('\n')[0]}`);
+    // La primera línea dice qué falló; las siguientes, sobre qué elemento estaba esperando.
+    const detail = error.message.split('\n').filter((l) => l.trim() && !l.includes('=====')).slice(0, 3).join('\n      ');
+    console.log(`  ✗ ${name}\n      ${detail}`);
+    failures += 1;
+    await mainPage?.screenshot({ path: path.join(OUT, `fallo-${failures}.png`) }).catch(() => {});
   }
 };
 const expect = (cond, message) => { if (!cond) throw new Error(message); };
@@ -79,6 +86,7 @@ try {
   // ---------- Registro y onboarding ----------
   const ctxNew = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, hasTouch: true, isMobile: true });
   const p = await ctxNew.newPage();
+  mainPage = p;
   watch(p, 'nuevo');
 
   await step('bienvenida → registro → onboarding completo', async () => {
@@ -447,12 +455,59 @@ try {
 
     const { context, page } = await adminLogin({ width: 1366, height: 768 });
     await page.locator('.adm-nav').getByRole('link', { name: /Difusión/ }).click();
-    await page.locator('.adm-table tbody tr', { hasText: 'Brote' }).first().click();
+    // Clic en la celda de la startup: el centro de la fila puede caer sobre el enlace a la persona.
+    await page.locator('.adm-table tbody tr', { hasText: 'Brote' }).first().locator('td').first().click();
     await page.waitForURL(/\/admin\/difusion\/\d+/);
     await page.getByRole('button', { name: 'Tomar' }).click();
     await page.locator('.adm-entity-pills .adm-status', { hasText: 'En preparación' }).waitFor();
     await page.screenshot({ path: path.join(OUT, '16-admin-difusion.png') });
     await context.close();
+  });
+
+  await step('necesito ayuda con…: pedir, responder, votar, elegir y ver el ranking', async () => {
+    // Sol pide ayuda desde el celular: se entra por la barra superior, no por el menú.
+    const sol = await loginContext(browser, 'sol@kefounder.demo');
+    await sol.page.getByRole('link', { name: /Necesito ayuda con/ }).first().click();
+    await sol.page.waitForURL(`${BASE}/ayuda`);
+    await sol.page.getByRole('button', { name: 'Pedir ayuda' }).first().click();
+    const sheet = sol.page.getByRole('dialog', { name: 'Pedir ayuda' });
+    await sheet.getByRole('button', { name: 'Marketing y growth' }).click();
+    await sheet.getByLabel('Tu pedido').fill('conseguir reseñas de los primeros clientes');
+    await sheet.getByLabel('Contexto').fill('Tenemos 30 clientes contentos pero ninguno deja reseñas en Google. ¿Cómo lo resolvieron ustedes?');
+    await sheet.getByRole('button', { name: 'Publicar pedido' }).click();
+    await sol.page.waitForURL(/\/ayuda\/\d+$/);
+    const requestUrl = sol.page.url();
+    await sol.page.locator('.help-question h1', { hasText: 'conseguir reseñas de los primeros clientes' }).waitFor();
+
+    // Martín responde desde la PC y Ana marca «Me sirvió».
+    const martin = await loginContext(browser, 'martin@kefounder.demo', { width: 1366, height: 768 });
+    await martin.page.goto(requestUrl);
+    await martin.page.getByRole('textbox', { name: 'Tu solución' }).fill('Mandá un WhatsApp a los 30 el día después de la compra con el enlace directo a la reseña. Funciona mejor que el email.');
+    await martin.page.getByRole('button', { name: 'Publicar solución' }).click();
+    await martin.page.locator('.help-answer', { hasText: 'Mandá un WhatsApp' }).waitFor();
+    const ana = await loginContext(browser, 'ana@kefounder.demo');
+    await ana.page.goto(requestUrl);
+    await ana.page.locator('.help-answer', { hasText: 'Mandá un WhatsApp' }).getByRole('button', { name: /Me sirvió/ }).click();
+    await ana.page.locator('.help-vote.is-on').waitFor();
+    await ana.context.close();
+
+    // Sol elige la solución: Martín suma puntos y lo ve en el ranking.
+    await sol.page.reload();
+    await sol.page.getByRole('button', { name: 'Elegir esta solución' }).click();
+    await sol.page.locator('.help-answer-badge', { hasText: 'Solución elegida' }).waitFor();
+    const wide = await sol.page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
+    expect(!wide, 'el pedido desborda en el celular');
+    await sol.page.screenshot({ path: path.join(OUT, '17-ayuda-mobile.png') });
+    await sol.context.close();
+
+    await martin.page.goto(`${BASE}/ayuda/ranking`);
+    await martin.page.locator('.my-week', { hasText: 'puntos' }).waitFor();
+    const mine = await martin.page.locator('.my-week').innerText();
+    expect(/Vas \d+\.º con 27 puntos/.test(mine), `Martín debería tener 27 puntos: ${mine}`);
+    await martin.page.screenshot({ path: path.join(OUT, '18-ranking-desktop.png') });
+    await martin.page.goto(`${BASE}/perfil`);
+    await martin.page.locator('.recognitions .award-list li').first().waitFor();
+    await martin.context.close();
   });
 
   await browser.close();

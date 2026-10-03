@@ -386,7 +386,21 @@ La startup la pide desde «Mis proyectos». Elige uno de sus proyectos publicado
 
 Si un pedido se rechaza o se cancela antes de que se tome, el cupo vuelve. El equipo gestiona los pedidos desde la sección Difusión del panel de administración, que puede crear el borrador de la nota con los datos del pedido. En la revista, esas notas llevan la marca «Difusión».
 
-### 4.20. Panel de administración
+### 4.20. Necesito ayuda con…
+
+Un espacio para que la comunidad se ayude. No ocupa lugar en el menú: se entra desde el ícono de salvavidas de la barra superior y desde la tarjeta «Reconocimientos» del Perfil. El ícono muestra un punto cuando hay pedidos nuevos desde la última visita.
+
+- **Pedir ayuda:** se elige el tema y se completa «Necesito ayuda con…» y el contexto. Hasta tres pedidos por día. Mientras nadie respondió, el pedido se puede editar o borrar; después, solo cerrar o volver a abrir.
+- **Responder:** cada persona publica una solución por pedido y la puede editar. Las soluciones se ordenan con la elegida primero y después por «Me sirvió».
+- **Votar y elegir:** quien lee marca «Me sirvió»; quien pidió ayuda elige la solución que le sirvió (y puede deshacerlo). El pedido queda como resuelto.
+- **Lista:** pestañas Abiertos, Sin respuesta, Resueltos y Míos, filtro por tema y búsqueda sin importar tildes.
+- **Puntos:** +2 por publicar una solución (hasta 10 por semana), +5 por cada «Me sirvió» de otra persona y +20 si eligen tu solución. Una misma persona te puede dar hasta 30 puntos por semana, y para el podio los puntos tienen que venir de al menos dos personas distintas.
+- **Ranking semanal** (`/ayuda/ranking`): de lunes a domingo, con podio, lista, tu posición, lo que te falta para el podio y los podios anteriores.
+- **Reconocimientos:** al cerrar la semana, las tres personas con más puntos (mínimo 15) reciben un aviso y un reconocimiento de 1.º, 2.º o 3.º puesto. Queda en su perfil y en el que ven los demás, y durante cuatro semanas una medalla «Top» acompaña su nombre.
+- **Avisos:** soluciones nuevas a tu pedido (agrupadas), solución elegida y podio. Se pueden apagar en Configuración.
+- **Moderación:** pedidos y soluciones se pueden reportar. Desde el panel se ocultan con motivo y dejan de sumar puntos; si hubo trampa, se puede anular un reconocimiento.
+
+### 4.21. Panel de administración
 
 El panel vive en `/admin` y solo lo ve la cuenta de administración, que entra por la pantalla de ingreso normal y va directo ahí. Esa cuenta no tiene perfil público: no aparece en Descubrir ni puede recibir conexiones.
 
@@ -394,7 +408,7 @@ Tiene su propio menú lateral, agrupado en tres partes:
 
 - **Panorama**: Resumen (indicadores, tendencia, pendientes, activación, planes y últimos registros), Métricas (siete métricas diarias en 7, 30 o 90 días, embudo de activación y distribuciones) e Ingresos (MRR, ARR, ticket promedio, altas y bajas, ingreso por plan y movimientos).
 - **Gestión**: Usuarios (lista y ficha completa con acciones), Proyectos (lista, ficha y moderación), Moderación (reportes y verificación de identidad) y Seguimiento (tareas con vencimiento y notas internas).
-- **Contenido**: Revista (notas, entrevistas y noticias, con editor, programación y lecturas) y Difusión (pedidos de las startups para salir en la revista e Instagram).
+- **Contenido**: Revista (notas, entrevistas y noticias, con editor, programación y lecturas), Difusión (pedidos de las startups para salir en la revista e Instagram) y Ayuda (pedidos y soluciones de «Necesito ayuda con…», ranking y podios).
 - **Control**: Auditoría (registro de todas las acciones del panel) y Sistema (estado de la base, copias de seguridad, integridad y mantenimiento).
 
 Las listas se filtran, ordenan y paginan en el servidor; los filtros quedan en la dirección para poder guardarlos o compartirlos. Las métricas separan las cuentas reales de las de demostración. Cada acción que cambia algo pide un motivo cuando corresponde y queda en la auditoría. Las cuentas de administración se crean y administran desde la consola (`npm run admin`), y su contraseña nunca se guarda en archivos.
@@ -480,6 +494,7 @@ La identidad actual combina **verde petróleo, salvia azulada, terracota y crema
 - **Logotipo:** «KeFounder!» en Manrope ExtraBold convertida a trazos, con un «!» propio cuyo punto también es terracota. Se usa en petróleo sobre fondos claros y en crema sobre petróleo.
 - **Dónde aparece:** isotipo en crema en la barra lateral de escritorio; logotipo en la barra superior, la landing, ingreso y registro, onboarding y la página pública de proyectos; isotipo en su cuadro petróleo en la pantalla de carga, el favicon y los íconos de instalación.
 - **Archivos:** `public/brand/` (SVG y PNG, más la hoja de marca `kefounder-marca.png`). En el código, `src/components/Brand.jsx`.
+- **Marca de la Revista:** isotipo (la K! con «REVISTA» debajo) y logotipo («KeFounder! | REVISTA») en 8 variantes, como PNG sin fondo y SVG, en `public/brand/revista/`.
 
 ### 7.1. Colores principales
 
@@ -766,11 +781,12 @@ Para desactivar las funciones demo se utilizan valores `0`. Ocultar accesos o ap
 
 ## 12. Validaciones realizadas
 
-Con el panel de administración, la revista y la difusión se completaron:
+Con el panel de administración, la revista, la difusión y «Necesito ayuda con…» se completaron:
 
 - Compilación del frontend con Vite.
-- **88 pruebas automáticas**, sin fallos: 43 de la API (incluida una matriz que recorre cada función de cada plan con las cuatro cuentas de ejemplo), 24 del panel (permisos, suspensión, moderación, reportes, identidad, planes de cortesía, tareas, auditoría, exportación CSV, copias de seguridad y conservación de cuentas reales al reiniciar la demo) y 13 de la revista (lectura sin cuenta, borradores, publicación y programación, portada, imágenes, formato seguro, lecturas, datos para compartir y notas de ejemplo) y 8 de la difusión (beneficio por plan, cupos, pedido, cancelación, borrador, publicación, rechazo y avisos).
-- **22 pasos de prueba en navegador**, sin fallos: 14 de la app, 5 del panel (creación de la cuenta por consola, resumen, plan de cortesía con motivo, tareas y búsqueda global, menú en celular) y 2 de la revista (entrar sin cuenta desde la bienvenida y leer una nota en el celular; escribir y publicar una nota desde el panel) y 1 de la difusión (pedirla desde Mis proyectos en el celular y tomarla desde el panel).
+- **107 pruebas automáticas**, sin fallos: 43 de la API (incluida una matriz que recorre cada función de cada plan con las cuatro cuentas de ejemplo), 24 del panel (permisos, suspensión, moderación, reportes, identidad, planes de cortesía, tareas, auditoría, exportación CSV, copias de seguridad y conservación de cuentas reales al reiniciar la demo) y 13 de la revista (lectura sin cuenta, borradores, publicación y programación, portada, imágenes, formato seguro, lecturas, datos para compartir y notas de ejemplo) 8 de la difusión (beneficio por plan, cupos, pedido, cancelación, borrador, publicación, rechazo y avisos) y 19 de «Necesito ayuda con…» (podio de la semana cerrada, ranking en vivo, topes de puntos, podio con al menos dos personas, pedidos, soluciones, votos que no se reciclan, elección, avisos, bloqueos, privacidad del ranking, pedidos que se reabren si se oculta la solución elegida, reconocimientos en el perfil y moderación).
+- **23 pasos de prueba en navegador**, sin fallos: 14 de la app, 5 del panel (creación de la cuenta por consola, resumen, plan de cortesía con motivo, tareas y búsqueda global, menú en celular), 2 de la revista (entrar sin cuenta desde la bienvenida y leer una nota en el celular; escribir y publicar una nota desde el panel), 1 de la difusión (pedirla desde Mis proyectos en el celular y tomarla desde el panel) y 1 de «Necesito ayuda con…» (pedir desde el celular, responder desde la PC, votar, elegir la solución y ver los puntos en el ranking y el reconocimiento en el perfil).
+- **Chequeo de pantallas** (`npm run test:responsive`): todas las rutas de la app, la revista y el panel, más las hojas y menús que se abren, en 16 tamaños (320×568, 360×740, 375×667, 390×844, 412×915, 430×932, celular acostado 844×390, 768×1024, 820×1180, 1024×768, 1280×720, 1366×768, 1440×900, 1536×864, 1920×1080 y 2560×1440). Mide desbordes horizontales, controles cortados por el borde, contenido tapado por barras fijas, textos que no entran y errores de la página o de la API.
 - Capturas del panel en 320, 375, 390, 820, 1024, 1280, 1366, 1536 y 1920 px de ancho.
 - Capturas y revisión de desbordes horizontales en tamaños de celular y escritorio.
 - Comprobación de respuesta del frontend y backend mediante la dirección local de red.
@@ -785,6 +801,7 @@ Los comandos disponibles son:
 ```bash
 npm test
 npm run test:e2e
+npm run test:responsive
 node tests/shots.mjs --out capturas --routes /,/matches --sizes small,mobile,hd,win,fhd --user ana
 ```
 
@@ -817,8 +834,9 @@ En la tabla, `:id` representa el identificador de una persona, proyecto o conver
 | Notificaciones | `/notificaciones` | Autenticado. |
 | Planes | `/planes` | Autenticado. |
 | Configuración | `/configuracion` | Autenticado. |
+| Necesito ayuda con… | `/ayuda`, `/ayuda/:id` y `/ayuda/ranking` | Autenticado. |
 | Revista | `/revista`, `/revista/seccion/:id`, `/revista/buscar` y `/revista/:nota` | Público, sin cuenta. |
-| Panel de administración | `/admin` y sus secciones (`/admin/metricas`, `/admin/ingresos`, `/admin/usuarios`, `/admin/proyectos`, `/admin/moderacion`, `/admin/seguimiento`, `/admin/revista`, `/admin/auditoria`, `/admin/sistema`) | Solo la cuenta de administración. |
+| Panel de administración | `/admin` y sus secciones (`/admin/metricas`, `/admin/ingresos`, `/admin/usuarios`, `/admin/proyectos`, `/admin/moderacion`, `/admin/seguimiento`, `/admin/revista`, `/admin/difusion`, `/admin/ayuda`, `/admin/auditoria`, `/admin/sistema`) | Solo la cuenta de administración. |
 
 Las restricciones se controlan también en el backend; conocer una ruta no concede acceso a datos o acciones ajenas.
 

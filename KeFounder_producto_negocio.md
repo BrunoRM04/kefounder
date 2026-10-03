@@ -718,7 +718,44 @@ El plan Plus puede ver quiénes son.
 
 ---
 
-# 22. Modelo de negocio
+# 22. Necesito ayuda con… (comunidad y ranking semanal)
+
+Un espacio para que la comunidad se ayude entre sí y para que la gente vuelva todas las semanas. Alguien cuenta en qué está trabado («Necesito ayuda con validar mi idea», «…con conseguir los primeros clientes») y los demás proponen soluciones.
+
+No ocupa lugar en el menú principal. Se entra desde un ícono en la barra superior, que muestra un punto cuando hay pedidos nuevos, y desde el Perfil.
+
+## Cómo funciona
+
+1. La persona elige el tema (producto, tecnología, diseño, marketing, ventas, inversión, finanzas, legal, equipo u otro) y completa «Necesito ayuda con…» y el contexto.
+2. La comunidad publica soluciones, una por persona y por pedido.
+3. Quien lee marca «Me sirvió» en las soluciones útiles.
+4. Quien pidió ayuda elige la solución que le sirvió y el pedido queda como resuelto.
+
+## Puntos
+
+| Acción | Puntos |
+|---|---|
+| Publicar una solución | +2 (hasta 10 por semana) |
+| Cada «Me sirvió» de otra persona | +5 |
+| Que elijan tu solución | +20 |
+
+Para que el ranking sea justo, una misma persona te puede dar hasta 30 puntos por semana, para el podio los puntos tienen que venir de al menos dos personas distintas, nadie puede votarse ni responderse a sí mismo, y lo que la moderación oculta (o lo de una cuenta suspendida) deja de sumar.
+
+## Ranking semanal y reconocimientos
+
+El ranking va de lunes a domingo. Muestra el podio en vivo, la lista y cuántos puntos te faltan para entrar al podio.
+
+Al cerrar la semana, las tres personas con más puntos (mínimo 15) ganan un reconocimiento: 1.º, 2.º o 3.º puesto. El reconocimiento queda en su perfil, a la vista de quienes lo visitan, y durante cuatro semanas aparece una medalla «Top» junto a su nombre.
+
+## Por qué importa
+
+- **Retención:** da un motivo para volver cada semana, aunque no haya un match nuevo.
+- **Reputación:** quien ayuda muestra lo que sabe. Para el talento es una forma de destacarse ante los founders.
+- **Contenido:** los problemas reales de la comunidad pueden inspirar notas para la Revista.
+
+---
+
+# 23. Modelo de negocio
 
 Inicialmente KeFounder! puede monetizarse exclusivamente mediante suscripciones.
 
@@ -736,7 +773,7 @@ El negocio se sostiene con una versión gratuita y tres niveles pagos.
 
 ---
 
-# 23. Plan FREE
+# 24. Plan FREE
 
 ## Precio
 
@@ -763,7 +800,7 @@ La versión gratuita debe ser suficientemente buena para generar comunidad.
 
 ---
 
-# 24. Plan PLUS
+# 25. Plan PLUS
 
 ## Precio sugerido
 
@@ -792,7 +829,7 @@ La función más atractiva puede ser:
 
 ---
 
-# 25. Plan PRO
+# 26. Plan PRO
 
 ## Precio sugerido
 
@@ -827,7 +864,7 @@ Ejemplo de estadísticas:
 
 ---
 
-# 26. Plan STARTUP
+# 27. Plan STARTUP
 
 ## Precio sugerido
 
@@ -855,7 +892,7 @@ Todo Pro más:
 
 ---
 
-# 27. Difusión en la Revista e Instagram
+# 28. Difusión en la Revista e Instagram
 
 KeFounder! también se encarga de dar a conocer a las startups de la comunidad: las publica en la **Revista KeFounder!** (el diario online público del sitio) y en el **Instagram** de KeFounder!. Para la startup es reconocimiento y alcance. Para KeFounder!, contenido real para la revista y una razón concreta para elegir un plan pago.
 
@@ -883,7 +920,7 @@ Si un pedido se rechaza (con motivo) o la startup lo cancela antes de que se tom
 
 ---
 
-# 28. Tabla de suscripciones
+# 29. Tabla de suscripciones
 
 | Función | Free | Plus | Pro | Startup |
 |---|---:|---:|---:|---:|
@@ -905,7 +942,7 @@ Si un pedido se rechaza (con motivo) o la startup lo cancela antes de que se tom
 
 ---
 
-# 29. Suscripciones anuales
+# 30. Suscripciones anuales
 
 También deberían existir planes anuales.
 
@@ -927,7 +964,7 @@ La diferencia debe comunicarse como ahorro respecto al pago mensual.
 
 ---
 
-# 30. Pantalla de suscripción
+# 31. Pantalla de suscripción
 
 La pantalla no debería parecer agresiva.
 
@@ -971,7 +1008,7 @@ Botones:
 
 ---
 
-# 31. Cuándo mostrar el paywall
+# 32. Cuándo mostrar el paywall
 
 No debe aparecer apenas el usuario ingresa.
 
@@ -1011,7 +1048,7 @@ Esto convierte mejor porque el usuario entiende inmediatamente qué valor está 
 
 ---
 
-# 32. Diseño general
+# 33. Diseño general
 
 La identidad debería ser ultra minimalista.
 
@@ -1050,7 +1087,7 @@ Ejemplos de estilo:
 
 ---
 
-# 33. Filosofía UX
+# 34. Filosofía UX
 
 Cada pantalla debe responder una sola pregunta.
 
@@ -1080,7 +1117,7 @@ Evitar dashboards llenos de información innecesaria.
 
 ---
 
-# 34. Navegación
+# 35. Navegación
 
 ## Desktop
 
@@ -1111,7 +1148,7 @@ La aplicación debe diseñarse principalmente pensando en mobile.
 
 ---
 
-# 35. MVP recomendado
+# 36. MVP recomendado
 
 La primera versión debería contener solamente lo necesario para probar si las personas realmente quieren utilizar el producto.
 
@@ -1153,7 +1190,7 @@ Primero hay que validar el comportamiento principal:
 
 ---
 
-# 36. Métricas importantes
+# 37. Métricas importantes
 
 Las métricas principales deberían ser:
 
@@ -1193,7 +1230,7 @@ La métrica más importante a largo plazo:
 
 ---
 
-# 37. Posicionamiento
+# 38. Posicionamiento
 
 KeFounder! no debería comunicarse como una bolsa de trabajo.
 
@@ -1213,7 +1250,7 @@ O:
 
 ---
 
-# 38. Diferencia frente a otras plataformas
+# 39. Diferencia frente a otras plataformas
 
 LinkedIn está orientado a redes profesionales.
 
@@ -1240,7 +1277,7 @@ El verdadero producto es el sistema de compatibilidad entre:
 
 ---
 
-# 39. Visión futura
+# 40. Visión futura
 
 Aunque inicialmente el negocio se base únicamente en suscripciones, la plataforma puede evolucionar hasta convertirse en una infraestructura de creación de equipos.
 
@@ -1264,7 +1301,7 @@ Sino como:
 
 ---
 
-# 40. Resumen del negocio
+# 41. Resumen del negocio
 
 ## Producto
 

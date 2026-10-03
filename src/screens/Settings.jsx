@@ -164,6 +164,7 @@ export default function Settings() {
               <Toggle label="Nuevos matches" checked={n.matches} onChange={(v) => update({ notifications: { matches: v } })} />
               <Toggle label="Mensajes" checked={n.messages} onChange={(v) => update({ notifications: { messages: v } })} />
               <Toggle label="Actividad" description="Guardados, visitas y recomendaciones." checked={n.activity} onChange={(v) => update({ notifications: { activity: v } })} />
+              <Toggle label="Necesito ayuda con…" description="Soluciones a tus pedidos, soluciones tuyas elegidas y el podio semanal." checked={n.help !== false} onChange={(v) => update({ notifications: { help: v } })} />
             </>
           )}
         </section>

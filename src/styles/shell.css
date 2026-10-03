@@ -32,7 +32,11 @@
     padding: 22px 10px 18px;
     background: var(--accent);
     border-right: 1px solid var(--accent-strong);
+    /* En pantallas bajas (celular acostado) los últimos accesos quedaban fuera de la pantalla. */
+    overflow-y: auto;
+    scrollbar-width: none;
   }
+  .rail::-webkit-scrollbar { display: none; }
 }
 .rail-brand { display: grid; place-items: center; width: 56px; height: 56px; margin-bottom: 30px; border-radius: 16px; color: var(--on-primary); transition: background-color 0.16s ease; }
 .rail-brand:hover { background: var(--accent-strong); }

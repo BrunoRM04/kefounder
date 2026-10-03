@@ -2,10 +2,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { hashPassword, lockedPasswordHash } from './auth.js';
 import { openDb } from './db.js';
+import { ensureSampleHelp, removeSampleHelp } from './help.js';
 import { ensureSampleArticles, removeSampleArticles } from './revista.js';
 import { DEMO_ACCOUNTS, DEMO_PASSWORD, PEOPLE, PROJECTS } from './seed-data.js';
 
-const TABLES = ['press_requests', 'sessions', 'notifications', 'messages', 'matches', 'interests', 'saves', 'passes', 'views', 'blocks', 'reports', 'subscriptions', 'uploads', 'projects', 'users'];
+const TABLES = ['help_awards', 'help_votes', 'help_answers', 'help_requests', 'press_requests', 'sessions', 'notifications', 'messages', 'matches', 'interests', 'saves', 'passes', 'views', 'blocks', 'reports', 'subscriptions', 'uploads', 'projects', 'users'];
 
 const minutesAgo = (m) => new Date(Date.now() - m * 60000).toISOString();
 const hoursAgo = (h) => minutesAgo(h * 60);
@@ -46,7 +47,9 @@ export function resetDemo(db) {
     for (const table of ['views', 'saves', 'passes']) {
       db.run(`DELETE FROM ${table} WHERE (target_type = 'person' AND target_id NOT IN (SELECT id FROM users)) OR (target_type = 'project' AND target_id NOT IN (SELECT id FROM projects))`);
     }
-    db.run("DELETE FROM reports WHERE (target_type = 'person' AND target_id NOT IN (SELECT id FROM users)) OR (target_type = 'project' AND target_id NOT IN (SELECT id FROM projects)) OR (target_type = 'match' AND target_id NOT IN (SELECT id FROM matches))");
+    db.run(`DELETE FROM reports WHERE (target_type = 'person' AND target_id NOT IN (SELECT id FROM users)) OR (target_type = 'project' AND target_id NOT IN (SELECT id FROM projects))
+      OR (target_type = 'match' AND target_id NOT IN (SELECT id FROM matches)) OR (target_type = 'help' AND target_id NOT IN (SELECT id FROM help_requests))
+      OR (target_type = 'help_answer' AND target_id NOT IN (SELECT id FROM help_answers))`);
   });
   return kept;
 }
@@ -330,6 +333,10 @@ export async function seed(db, { reset = false } = {}) {
   // Revista: las notas de ejemplo se rehacen con la demo; las propias nunca se tocan.
   if (reset) removeSampleArticles(db);
   ensureSampleArticles(db, { force: reset });
+
+  // «Necesito ayuda con…»: pedidos y soluciones de ejemplo (la semana pasada ya tiene podio al arrancar).
+  if (reset) removeSampleHelp(db);
+  ensureSampleHelp(db, { force: reset });
 
   // Difusión: Martín (Pro) pidió una mención para Formo; queda pendiente en el panel.
   const formo = db.get("SELECT id, name, website FROM projects WHERE owner_id = ? AND name = 'Formo'", [ids.martin]);

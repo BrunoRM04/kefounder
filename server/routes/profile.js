@@ -99,7 +99,7 @@ export default function profileRoutes(router, ctx) {
   router.get('/me/settings', requireAuth, (req, res) => {
     const u = parseUser(req.user);
     res.json({
-      notifications: { interests: true, matches: true, messages: true, activity: true, ...(u.settings.notifications || {}) },
+      notifications: { interests: true, matches: true, messages: true, activity: true, help: true, ...(u.settings.notifications || {}) },
       visible: Boolean(u.visible),
       showAge: Boolean(u.show_age)
     });
@@ -109,7 +109,7 @@ export default function profileRoutes(router, ctx) {
     const body = req.body ?? {};
     const u = parseUser(req.user);
     const notifications = { ...(u.settings.notifications || {}) };
-    for (const key of ['interests', 'matches', 'messages', 'activity']) {
+    for (const key of ['interests', 'matches', 'messages', 'activity', 'help']) {
       if (body.notifications && key in body.notifications) notifications[key] = Boolean(body.notifications[key]);
     }
     const cols = { settings: JSON.stringify({ ...u.settings, notifications }) };
@@ -255,7 +255,7 @@ export default function profileRoutes(router, ctx) {
 
   router.post('/reports', requireAuth, (req, res) => {
     const { targetType, targetId, reason, details } = req.body ?? {};
-    if (!['person', 'project', 'match'].includes(targetType)) throw badRequest('Tipo inválido.');
+    if (!['person', 'project', 'match', 'help', 'help_answer'].includes(targetType)) throw badRequest('Tipo inválido.');
     const id = idParam(targetId);
     if (!str(reason, 80)) throw badRequest('Elegí un motivo.');
     if (targetType === 'match') {
@@ -263,6 +263,12 @@ export default function profileRoutes(router, ctx) {
       if (!match || (match.user_a !== req.user.id && match.user_b !== req.user.id)) throw notFound('Esta conversación no está disponible.');
     } else if (targetType === 'person') {
       if (id === req.user.id || !db.get('SELECT 1 FROM users WHERE id = ?', [id])) throw notFound('Este perfil ya no está disponible.');
+    } else if (targetType === 'help') {
+      const r = db.get('SELECT user_id, hidden FROM help_requests WHERE id = ?', [id]);
+      if (!r || r.hidden || r.user_id === req.user.id) throw notFound('Este pedido de ayuda ya no está disponible.');
+    } else if (targetType === 'help_answer') {
+      const a = db.get('SELECT user_id, hidden FROM help_answers WHERE id = ?', [id]);
+      if (!a || a.hidden || a.user_id === req.user.id) throw notFound('Esta solución ya no está disponible.');
     } else if (!db.get('SELECT 1 FROM projects WHERE id = ?', [id])) {
       throw notFound('Este proyecto ya no está disponible.');
     }

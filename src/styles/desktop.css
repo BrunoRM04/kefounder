@@ -58,7 +58,8 @@
   .page-interested .locked-copy h2 { font-size: 26px; }
   .notif-group { margin-bottom: 16px; }
   .notif-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 10px; background: transparent; border: 0; border-radius: 0; overflow: visible; }
-  .notif-item { border: 1px solid var(--line); border-radius: 16px; background: var(--surface); overflow: hidden; }
+  /* En flex para que el aviso (y su fondo de no leído) ocupe toda la altura de la fila de la grilla. */
+  .notif-item { display: flex; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); overflow: hidden; }
   .notif-item + .notif-item { border-top: 1px solid var(--line); }
 
   /* ---------- Mis proyectos: tarjetas en columnas ---------- */
@@ -98,7 +99,8 @@
   .page-edit .field-label { font-size: 13px; }
   .page-edit .input { min-height: 40px; padding: 8px 12px; font-size: 14.5px; border-radius: 10px; }
   .page-edit .textarea { min-height: 70px; }
-  .page-edit .select { background-position: right 12px center; }
+  /* El padding compacto de .input no puede tapar la flecha: el texto largo quedaba debajo de ella. */
+  .page-edit .select { background-position: right 12px center; padding-right: 34px; }
   .page-edit .chip-group { gap: 6px; }
   .page-edit .chip { min-height: 32px; padding: 0 11px; font-size: 13px; }
   .page-edit .tag-input { min-height: 40px; padding: 4px 6px; }
@@ -191,7 +193,9 @@
   .board .interest-person .avatar { width: 40px !important; height: 40px !important; }
   .board .interest-person strong { font-size: 15px; }
   .board .interest-person > div > span, .board .interest-person > div > small { font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .board .interest-note { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; padding: 8px 10px; font-size: 13px; }
+  /* El aire de arriba y abajo va en bordes del color del fondo: con padding, la cuarta línea
+     recortada se asomaba por debajo del texto. */
+  .board .interest-note { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; padding: 0 10px; border-top: 8px solid var(--surface-2); border-bottom: 8px solid var(--surface-2); font-size: 13px; }
   .board .chip-row { gap: 5px; }
   .board .chip-row .pill { height: 24px; padding: 0 9px; font-size: 11.5px; }
   .board .candidate-foot { flex-direction: column; align-items: stretch; gap: 8px; padding-top: 10px; }
@@ -231,6 +235,8 @@
   /* Tarjeta lateral más baja: los datos en dos columnas. */
   .aside-card { gap: 14px; padding: 18px; }
   .aside-card .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 10px; padding-top: 14px; }
+  /* Un poco menos de espaciado: "COMPENSACIÓN" sobresalía de su columna. */
+  .aside-card .facts dt { letter-spacing: 0.06em; }
   .detail-section { padding: 18px 0; }
 }
 

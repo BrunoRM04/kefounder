@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChartLine, ClipboardList, FolderKanban, LayoutDashboard, LogOut, Megaphone, Menu, Newspaper, ScrollText, Search, Server, ShieldAlert, Users, Wallet, X } from 'lucide-react';
+import { ChartLine, ClipboardList, FolderKanban, LayoutDashboard, LifeBuoy, LogOut, Megaphone, Menu, Newspaper, ScrollText, Search, Server, ShieldAlert, Users, Wallet, X } from 'lucide-react';
 import { Isotipo, Logotipo } from '../components/Brand.jsx';
 import { Avatar, IconButton, ProjectLogo, Spinner, cx } from '../components/ui.jsx';
 import { api } from '../lib/api.js';
@@ -23,6 +23,9 @@ const RevistaList = lazy(() => import('./screens/Revista.jsx'));
 const ArticleEditor = lazy(() => import('./screens/ArticleEditor.jsx'));
 const PressList = lazy(() => import('./screens/Press.jsx'));
 const PressDetail = lazy(() => import('./screens/PressDetail.jsx'));
+const HelpList = lazy(() => import('./screens/Help.jsx'));
+const HelpDetail = lazy(() => import('./screens/HelpDetail.jsx'));
+const HelpRanking = lazy(() => import('./screens/HelpRanking.jsx'));
 const Audit = lazy(() => import('./screens/Audit.jsx'));
 const System = lazy(() => import('./screens/System.jsx'));
 
@@ -43,6 +46,9 @@ const ROUTES = [
   { path: '/admin/revista/:id', Screen: ArticleEditor, title: 'Nota', keyByPath: true },
   { path: '/admin/difusion', Screen: PressList, title: 'Difusión' },
   { path: '/admin/difusion/:id', Screen: PressDetail, title: 'Pedido de difusión' },
+  { path: '/admin/ayuda', Screen: HelpList, title: 'Necesito ayuda con…' },
+  { path: '/admin/ayuda/ranking', Screen: HelpRanking, title: 'Ranking semanal' },
+  { path: '/admin/ayuda/:id', Screen: HelpDetail, title: 'Pedido de ayuda' },
   { path: '/admin/auditoria', Screen: Audit, title: 'Auditoría' },
   { path: '/admin/sistema', Screen: System, title: 'Sistema' }
 ];
@@ -61,7 +67,8 @@ const NAV = [
   ] },
   { group: 'Contenido', items: [
     { to: '/admin/revista', label: 'Revista', icon: Newspaper },
-    { to: '/admin/difusion', label: 'Difusión', icon: Megaphone, badge: (b) => b.press || 0 }
+    { to: '/admin/difusion', label: 'Difusión', icon: Megaphone, badge: (b) => b.press || 0 },
+    { to: '/admin/ayuda', label: 'Ayuda', icon: LifeBuoy }
   ] },
   { group: 'Control', items: [
     { to: '/admin/auditoria', label: 'Auditoría', icon: ScrollText },

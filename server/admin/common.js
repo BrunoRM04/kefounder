@@ -142,4 +142,4 @@ export const requireReason = (value, message = 'Escribí el motivo: queda regist
   return reason;
 };
 
-export const TARGET_TYPES = ['user', 'project', 'report', 'article', 'press'];
+export const TARGET_TYPES = ['user', 'project', 'report', 'article', 'press', 'help'];

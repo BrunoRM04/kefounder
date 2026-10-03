@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BadgeCheck, Bookmark, BriefcaseBusiness, Check, Github, Globe, Heart, Linkedin, Mail, MapPin, MessageCircle, MoreHorizontal, Send, Share2, ShieldAlert, ThumbsDown, Undo2, UserX } from 'lucide-react';
 import { CompatBlock } from '../components/Compat.jsx';
+import { PersonRecognitions } from '../components/HelpParts.jsx';
 import { ConfirmSheet, NoteSheet, ReportSheet } from '../components/Sheets.jsx';
 import { TopBar } from '../components/Shell.jsx';
 import { ActionMenu, Button, Cover, ErrorState, IconButton, Pill, ProjectLogo, Skeleton, cx } from '../components/ui.jsx';
@@ -248,6 +249,8 @@ export default function PersonDetail({ params }) {
                 <div className="chip-row">{person.skills.map((s) => <Pill key={s}>{s}</Pill>)}</div>
               </section>
             )}
+
+            <PersonRecognitions userId={id} />
 
             {person.experience?.length > 0 && (
               <section className="detail-section">
