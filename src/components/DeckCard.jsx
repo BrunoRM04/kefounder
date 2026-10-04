@@ -5,7 +5,7 @@ import { imageSrc } from '../lib/media.js';
 import { Pill, ProjectLogo, cx } from './ui.jsx';
 
 function MatchBadge({ match }) {
-  if (!match?.score) return null;
+  if (match?.score == null) return null;
   return <span className="dc-match"><Sparkles size={13} fill="currentColor" /> {match.score}% <small>match</small></span>;
 }
 

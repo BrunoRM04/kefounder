@@ -222,7 +222,7 @@ const ADMIN = { email: 'staff@kefounder.test', password: `${crypto.randomBytes(1
 
 const server = spawn(process.execPath, ['--disable-warning=ExperimentalWarning', 'server/index.js'], {
   cwd: root,
-  env: { ...process.env, PORT: String(PORT), KEFOUNDER_DATA_DIR: dataDir, HOST: '127.0.0.1', KEFOUNDER_DEMO_BOTS: '0' },
+  env: { ...process.env, PORT: String(PORT), KEFOUNDER_DATA_DIR: dataDir, HOST: '127.0.0.1', KEFOUNDER_DEMO: '1', KEFOUNDER_DEMO_BOTS: '0' },
   stdio: ['ignore', 'pipe', 'pipe']
 });
 let serverLog = '';

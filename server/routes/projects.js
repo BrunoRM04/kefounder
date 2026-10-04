@@ -1,7 +1,7 @@
 import { BRAND_ACCENTS } from '../../shared/theme.js';
 import { AVAILABILITY, COUNTRIES, INDUSTRIES, PROJECT_COMPENSATION, PROJECT_ROLES, ROLES, STAGES, WORK_MODES, labelOf } from '../../shared/catalog.js';
 import { requireOnboarded } from '../auth.js';
-import { projectCompat } from '../compat.js';
+import { compatPayload, projectCompat } from '../compat.js';
 import { now } from '../db.js';
 import { hasFeature, limitOf, paywall, requireFeature, usage } from '../plans.js';
 import { ownedProject, parseProject, parseUser, personMini, projectDetail } from '../serializers.js';
@@ -32,7 +32,10 @@ function projectColumns(db, body, user, existing) {
   if ('industry' in body) cols.industry = oneOf(body.industry, INDUSTRIES, str(body.industry, 40));
   if ('city' in body) cols.city = str(body.city, 60);
   if ('country' in body) cols.country = oneOf(body.country, COUNTRIES, str(body.country, 40));
-  if ('workMode' in body) cols.work_mode = oneOf(body.workMode, WORK_MODES, 'remote');
+  if ('workMode' in body) {
+    cols.work_mode = oneOf(body.workMode, WORK_MODES, '');
+    cols.work_mode_confirmed = cols.work_mode ? 1 : 0;
+  }
   if ('website' in body) {
     const url = safeUrl(body.website);
     if (body.website && !url) throw badRequest('Revisá el sitio web.', { field: 'website' });
@@ -56,8 +59,8 @@ function projectColumns(db, body, user, existing) {
     }
     cols.roles_needed = JSON.stringify(roles);
   }
-  if ('dedication' in body) cols.dedication = oneOf(body.dedication, AVAILABILITY, 'exploring');
-  if ('compensation' in body) cols.compensation = oneOf(body.compensation, PROJECT_COMPENSATION, 'talk');
+  if ('dedication' in body) cols.dedication = oneOf(body.dedication, AVAILABILITY, '');
+  if ('compensation' in body) cols.compensation = oneOf(body.compensation, PROJECT_COMPENSATION, '');
   if ('stack' in body) cols.stack = JSON.stringify(strList(body.stack, { max: 12, itemMax: 32 }));
   if ('team' in body) {
     const list = Array.isArray(body.team) ? body.team : [];
@@ -76,6 +79,10 @@ const canPublish = (project) => {
   const p = parseProject(project);
   if (!p.tagline) throw badRequest('Agregá una descripción corta antes de publicar.', { field: 'tagline' });
   if (!p.rolesNeeded.length) throw badRequest('Elegí al menos un perfil que buscás.', { field: 'rolesNeeded' });
+  if (!p.work_mode) throw badRequest('Elegí la modalidad de trabajo del proyecto.', { field: 'workMode' });
+  if (p.work_mode !== 'remote' && (!p.city || !p.country)) throw badRequest('Indicá la ciudad y el país del proyecto.', { field: 'city' });
+  if (!p.dedication) throw badRequest('Indicá la dedicación que necesitás.', { field: 'dedication' });
+  if (!p.compensation) throw badRequest('Indicá la compensación que ofrecés.', { field: 'compensation' });
 };
 
 export default function projectRoutes(router, ctx) {
@@ -109,12 +116,14 @@ export default function projectRoutes(router, ctx) {
     const total = db.get('SELECT COUNT(*) AS n FROM projects WHERE owner_id = ?', [req.user.id]).n;
     if (total >= 20) throw badRequest('Llegaste al máximo de proyectos guardados. Eliminá alguno para crear otro.');
     const at = now();
-    const me = parseUser(req.user);
     const base = {
       owner_id: req.user.id,
       accent: ACCENTS[total % ACCENTS.length],
-      city: me.city,
-      country: me.country,
+      city: '',
+      country: '',
+      work_mode: '',
+      dedication: '',
+      compensation: '',
       created_at: at,
       updated_at: at,
       status: 'draft',
@@ -144,14 +153,14 @@ export default function projectRoutes(router, ctx) {
     const project = parseProject(db.get('SELECT * FROM projects WHERE id = ?', [id]));
     const isOwner = project?.owner_id === req.user.id;
     const owner = project ? db.get('SELECT * FROM users WHERE id = ?', [project.owner_id]) : null;
-    const listed = project?.status === 'published' && project.moderation === 'ok' && owner?.status === 'active';
+    const listed = project?.status === 'published' && project.moderation === 'ok' && owner?.status === 'active' && owner?.visible;
     if (!project || (!isOwner && (!listed || isBlocked(db, req.user.id, project.owner_id)))) throw notFound('Este proyecto ya no está disponible.');
     const me = parseUser(req.user);
     const compat = isOwner ? null : projectCompat(me, project);
     if (!isOwner) recordView(ctx, me.id, 'project', id);
     res.json({
       project: {
-        ...projectDetail(project, { owner, hub, compat: compat ? { score: compat.score, reasons: compat.reasons, breakdown: hasFeature(me, 'advancedCompat') ? compat.breakdown : null } : null }),
+        ...projectDetail(project, { owner, hub, compat: compat ? compatPayload(compat, { advanced: hasFeature(me, 'advancedCompat') }) : null }),
         status: project.status
       },
       relationship: { ...relationship(db, me, project.owner_id, { targetType: 'project', targetId: id }), owner: isOwner },

@@ -365,11 +365,11 @@ export function markRead(ctx, match, readerId) {
 
 export function interestTargetOwner(db, targetType, targetId) {
   if (targetType === 'person') {
-    const user = db.get("SELECT * FROM users WHERE id = ? AND onboarded = 1 AND status = 'active' AND role = 'user'", [targetId]);
+    const user = db.get("SELECT * FROM users WHERE id = ? AND onboarded = 1 AND visible = 1 AND status = 'active' AND role = 'user'", [targetId]);
     if (!user) throw notFound('Este perfil ya no está disponible.');
     return { ownerId: user.id, project: null };
   }
-  const project = db.get("SELECT p.* FROM projects p JOIN users u ON u.id = p.owner_id WHERE p.id = ? AND u.status = 'active'", [targetId]);
+  const project = db.get("SELECT p.* FROM projects p JOIN users u ON u.id = p.owner_id WHERE p.id = ? AND u.status = 'active' AND u.visible = 1", [targetId]);
   if (!project || project.status !== 'published' || project.moderation !== 'ok') throw notFound('Este proyecto ya no está disponible.');
   return { ownerId: project.owner_id, project };
 }

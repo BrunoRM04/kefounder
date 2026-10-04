@@ -137,7 +137,7 @@ export default function ProfileEdit() {
                 <Select label="Disponibilidad" value={form.availability} onChange={set('availability')} options={AVAILABILITY} />
                 <Select label="Compensación" value={form.compensation} onChange={set('compensation')} options={COMPENSATION} />
               </div>
-              <div className="field"><span className="field-label">Modalidad</span><ChipGroup options={WORK_MODES} value={form.workMode} onChange={(v) => set('workMode')(v || 'remote')} /></div>
+              <div className="field"><span className="field-label">Modalidad</span><ChipGroup options={WORK_MODES} value={form.workMode} onChange={set('workMode')} /></div>
             </Section>
 
             <Section order={6} title="Links" text="Suman señales de confianza a tu perfil.">

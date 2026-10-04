@@ -1,5 +1,5 @@
 import { requireOnboarded } from '../auth.js';
-import { personCompat } from '../compat.js';
+import { compatPayload, personCompat } from '../compat.js';
 import { now } from '../db.js';
 import { hasFeature, paywall, usage } from '../plans.js';
 import { parseProject, parseUser, personDetail } from '../serializers.js';
@@ -33,7 +33,7 @@ export default function peopleRoutes(router, ctx) {
     const row = parseUser(db.get('SELECT * FROM users WHERE id = ? AND onboarded = 1', [id]));
     if (!row || (id !== me.id && (!row.visible || row.status !== 'active' || row.role !== 'user' || isBlocked(db, me.id, id)))) throw notFound('Este perfil ya no está disponible.');
     const projects = db.all("SELECT * FROM projects WHERE owner_id = ? AND status = 'published' AND moderation = 'ok' ORDER BY updated_at DESC", [id]).map(parseProject);
-    const mine = db.all("SELECT * FROM projects WHERE owner_id = ? AND status = 'published'", [me.id]).map(parseProject);
+    const mine = db.all("SELECT * FROM projects WHERE owner_id = ? AND status = 'published' AND moderation = 'ok'", [me.id]).map(parseProject);
     const compat = id === me.id ? null : personCompat(me, row, mine);
     const advanced = hasFeature(me, 'advancedCompat');
     if (id !== me.id) recordView(ctx, me.id, 'person', id);
@@ -42,7 +42,7 @@ export default function peopleRoutes(router, ctx) {
         hub,
         projects,
         currentProject: projects[0] || null,
-        compat: compat ? { score: compat.score, reasons: compat.reasons, breakdown: advanced ? compat.breakdown : null } : null
+        compat: compat ? compatPayload(compat, { advanced }) : null
       }),
       relationship: relationship(db, me, id),
       usage: usage(db, me)

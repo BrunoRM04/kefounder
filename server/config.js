@@ -19,8 +19,8 @@ export const config = {
   backupsDir: path.join(dataDir, 'backups'),
   distDir: path.join(root, 'dist'),
   // Modo demo: muestra accesos rápidos a cuentas de prueba en la bienvenida.
-  demo: env('DEMO') !== '0',
+  demo: env('DEMO') === '1',
   // Perfiles de ejemplo que aceptan conexiones y responden mensajes.
-  bots: env('DEMO_BOTS') !== '0',
+  bots: env('DEMO') === '1' && env('DEMO_BOTS') !== '0',
   demoAccounts: DEMO_ACCOUNTS.map(({ email, name, plan, headline }) => ({ email, password: DEMO_PASSWORD, name, plan, headline }))
 };

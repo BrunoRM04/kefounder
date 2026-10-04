@@ -60,7 +60,7 @@ const register = async (name) => {
   return { c, id: res.data.user.id, email };
 };
 
-const onboard = (c) => c.put('/api/me/onboarding', { goal: 'join_project', roles: ['developer'], availability: 'h10_20', compensation: 'equity', skills: ['React'], country: 'Uruguay' });
+const onboard = (c) => c.put('/api/me/onboarding', { goal: 'join_project', roles: ['developer'], availability: 'h10_20', compensation: 'equity', workMode: 'remote', skills: ['React'], country: 'Uruguay' });
 
 const idOf = (email) => ctx.db.get('SELECT id FROM users WHERE email = ?', [email]).id;
 
@@ -109,7 +109,7 @@ describe('acceso al panel', () => {
     const file = path.join(dataDir, 'again.db');
     openDb(file).close();
     const db = openDb(file);
-    assert.deepEqual(db.all('SELECT id FROM schema_migrations').map((r) => r.id), MIGRATION_IDS);
+    assert.deepEqual(db.all('SELECT id FROM schema_migrations').map((r) => r.id).sort(), [...MIGRATION_IDS].sort());
     db.close();
   });
 
@@ -458,7 +458,7 @@ describe('sistema', () => {
   test('estado, copia de seguridad, chequeo y limpieza', async () => {
     const status = await admin.get('/api/admin/system');
     assert.ok(status.data.database.bytes > 0);
-    assert.deepEqual(status.data.database.migrations.map((m) => m.id), MIGRATION_IDS);
+    assert.deepEqual(status.data.database.migrations.map((m) => m.id).sort(), [...MIGRATION_IDS].sort());
     assert.ok(status.data.database.tables.find((t) => t.name === 'users').rows > 0);
 
     const backup = await admin.post('/api/admin/system/backup');

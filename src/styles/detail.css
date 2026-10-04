@@ -96,15 +96,17 @@ a.team-member:hover { background: var(--surface); }
 .compat-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; }
 .compat-score { font: 800 44px/1 var(--font-display); letter-spacing: -2px; color: var(--accent-strong); }
 .compat-score small { font-size: 20px; letter-spacing: 0; }
+.compat-coverage { font-size: 12px; color: var(--muted); }
 .compat-reasons { display: flex; flex-direction: column; gap: 8px; }
 .compat-reasons li { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; color: var(--ink-2); }
 .compat-reasons svg { flex: none; margin-top: 3px; color: var(--accent); }
 .compat-text { font-size: 14px; color: var(--muted); }
 .compat-breakdown { display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid var(--line-soft); }
-.compat-bar { display: grid; grid-template-columns: minmax(0, 1fr) 90px 38px; align-items: center; gap: 10px; font-size: 13px; color: var(--ink-2); }
+.compat-bar { display: grid; grid-template-columns: minmax(0, 1fr) minmax(42px, 90px) minmax(40px, auto); align-items: center; gap: 8px; font-size: 13px; color: var(--ink-2); }
+.compat-bar > span { min-width: 0; overflow-wrap: anywhere; }
 .compat-bar div { height: 6px; border-radius: 6px; background: var(--soft); overflow: hidden; }
 .compat-bar i { display: block; height: 100%; border-radius: 6px; background: var(--accent-muted); }
-.compat-bar em { font-style: normal; text-align: right; color: var(--muted); font-size: 12px; }
+.compat-bar em { font-style: normal; text-align: right; color: var(--muted); font-size: 12px; white-space: nowrap; }
 .compat-lock { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; padding: 6px 10px; border-radius: 999px; background: var(--gold-soft); color: var(--gold); font-size: 12.5px; font-weight: 600; text-align: left; }
 .facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 12px; margin: 0; padding-top: 16px; border-top: 1px solid var(--line-soft); }
 .facts > div { display: grid; grid-template-columns: 30px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 9px; align-items: center; }

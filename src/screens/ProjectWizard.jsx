@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft, ArrowRight, Check, X } from 'lucide-react';
-import { AVAILABILITY, INDUSTRIES, PROJECT_COMPENSATION, PROJECT_ROLES, STAGES } from '../../shared/catalog.js';
+import { AVAILABILITY, COUNTRIES, INDUSTRIES, PROJECT_COMPENSATION, PROJECT_ROLES, STAGES, WORK_MODES } from '../../shared/catalog.js';
 import { ProjectCardView } from '../components/DeckCard.jsx';
 import { Button, ChipGroup, OptionList, Progress, Select, TextArea, TextInput } from '../components/ui.jsx';
 import { api } from '../lib/api.js';
@@ -8,7 +8,7 @@ import { useApp } from '../lib/app.jsx';
 import { usePersisted } from '../lib/hooks.js';
 import { useRouter } from '../lib/router.jsx';
 
-const EMPTY = { name: '', tagline: '', problem: '', stage: '', industry: '', roles: [], dedication: '', compensation: '' };
+const EMPTY = { name: '', tagline: '', problem: '', stage: '', industry: '', roles: [], workMode: '', city: '', country: '', dedication: '', compensation: '' };
 
 const STEPS = [
   { key: 'name', title: '¿Cómo se llama tu proyecto?', text: 'Puede ser provisorio. Lo cambiás cuando quieras.' },
@@ -16,6 +16,7 @@ const STEPS = [
   { key: 'problem', title: '¿Qué problema resuelve?', text: '¿A quién le pasa y por qué importa?' },
   { key: 'stage', title: '¿En qué etapa está?', text: 'Indicá cuánto avanzó tu proyecto. Después podés cambiarlo en Mis proyectos → Editar.' },
   { key: 'roles', title: '¿A quién buscás?', text: 'Elegí uno o varios perfiles.' },
+  { key: 'workMode', title: '¿Cómo van a trabajar?', text: 'Elegí la modalidad del proyecto, que puede ser distinta a la tuya.' },
   { key: 'dedication', title: '¿Cuánta dedicación necesitás?', text: 'Una referencia para quienes quieran sumarse.' },
   { key: 'compensation', title: '¿Qué ofrecés?', text: 'Podés ajustarlo por perfil más adelante.' },
   { key: 'publish', title: 'Todo listo para publicar', text: 'Así se va a ver tu proyecto en Descubrir.' }
@@ -24,7 +25,7 @@ const STEPS = [
 export default function ProjectWizard() {
   const { me, fail, toast, showPaywall, setMe } = useApp();
   const { navigate, back } = useRouter();
-  const [form, setForm] = usePersisted(`kefounder:wizard:${me.id}`, EMPTY);
+  const [form, setForm] = usePersisted(`kefounder:wizard:${me.id}`, { ...EMPTY, city: me.city || '', country: me.country || '' });
   const [step, setStep] = usePersisted(`kefounder:wizard-step:${me.id}`, 0);
   const [saving, setSaving] = useState('');
   const set = (key) => (value) => setForm((f) => ({ ...f, [key]: value }));
@@ -36,6 +37,7 @@ export default function ProjectWizard() {
     problem: form.problem.trim().length >= 10,
     stage: Boolean(form.stage),
     roles: form.roles.length > 0,
+    workMode: Boolean(form.workMode) && (form.workMode === 'remote' || Boolean(form.city?.trim() && form.country)),
     dedication: Boolean(form.dedication),
     compensation: Boolean(form.compensation),
     publish: true
@@ -54,16 +56,18 @@ export default function ProjectWizard() {
         problem: form.problem,
         stage: form.stage,
         industry: form.industry,
+        city: form.city || '',
+        country: form.country || '',
         dedication: form.dedication,
         compensation: form.compensation,
         rolesNeeded: form.roles.map((role) => ({ role, dedication: form.dedication, compensation: form.compensation })),
-        workMode: me.workMode || 'remote',
+        workMode: form.workMode,
         publish
       };
       const res = await api.post('/projects', payload);
       if (res.usage) setMe((m) => ({ ...m, usage: res.usage }));
       clear();
-      setForm(EMPTY);
+      setForm({ ...EMPTY, city: me.city || '', country: me.country || '' });
       setStep(0);
       navigate(`/proyectos/${res.project.id}/editar?nuevo=1`, { replace: true });
       if (res.publishBlocked) {
@@ -83,7 +87,7 @@ export default function ProjectWizard() {
   const preview = {
     type: 'project', id: 0, name: form.name || 'Tu proyecto', tagline: form.tagline, stage: form.stage, industry: form.industry,
     accent: '#D4E0DA', teamSize: 1, rolesNeeded: form.roles.map((role) => ({ role })), dedication: form.dedication, compensation: form.compensation,
-    workMode: me.workMode || 'remote', location: [me.city, me.country].filter(Boolean).join(', '), owner: { id: me.id, name: me.name, photo: me.photo, accent: me.accent }
+    workMode: form.workMode, location: [form.city, form.country].filter(Boolean).join(', '), owner: { id: me.id, name: me.name, photo: me.photo, accent: me.accent }
   };
 
   return (
@@ -123,6 +127,17 @@ export default function ProjectWizard() {
           <div className="flow-form">
             <ChipGroup multiple max={6} options={PROJECT_ROLES} value={form.roles} onChange={set('roles')} />
             <p className="field-hint">{form.roles.length ? `${form.roles.length} ${form.roles.length === 1 ? 'perfil elegido' : 'perfiles elegidos'} · máximo 6` : 'Por ejemplo: CTO y Designer.'}</p>
+          </div>
+        )}
+        {current.key === 'workMode' && (
+          <div className="flow-form">
+            <OptionList options={WORK_MODES} value={form.workMode || ''} onChange={set('workMode')} />
+            {form.workMode && form.workMode !== 'remote' && (
+              <div className="form-grid cols-2">
+                <TextInput label="Ciudad del proyecto" value={form.city || ''} onChange={set('city')} maxLength={60} placeholder="Montevideo" />
+                <Select label="País del proyecto" value={form.country || ''} onChange={set('country')} options={COUNTRIES} placeholder="Elegí un país" />
+              </div>
+            )}
           </div>
         )}
         {current.key === 'dedication' && <OptionList options={AVAILABILITY} value={form.dedication} onChange={set('dedication')} />}

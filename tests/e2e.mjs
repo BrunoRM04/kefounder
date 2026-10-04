@@ -22,7 +22,7 @@ if (!fs.existsSync(path.join(root, 'dist', 'index.html'))) {
 const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'kefounder-e2e-'));
 const server = spawn(process.execPath, ['--disable-warning=ExperimentalWarning', 'server/index.js'], {
   cwd: root,
-  env: { ...process.env, PORT: String(PORT), KEFOUNDER_DATA_DIR: dataDir, HOST: '127.0.0.1' },
+  env: { ...process.env, PORT: String(PORT), KEFOUNDER_DATA_DIR: dataDir, HOST: '127.0.0.1', KEFOUNDER_DEMO: '1' },
   stdio: ['ignore', 'pipe', 'pipe']
 });
 let serverLog = '';
@@ -124,6 +124,7 @@ try {
     await p.getByRole('button', { name: 'Continuar' }).click();
     await p.getByLabel('Rol principal').fill('Frontend developer');
     await p.getByLabel('Ciudad').fill('Montevideo');
+    await p.getByLabel('Cómo preferís trabajar').selectOption('remote');
     await p.getByLabel('Bio corta').fill('Me gusta construir interfaces simples que la gente disfruta usar.');
     await p.getByLabel('Skills').fill('React');
     await p.keyboard.press('Enter');
@@ -242,7 +243,7 @@ try {
     expect(locked === 0, 'con Plus no debería estar bloqueado');
   });
 
-  await step('crear proyecto con el asistente de 8 pasos', async () => {
+  await step('crear proyecto con el asistente de 9 pasos', async () => {
     await p.goto(`${BASE}/proyectos/nuevo`);
     await p.getByLabel('Nombre del proyecto').fill('Brújula');
     await p.getByRole('button', { name: 'Continuar' }).click();
@@ -254,6 +255,8 @@ try {
     await p.getByRole('button', { name: 'Continuar' }).click();
     await p.getByRole('button', { name: 'Designer' }).click();
     await p.getByRole('button', { name: 'Growth' }).click();
+    await p.getByRole('button', { name: 'Continuar' }).click();
+    await p.getByRole('radio', { name: 'Remoto' }).click();
     await p.getByRole('button', { name: 'Continuar' }).click();
     await p.getByRole('radio', { name: /Menos de 10/ }).click();
     await p.getByRole('button', { name: 'Continuar' }).click();

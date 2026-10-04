@@ -1,6 +1,6 @@
 import { EXPERIENCE_LEVELS, TEAM_SIZES } from '../../shared/catalog.js';
 import { requireOnboarded } from '../auth.js';
-import { personCompat, personRolesFor, projectCompat } from '../compat.js';
+import { compatPayload, personCompat, personRolesFor, projectCompat } from '../compat.js';
 import { now } from '../db.js';
 import { hasFeature, paywall, usage } from '../plans.js';
 import { parseProject, parseUser, personCard, projectCard, teamSize } from '../serializers.js';
@@ -56,15 +56,24 @@ function projectPasses(project, { basic, advanced }) {
   if (basic.role && !personRolesFor(project.rolesNeeded).includes(basic.role)) return false;
   if (basic.country && project.country !== basic.country) return false;
   if (basic.workMode && project.work_mode !== basic.workMode) return false;
+  const relevantNeeds = basic.role
+    ? project.rolesNeeded.filter((need) => personRolesFor([need]).includes(basic.role))
+    : project.rolesNeeded;
   if (basic.compensation) {
-    // Las compensaciones de persona y proyecto usan ids casi iguales.
+    // Cada perfil puede tener condiciones propias; si no las define, rigen las generales.
     const wanted = basic.compensation === 'personal' || basic.compensation === 'unsure' ? 'talk' : basic.compensation;
-    if (project.compensation !== wanted && !(wanted === 'equity' && project.compensation === 'mixed')) return false;
+    const offers = relevantNeeds.map((need) => need.compensation || project.compensation);
+    if (!offers.length) offers.push(project.compensation);
+    if (!offers.some((offer) => offer === wanted || (wanted === 'equity' && offer === 'mixed'))) return false;
   }
   if (advanced.skills.length && !advanced.skills.some((s) => lower(project.stack).includes(s.toLowerCase()))) return false;
   if (advanced.industry && project.industry !== advanced.industry) return false;
   if (advanced.stage && project.stage !== advanced.stage) return false;
-  if (advanced.availability && project.dedication !== advanced.availability) return false;
+  if (advanced.availability) {
+    const dedications = relevantNeeds.map((need) => need.dedication || project.dedication);
+    if (!dedications.length) dedications.push(project.dedication);
+    if (!dedications.includes(advanced.availability)) return false;
+  }
   if (advanced.teamSize) {
     const size = TEAM_SIZES.find((t) => t.id === advanced.teamSize);
     const n = teamSize(project);
@@ -102,7 +111,7 @@ export default function discoverRoutes(router, ctx) {
     return Boolean(p) && p.owner_id !== meId && !isBlocked(db, meId, p.owner_id);
   };
 
-  const myProjects = (userId) => db.all("SELECT * FROM projects WHERE owner_id = ? AND status = 'published'", [userId]).map(parseProject);
+  const myProjects = (userId) => db.all("SELECT * FROM projects WHERE owner_id = ? AND status = 'published' AND moderation = 'ok'", [userId]).map(parseProject);
   const latestProject = (userId) => parseProject(db.get("SELECT * FROM projects WHERE owner_id = ? AND status = 'published' AND moderation = 'ok' ORDER BY updated_at DESC LIMIT 1", [userId]));
 
   router.get('/discover', requireOnboarded, (req, res) => {
@@ -148,13 +157,14 @@ export default function discoverRoutes(router, ctx) {
       if (a.priority !== b.priority) return a.priority ? -1 : 1;
       if (sort === 'recent') return String(b.createdAt).localeCompare(String(a.createdAt));
       if (sort === 'active') return String(b.activeAt).localeCompare(String(a.activeAt));
-      const sa = a.compat.score + a.boost;
-      const sb = b.compat.score + b.boost;
+      if ((a.compat.score === null) !== (b.compat.score === null)) return a.compat.score === null ? 1 : -1;
+      const sa = (a.compat.score ?? 0) + a.boost;
+      const sb = (b.compat.score ?? 0) + b.boost;
       return sb - sa;
     });
 
     const showBreakdown = hasFeature(me, 'advancedCompat');
-    const shape = (compat) => ({ score: compat.score, reasons: compat.reasons.slice(0, showBreakdown ? 4 : 2), breakdown: showBreakdown ? compat.breakdown : null });
+    const shape = (compat) => compatPayload(compat, { advanced: showBreakdown, preview: true });
     const page = items.slice(0, limit).map((item) => {
       if (mode === 'people') return personCard(item.row, { hub, compat: shape(item.compat), currentProject: latestProject(item.row.id) });
       const owner = db.get('SELECT * FROM users WHERE id = ?', [item.row.owner_id]);
@@ -207,6 +217,7 @@ export default function discoverRoutes(router, ctx) {
     }
 
     if (action === 'save') {
+      if (!listed(me.id, targetType, id)) throw badRequest('Perfil no disponible.');
       const exists = db.get('SELECT 1 FROM saves WHERE user_id = ? AND target_type = ? AND target_id = ?', [me.id, targetType, id]);
       if (exists) return res.json({ status: 'saved', usage: usage(db, me) });
       const u = usage(db, me);
@@ -247,13 +258,13 @@ export default function discoverRoutes(router, ctx) {
       const u = parseUser(db.get('SELECT * FROM users WHERE id = ?', [last.target_id]));
       if (!u) return res.json({ item: null });
       const compat = personCompat(me, u, myProjects(me.id));
-      return res.json({ item: personCard(u, { hub, compat: { score: compat.score, reasons: compat.reasons.slice(0, 2), breakdown: hasFeature(me, 'advancedCompat') ? compat.breakdown : null }, currentProject: latestProject(u.id) }) });
+      return res.json({ item: personCard(u, { hub, compat: compatPayload(compat, { advanced: hasFeature(me, 'advancedCompat'), preview: true }), currentProject: latestProject(u.id) }) });
     }
     const p = parseProject(db.get('SELECT * FROM projects WHERE id = ?', [last.target_id]));
     if (!p) return res.json({ item: null });
     const compat = projectCompat(me, p);
     const owner = db.get('SELECT * FROM users WHERE id = ?', [p.owner_id]);
-    res.json({ item: projectCard(p, { owner, hub, compat: { score: compat.score, reasons: compat.reasons.slice(0, 2), breakdown: hasFeature(me, 'advancedCompat') ? compat.breakdown : null } }) });
+    res.json({ item: projectCard(p, { owner, hub, compat: compatPayload(compat, { advanced: hasFeature(me, 'advancedCompat'), preview: true }) }) });
   });
 
   router.post('/views', requireOnboarded, (req, res) => {
@@ -268,17 +279,20 @@ export default function discoverRoutes(router, ctx) {
     const me = parseUser(req.user);
     const rows = db.all('SELECT * FROM saves WHERE user_id = ? ORDER BY created_at DESC', [me.id]);
     const projects = myProjects(me.id);
+    const advanced = hasFeature(me, 'advancedCompat');
     const people = [];
     const projectItems = [];
     for (const row of rows) {
       if (row.target_type === 'person') {
+        if (!listed(me.id, 'person', row.target_id)) continue;
         const u = parseUser(db.get("SELECT * FROM users WHERE id = ? AND onboarded = 1 AND status = 'active' AND role = 'user'", [row.target_id]));
-        if (u) people.push({ ...personCard(u, { hub, compat: { score: personCompat(me, u, projects).score, reasons: [] }, currentProject: latestProject(u.id) }), savedAt: row.created_at });
+        if (u) people.push({ ...personCard(u, { hub, compat: compatPayload(personCompat(me, u, projects), { advanced, preview: true }), currentProject: latestProject(u.id) }), savedAt: row.created_at });
       } else {
+        if (!listed(me.id, 'project', row.target_id)) continue;
         const p = parseProject(db.get("SELECT p.* FROM projects p JOIN users u ON u.id = p.owner_id WHERE p.id = ? AND p.status = 'published' AND p.moderation = 'ok' AND u.status = 'active'", [row.target_id]));
         if (p) {
           const owner = db.get('SELECT * FROM users WHERE id = ?', [p.owner_id]);
-          projectItems.push({ ...projectCard(p, { owner, hub, compat: { score: projectCompat(me, p).score, reasons: [] } }), savedAt: row.created_at });
+          projectItems.push({ ...projectCard(p, { owner, hub, compat: compatPayload(projectCompat(me, p), { advanced, preview: true }) }), savedAt: row.created_at });
         }
       }
     }

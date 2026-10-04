@@ -18,7 +18,7 @@ function SavedCard({ item, onRemove, onConnect }) {
     <article className="saved-card">
       <Link to={to} className="saved-card-media" style={{ backgroundColor: item.accent, backgroundImage: image ? `url("${imageSrc(image, 500)}")` : undefined }}>
         {!image && <span className="saved-initial">{isProject ? '✳' : item.name?.[0]}</span>}
-        {item.match?.score && <span className="saved-score"><Sparkles size={11} fill="currentColor" /> {item.match.score}%</span>}
+        {item.match?.score != null && <span className="saved-score"><Sparkles size={11} fill="currentColor" /> {item.match.score}%</span>}
       </Link>
       <div className="saved-card-body">
         <Link to={to} className="saved-card-title">

@@ -105,9 +105,11 @@
   .page-edit .chip { min-height: 32px; padding: 0 11px; font-size: 13px; }
   .page-edit .tag-input { min-height: 40px; padding: 4px 6px; }
   .page-edit .tag-input input { height: 28px; font-size: 14px; }
-  .page-edit .tag { height: 28px; }
+  .page-edit .tag { height: 30px; }
+  .page-edit .tag button { width: 28px; height: 28px; }
   .page-edit .photo-picker { padding: 12px; }
   .page-edit .role-editor, .page-edit .exp-editor { padding: 12px; gap: 10px; }
+  .page-edit .role-editor .form-grid.cols-2 { grid-template-columns: minmax(0, 1fr); }
   .page-edit .member-editor + .member-editor .field-label { display: none; }
   .page-edit .cover-editor-img { height: 150px; }
   /* Sugerencias de skills y stack: una sola fila; el resto aparece al escribir. */
@@ -123,10 +125,10 @@
   .page-edit .option-copy small { display: none; }
   .page-edit .danger-zone { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
   .page-edit .danger-zone > header { margin: 0; }
-  /* Con columnas anchas, los campos de cada perfil buscado y de cada experiencia van en una fila. */
+  /* Dos columnas dan espacio a las opciones completas de dedicación y compensación. */
   .page-edit .form-section:not(.danger-zone) { container-type: inline-size; }
   @container (min-width: 480px) {
-    .role-editor { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .role-editor { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
     .role-editor-head { grid-column: 1 / -1; }
     .role-editor .form-grid { display: contents; }
     .exp-editor { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 0.8fr); gap: 10px; }

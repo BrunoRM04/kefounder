@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, Camera, Compass, Handshake, Lightbulb, Rocket, Search } from 'lucide-react';
-import { AVAILABILITY, COMPENSATION, COUNTRIES, GOALS, ROLES, SKILLS } from '../../shared/catalog.js';
+import { AVAILABILITY, COMPENSATION, COUNTRIES, GOALS, ROLES, SKILLS, WORK_MODES } from '../../shared/catalog.js';
 import { Avatar, Button, OptionList, Progress, Select, TagInput, TextArea, TextInput } from '../components/ui.jsx';
 import { api } from '../lib/api.js';
 import { useApp } from '../lib/app.jsx';
@@ -24,8 +24,8 @@ export default function Onboarding() {
   const { navigate } = useRouter();
   const [step, setStep] = usePersisted(`kefounder:onboarding-step:${me?.id}`, 0);
   const [form, setForm] = usePersisted(`kefounder:onboarding:${me?.id}`, {
-    goal: '', roles: [], availability: '', compensation: '',
-    name: me?.name || '', photo: '', headline: '', city: '', country: 'Uruguay', bio: '', skills: [], links: { linkedin: '', github: '', portfolio: '' }
+    goal: '', roles: [], availability: '', compensation: '', workMode: '',
+    name: me?.name || '', photo: '', headline: '', city: '', country: '', bio: '', skills: [], links: { linkedin: '', github: '', portfolio: '' }
   });
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -40,7 +40,8 @@ export default function Onboarding() {
     roles: form.roles.length > 0,
     availability: Boolean(form.availability),
     compensation: Boolean(form.compensation),
-    profile: form.name.trim().length >= 2
+    profile: form.name.trim().length >= 2 && Boolean(form.workMode)
+      && (form.workMode === 'remote' || Boolean(form.city.trim() && form.country))
   }[current.key];
 
   const onPhoto = async (file) => {
@@ -131,9 +132,10 @@ export default function Onboarding() {
             <TextInput label="Nombre" value={form.name} onChange={set('name')} error={errors.name} maxLength={80} autoComplete="name" />
             <TextInput label="Rol principal" value={form.headline} onChange={set('headline')} placeholder="Ej. Full stack developer, Founder de ContaAI" maxLength={80} />
             <div className="form-grid cols-2">
-              <TextInput label="Ciudad" value={form.city} onChange={set('city')} placeholder="Montevideo" maxLength={60} autoComplete="address-level2" />
+              <TextInput label="Ciudad" value={form.city} onChange={set('city')} placeholder="Montevideo" maxLength={60} autoComplete="address-level2" error={errors.city} />
               <Select label="País" value={form.country} onChange={set('country')} options={COUNTRIES} />
             </div>
+            <Select label="Cómo preferís trabajar" value={form.workMode || ''} onChange={set('workMode')} options={WORK_MODES} placeholder="Elegí una modalidad" error={errors.workMode} />
             <TextArea label="Bio corta" value={form.bio} onChange={set('bio')} maxLength={400} rows={3} placeholder="¿Qué te mueve? ¿Qué querés construir?" />
             <TagInput label="Skills" value={form.skills} onChange={set('skills')} suggestions={SKILLS} max={12} placeholder="React, Figma, Ventas B2B…" />
             <div className="form-grid">

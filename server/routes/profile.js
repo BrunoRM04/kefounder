@@ -34,7 +34,10 @@ function profileColumns(db, user, body) {
   if ('availability' in body) cols.availability = oneOf(body.availability, AVAILABILITY, '');
   if ('compensation' in body) cols.compensation = oneOf(body.compensation, COMPENSATION, '');
   if ('lookingFor' in body) cols.looking_for = str(body.lookingFor, 140);
-  if ('workMode' in body) cols.work_mode = oneOf(body.workMode, WORK_MODES, 'remote');
+  if ('workMode' in body) {
+    cols.work_mode = oneOf(body.workMode, WORK_MODES, '');
+    cols.work_mode_confirmed = cols.work_mode ? 1 : 0;
+  }
   if ('experienceYears' in body) cols.experience_years = intOrNull(body.experienceYears, 0, 60);
   if ('experience' in body) {
     const list = Array.isArray(body.experience) ? body.experience : [];
@@ -77,6 +80,8 @@ export default function profileRoutes(router, ctx) {
     if (!cols.roles || cols.roles === '[]') throw badRequest('Elegí al menos un rol.', { field: 'roles' });
     if (!cols.availability) throw badRequest('Indicá tu disponibilidad.', { field: 'availability' });
     if (!cols.compensation) throw badRequest('Elegí qué tipo de propuesta te interesa.', { field: 'compensation' });
+    if (!cols.work_mode) throw badRequest('Elegí cómo preferís trabajar.', { field: 'workMode' });
+    if (cols.work_mode !== 'remote' && (!cols.city || !cols.country)) throw badRequest('Indicá tu ciudad y país para trabajar de forma presencial o híbrida.', { field: 'city' });
     const first = !req.user.onboarded;
     updateUser(db, req.user.id, { ...cols, onboarded: 1 });
     const user = db.get('SELECT * FROM users WHERE id = ?', [req.user.id]);

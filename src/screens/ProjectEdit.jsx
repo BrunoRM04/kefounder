@@ -167,7 +167,7 @@ export default function ProjectEdit({ params }) {
               </div>
               <div className="field">
                 <span className="field-label">Modalidad</span>
-                <ChipGroup options={WORK_MODES} value={form.workMode} onChange={(v) => set('workMode')(v || 'remote')} />
+                <ChipGroup options={WORK_MODES} value={form.workMode} onChange={set('workMode')} />
               </div>
               <TextInput label="Sitio web" optional value={form.website} onChange={set('website')} placeholder="tuproyecto.com" inputMode="url" error={errors.website} />
             </Section>

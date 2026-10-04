@@ -6,6 +6,7 @@ export function parseUser(row) {
   if (!row) return null;
   return {
     ...row,
+    work_mode: row.work_mode_confirmed ? row.work_mode : '',
     accent: brandAccent(row.accent, row.id),
     roles: parseJson(row.roles, []),
     skills: parseJson(row.skills, []),
@@ -20,6 +21,7 @@ export function parseProject(row) {
   if (!row) return null;
   return {
     ...row,
+    work_mode: row.work_mode_confirmed ? row.work_mode : '',
     accent: brandAccent(row.accent, row.id),
     rolesNeeded: parseJson(row.roles_needed, []),
     stack: parseJson(row.stack, []),

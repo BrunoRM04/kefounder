@@ -36,7 +36,7 @@ npm run dev
 
 Abrí **http://localhost:5173**. Ese comando inicia la API en el puerto **3000** y Vite en **5173**. Vite redirige `/api` y `/uploads` al backend; para esta modalidad se entra por 5173. Los cambios en `src/` aparecen sin recompilar. Para detener ambos procesos, `Ctrl+C`. Si preferís dos terminales, usá `npm run dev:api` en una y `npm run dev:web` en la otra.
 
-En Windows también está `iniciar-kefounder.cmd`: instala dependencias si falta `node_modules`, compila si falta `dist/index.html` y ejecuta el modo de un solo puerto. `detener-kefounder.cmd` termina los procesos que escuchen en **3000** y **5173**; usalo solo si esos puertos están dedicados a KeFounder!.
+En Windows también está `iniciar-kefounder.cmd`: instala dependencias si falta `node_modules`, compila si falta `dist/index.html` y ejecuta el modo de un solo puerto con la demo habilitada. `detener-kefounder.cmd` termina los procesos que escuchen en **3000** y **5173**; usalo solo si esos puertos están dedicados a KeFounder!.
 
 ### Usar XAMPP: qué copiar y dónde
 
@@ -95,7 +95,7 @@ El servidor Node escucha por defecto en `0.0.0.0`. Su consola muestra la URL de 
 | `martin@kefounder.demo` | Pro | Developer con el proyecto Formo. Estadísticas, compatibilidad avanzada, candidatos y mensajes sin match (5 por mes). |
 | `rodrigo@kefounder.demo` | Startup | Founder de Brote. Varias búsquedas activas, equipo completo, panel de candidatos por etapa y mensajes sin match ilimitados. |
 
-Contraseña de todas: **`kefounder1234`**. También podés entrar con un clic desde la landing («Probá la demo con Sol o Martín»).
+Contraseña de todas: **`kefounder1234`**. También podés entrar con un clic desde la landing («Probá la demo con Sol o Martín»). `npm run dev` y `iniciar-kefounder.cmd` habilitan la demo. Para un `npm start` nuevo con demo, configurá `KEFOUNDER_DEMO=1` explícitamente.
 
 Para probar el chat en tiempo real entre dos personas: abrí una ventana normal con Sol y una ventana de incógnito con Martín, y escribanse en su conversación.
 
@@ -203,11 +203,11 @@ La contraseña de administración necesita al menos 10 caracteres, con letras y 
 
 - **Registro, login y onboarding** en 5 pasos (objetivo, rol, disponibilidad, tipo de propuesta, perfil rápido con foto).
 - **Descubrir** personas y proyectos: swipe (izquierda pasar, derecha conectar, arriba guardar), botones, atajos de teclado en desktop (← ↑ → y Backspace para volver), filtros básicos y avanzados, orden, deshacer.
-- **Compatibilidad** calculada en el servidor (objetivos, roles complementarios, perfiles que busca tu proyecto, disponibilidad, compensación, industria, ubicación) con las razones visibles en cada tarjeta.
+- **Compatibilidad** calculada en el servidor con datos guardados de ambas cuentas y los requisitos de cada perfil buscado por un proyecto. Las razones describen coincidencias observadas; si faltan datos suficientes, no se muestra un porcentaje. Pro muestra el desglose, incluidos factores «Sin datos».
 - **Match**: conectar envía interés; si es mutuo, es match y se habilita el chat. Quienes ya te eligieron aparecen primero en Descubrir.
 - **Chat en tiempo real** (Server-Sent Events): escribiendo…, leído, archivos e imágenes, enlaces, enviar proyecto, proponer reunión con horarios, rompehielos, archivar, reportar, bloquear.
 - **Guardados**, **historial de vistos** (Plus), **interesados** y **quién te guardó** (Plus).
-- **Mis proyectos**: asistente de 8 pasos, edición completa (portada, logo, historia, perfiles buscados con equity, stack, equipo, tracción), publicar/pausar/duplicar/eliminar, **estadísticas** (Pro) y **panel de candidatos** por etapa (Startup).
+- **Mis proyectos**: asistente de 9 pasos, edición completa (portada, logo, historia, modalidad, perfiles buscados con condiciones propias, stack, equipo, tracción), publicar/pausar/duplicar/eliminar, **estadísticas** (Pro) y **panel de candidatos** por etapa (Startup).
 - **Perfil** con indicador de completitud y señales de confianza; **notificaciones** en vivo; **planes** Free/Plus/Pro/Startup con precios mensuales y anuales; **configuración** (notificaciones, privacidad, bloqueados, contraseña, eliminar cuenta).
 - Página pública para compartir proyectos (`/p/:id`) sin necesidad de cuenta.
 - **Necesito ayuda con…** (`/ayuda`): pedidos de ayuda, soluciones de la comunidad, «Me sirvió», ranking semanal con puntos y reconocimientos en el perfil.
@@ -278,7 +278,7 @@ Colores: petróleo `#345F63`, terracota `#C47F6A`, crema `#F1EDE4`, tinta `#252A
 ## Pruebas
 
 ```bash
-npm test           # 107 pruebas: API (reglas de negocio, planes, permisos, tiempo real, uploads, marca), panel de administración, revista, difusión y «Necesito ayuda con…»
+npm test           # 113 pruebas: API, compatibilidad, arranque real, panel, revista, difusión y «Necesito ayuda con…»
 npm run build && npm run test:e2e   # recorrido completo en Chrome (app, panel, revista, difusión y ayuda) con un servidor y base temporales
 npm run build && npm run test:responsive   # todas las pantallas (app, revista y panel) en 16 tamaños, de 320 px a 2560 px: desbordes, controles cortados, contenido tapado por barras, textos que no entran y errores
 node tests/shots.mjs --out capturas --routes /,/matches --sizes small,mobile,hd,win,fhd --metrics 1   # capturas, desbordes y scroll/ancho usado por pantalla
@@ -317,11 +317,13 @@ data/                  base de datos y archivos subidos (se crea sola)
 | `PORT` | `3000` | Puerto del servidor |
 | `HOST` | `0.0.0.0` | Interfaz de red |
 | `KEFOUNDER_DATA_DIR` | `./data` | Carpeta de la base y los uploads |
-| `KEFOUNDER_DEMO` | `1` | `0` oculta los accesos a cuentas demo |
-| `KEFOUNDER_DEMO_BOTS` | `1` | `0` apaga las respuestas automáticas de los perfiles demo |
+| `KEFOUNDER_DEMO` | `0` en `npm start`; `1` en los comandos locales de desarrollo | `1` crea y muestra las cuentas ficticias solo cuando se pide expresamente |
+| `KEFOUNDER_DEMO_BOTS` | `1` solo si la demo está activa | `0` apaga las respuestas automáticas de los perfiles demo |
 | `KEFOUNDER_TRUST_PROXY` | `loopback` | Detrás de un proxy (Nginx, Cloudflare…): cuál es, para leer la IP real de quien visita (`1`, una IP o `loopback`) |
 | `KEFOUNDER_ADMIN_PASSWORD` | — | Solo para `npm run admin`, si no querés escribir la contraseña en la consola |
 
 Las variables `FOUND_*` de antes del cambio de nombre siguen funcionando. Al primer arranque, una base vieja `data/found.db` se migra sola a `data/kefounder.db` (la original queda como `data/found-legacy.db`) y las cuentas demo pasan a `@kefounder.demo`.
 
-Para publicarlo con usuarios reales: `KEFOUNDER_DEMO=0`, `KEFOUNDER_DEMO_BOTS=0`, una base limpia (borrar `data/` sin volver a sembrar o quitar los perfiles demo), HTTPS delante (la cookie de sesión se marca `Secure` automáticamente detrás de un proxy HTTPS) y un proveedor de pagos real.
+Para publicarlo con usuarios reales: usá una base nueva y vacía, `KEFOUNDER_DEMO=0`, HTTPS delante (la cookie de sesión se marca `Secure` automáticamente detrás de un proxy HTTPS), un proveedor de pagos y un proveedor de email reales. `npm start` no siembra datos ficticios si la demo está apagada; si detecta cuentas ficticias en una base existente, se detiene sin borrar nada. **La compatibilidad sí funciona con cuentas reales, pero el checkout aún concede planes sin cobrar y no se envían emails: no habilites esos flujos para clientes hasta completar esas integraciones.**
+
+En bases creadas antes de esta revisión, la modalidad podía quedar como «Remoto» por defecto. La migración conserva ese dato original, pero deja de considerarlo confirmado para cuentas y proyectos reales. Cada propietario debe elegir y guardar su modalidad en el editor para que vuelva a mostrarse y participar en la compatibilidad; un proyecto publicado también exige confirmarla antes de guardar otras ediciones.

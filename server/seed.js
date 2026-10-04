@@ -66,10 +66,10 @@ export async function seed(db, { reset = false } = {}) {
       const settings = { notifications: {}, ...(isDemo ? { demoOnline: Boolean(p.online) } : {}) };
       return db.run(
         `INSERT INTO users (email, password_hash, name, headline, photo, accent, city, country, bio, goal, roles, skills, interests, languages,
-          availability, compensation, looking_for, work_mode, experience_years, experience, age, linkedin, github, portfolio, plan, plan_period, plan_renews_at,
+          availability, compensation, looking_for, work_mode, work_mode_confirmed, experience_years, experience, age, linkedin, github, portfolio, plan, plan_period, plan_renews_at,
           onboarded, email_verified, identity_verified, visible, settings, is_demo, segment, created_at, last_active_at)
          VALUES (:email, :hash, :name, :headline, :photo, :accent, :city, :country, :bio, :goal, :roles, :skills, :interests, :languages,
-          :availability, :compensation, :lookingFor, :workMode, :experienceYears, :experience, :age, :linkedin, :github, :portfolio, :plan, :planPeriod, :planRenews,
+          :availability, :compensation, :lookingFor, :workMode, 1, :experienceYears, :experience, :age, :linkedin, :github, :portfolio, :plan, :planPeriod, :planRenews,
           1, 1, :verified, 1, :settings, :isDemo, :segment, :created, :active)`,
         {
           email, hash, name: p.name, headline: p.headline, photo: p.photo, accent: p.accent || '#D4E0DA', city: p.city, country: p.country, bio: p.bio,
@@ -94,9 +94,9 @@ export async function seed(db, { reset = false } = {}) {
     for (const p of PROJECTS) {
       const created = daysAgoIso(p.daysAgo);
       projectIds[p.name] = db.run(
-        `INSERT INTO projects (owner_id, name, tagline, description, problem, solution, stage, industry, city, country, work_mode, cover, accent,
+        `INSERT INTO projects (owner_id, name, tagline, description, problem, solution, stage, industry, city, country, work_mode, work_mode_confirmed, cover, accent,
           roles_needed, dedication, compensation, stack, team, has_users, has_revenue, has_investment, status, created_at, updated_at, published_at)
-         VALUES (:owner, :name, :tagline, :description, :problem, :solution, :stage, :industry, :city, :country, :workMode, :cover, :accent,
+         VALUES (:owner, :name, :tagline, :description, :problem, :solution, :stage, :industry, :city, :country, :workMode, 1, :cover, :accent,
           :rolesNeeded, :dedication, :compensation, :stack, :team, :hasUsers, :hasRevenue, :hasInvestment, :status, :created, :updated, :published)`,
         {
           owner: ids[p.owner], name: p.name, tagline: p.tagline, description: p.description, problem: p.problem, solution: p.solution, stage: p.stage,

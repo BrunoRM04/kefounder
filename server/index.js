@@ -14,11 +14,17 @@ import { notify } from './services.js';
 
 if (migrateLegacyDbFile(config.dbPath)) console.log('✳ Base migrada: data/found.db → data/kefounder.db (la original quedó como found-legacy.db).');
 const db = openDb(config.dbPath);
-if (isEmpty(db)) {
+if (!config.demo && db.get("SELECT COUNT(*) AS n FROM users WHERE is_demo = 1 OR email LIKE '%@kefounder.demo' OR email LIKE '%@demo.kefounder' OR email LIKE '%@found.demo'").n > 0) {
+  db.close();
+  throw new Error('La base contiene cuentas de demostración. Para iniciar sin demo, usá una base limpia o retiralas primero; no se borró ningún dato.');
+}
+if (config.demo && isEmpty(db)) {
   await seed(db);
   console.log('✳ Base de datos creada con datos de demostración.');
-} else if (await migrateDemoAccounts(db)) {
+} else if (config.demo && await migrateDemoAccounts(db)) {
   console.log('✳ Cuentas demo actualizadas al dominio @kefounder.demo.');
+} else if (isEmpty(db)) {
+  console.log('✳ Base de datos vacía lista para cuentas reales.');
 }
 
 // Revista: en modo demo arranca con notas de ejemplo (una sola vez; si se borran, no vuelven).

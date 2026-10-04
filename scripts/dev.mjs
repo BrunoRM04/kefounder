@@ -2,7 +2,7 @@
 import { spawn } from 'node:child_process';
 
 const run = (name, args) => {
-  const child = spawn('npm', ['run', name, ...args], { stdio: 'inherit', shell: true, env: { ...process.env, PORT: process.env.PORT || '3000' } });
+  const child = spawn('npm', ['run', name, ...args], { stdio: 'inherit', shell: true, env: { ...process.env, PORT: process.env.PORT || '3000', KEFOUNDER_DEMO: process.env.KEFOUNDER_DEMO ?? '1' } });
   child.on('exit', (code) => {
     if (code) console.log(`[${name}] terminó con código ${code}`);
     process.exit(code ?? 0);

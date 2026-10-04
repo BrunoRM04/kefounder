@@ -9,5 +9,6 @@ if not exist dist\index.html (
   echo Compilando el frontend...
   call npm run build
 )
+if not defined KEFOUNDER_DEMO set KEFOUNDER_DEMO=1
 call npm start
 pause

@@ -206,7 +206,7 @@ export default function PersonDetail({ params }) {
       <div className="container container-md detail-wrap">
         <Cover src={person.photo} accent={person.accent} className="detail-cover detail-cover-person" width={1400}>
           <div className="detail-cover-shade" />
-          {person.match && <span className="detail-cover-badge">✳ {person.match.score}% de compatibilidad</span>}
+          {person.match?.score != null && <span className="detail-cover-badge">✳ {person.match.score}% de compatibilidad</span>}
           <div className="detail-cover-title">
             <h1>{person.name}{person.age ? <span>, {person.age}</span> : null}</h1>
             {person.location && <p><MapPin size={15} /> {person.location}</p>}

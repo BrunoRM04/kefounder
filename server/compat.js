@@ -1,152 +1,180 @@
-import { AVAILABILITY, COMPENSATION, PROJECT_COMPENSATION, PROJECT_ROLES, ROLES, STAGES, labelOf } from '../shared/catalog.js';
+import { AVAILABILITY, GOALS, PROJECT_ROLES, WORK_MODES, labelOf } from '../shared/catalog.js';
 
-// Sistema de compatibilidad entre personas, skills, proyectos, disponibilidad,
-// etapa, compensación y objetivos. Devuelve un puntaje 0–100 y las razones.
-
-const AVAIL_RANK = { exploring: 0, lt10: 1, h10_20: 2, h20_40: 3, fulltime: 4 };
-
-const SEEKERS = ['create_project', 'find_cofounder', 'find_talent'];
-const GOAL_REASON = {
-  create_project: 'Quiere crear un proyecto',
-  find_cofounder: 'Busca cofundador',
-  join_project: 'Quiere sumarse a un proyecto',
-  find_talent: 'Está sumando talento',
-  explore: 'Está explorando ideas'
-};
-const goalFit = (a, b) => {
-  if (!a || !b) return 0.6;
-  if (a === 'explore' || b === 'explore') return 0.62;
-  if (SEEKERS.includes(a) && b === 'join_project') return 1;
-  if (a === 'join_project' && SEEKERS.includes(b)) return 1;
-  if (a === 'find_cofounder' && b === 'find_cofounder') return 0.9;
-  if ((a === 'create_project' && b === 'find_cofounder') || (a === 'find_cofounder' && b === 'create_project')) return 0.82;
-  if (a === 'join_project' && b === 'join_project') return 0.45;
-  if (a === 'find_talent' && b === 'find_talent') return 0.4;
-  return 0.6;
+// Reglas orientativas calculadas con datos persistidos. Los factores sin datos
+// quedan fuera del promedio y se muestran como "Sin datos" en el detalle Pro.
+const goalIds = new Set(GOALS.map((goal) => goal.id));
+const modeIds = new Set(WORK_MODES.map((mode) => mode.id));
+const seekers = new Set(['create_project', 'find_cofounder', 'find_talent']);
+const availabilityRank = { lt10: 1, h10_20: 2, h20_40: 3, fulltime: 4 };
+const compensationFit = {
+  equity: { equity: 1, mixed: 0.85, paid: 0.15, personal: 0.55 },
+  paid: { paid: 1, mixed: 0.85, equity: 0.15, personal: 0.15 },
+  mixed: { mixed: 1, equity: 0.85, paid: 0.85, personal: 0.4 },
+  personal: { personal: 1, equity: 0.55, paid: 0.15, mixed: 0.4 }
 };
 
-const COMP_MATRIX = {
-  equity: { equity: 1, mixed: 0.8, talk: 0.75, paid: 0.3, personal: 0.7, unsure: 0.7 },
-  paid: { paid: 1, mixed: 0.85, talk: 0.7, equity: 0.3, personal: 0.2, unsure: 0.6 },
-  mixed: { mixed: 1, equity: 0.8, paid: 0.85, talk: 0.8, personal: 0.4, unsure: 0.7 },
-  personal: { personal: 1, equity: 0.7, talk: 0.7, mixed: 0.4, paid: 0.2, unsure: 0.7 },
-  unsure: { unsure: 0.7, equity: 0.7, paid: 0.6, mixed: 0.7, talk: 0.8, personal: 0.7 },
-  talk: { talk: 0.8, equity: 0.75, paid: 0.7, mixed: 0.8, personal: 0.7, unsure: 0.8 }
+const normalized = (value) => String(value || '').trim().normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+const shared = (left = [], right = []) => {
+  const rightValues = new Set(right.map(normalized));
+  return [...new Map(left.filter((value) => rightValues.has(normalized(value))).map((value) => [normalized(value), value])).values()];
 };
-const compFit = (a, b) => (a && b ? COMP_MATRIX[a]?.[b] ?? 0.6 : 0.6);
-
-const availFit = (a, b) => {
-  if (!(a in AVAIL_RANK) || !(b in AVAIL_RANK)) return 0.6;
-  if (a === 'exploring' || b === 'exploring') return 0.6;
-  return 1 - Math.abs(AVAIL_RANK[a] - AVAIL_RANK[b]) / 4;
+const commonRatio = (left, right) => {
+  if (!left?.length || !right?.length) return null;
+  return shared(left, right).length / Math.min(new Set(left.map(normalized)).size, new Set(right.map(normalized)).size);
+};
+const goalFit = (viewer, other) => {
+  if (!goalIds.has(viewer) || !goalIds.has(other)) return null;
+  if (seekers.has(viewer) && other === 'join_project') return 1;
+  if (viewer === 'join_project' && seekers.has(other)) return 1;
+  if (viewer === 'find_cofounder' && other === 'find_cofounder') return 0.85;
+  if ((viewer === 'create_project' && other === 'find_cofounder') || (viewer === 'find_cofounder' && other === 'create_project')) return 0.85;
+  if (viewer === 'create_project' && other === 'create_project') return 0.7;
+  if (viewer === 'explore' || other === 'explore') return 0.55;
+  if (viewer === 'join_project' && other === 'join_project') return 0.35;
+  if (viewer === 'find_talent' && other === 'find_talent') return 0.3;
+  return 0.5;
+};
+const availabilityFit = (left, right) => {
+  if (!(left in availabilityRank) || !(right in availabilityRank)) return null;
+  return 1 - 0.75 * Math.abs(availabilityRank[left] - availabilityRank[right]) / 3;
+};
+const payFit = (left, right) => compensationFit[left]?.[right] ?? null;
+const hasFounderRole = (roles) => roles.some((role) => role === 'founder' || role === 'ceo');
+const rolesFit = (viewerRoles = [], otherRoles = []) => {
+  if (!viewerRoles.length || !otherRoles.length) return null;
+  if (hasFounderRole(viewerRoles) !== hasFounderRole(otherRoles)) return 0.95;
+  const overlap = commonRatio(viewerRoles, otherRoles);
+  if (overlap >= 0.8) return 0.45;
+  if (overlap > 0) return 0.6;
+  return 0.7;
+};
+const modeFit = (viewer, other) => {
+  const left = viewer.work_mode;
+  const right = other.work_mode;
+  if (!modeIds.has(left) || !modeIds.has(right)) return null;
+  if (left === 'remote' && right === 'remote') return 1;
+  if (left === 'remote' || right === 'remote') return left === 'hybrid' || right === 'hybrid' ? 0.65 : 0.2;
+  if (!viewer.country || !other.country || !viewer.city || !other.city) return null;
+  const sameCountry = normalized(viewer.country) === normalized(other.country);
+  const sameCity = sameCountry && normalized(viewer.city) === normalized(other.city);
+  if (sameCity) return left === right ? 1 : 0.85;
+  if (!sameCountry) return 0.15;
+  return 0.25;
+};
+const modeReason = (viewer, other) => {
+  if (viewer.work_mode === 'remote' && other.work_mode === 'remote') return 'Ambos prefieren trabajar en remoto';
+  if (viewer.city && other.city && viewer.country && other.country
+    && normalized(viewer.city) === normalized(other.city) && normalized(viewer.country) === normalized(other.country)
+    && modeFit(viewer, other) >= 0.8) return 'Pueden colaborar en ' + other.city;
+  return null;
+};
+const needDefinition = (need) => PROJECT_ROLES.find((role) => role.id === need?.role || role.label === need?.role);
+const bestNeed = (project, person) => {
+  const candidates = (project.rolesNeeded || []).map((need) => {
+    const definition = needDefinition(need);
+    if (!definition) return null;
+    const matchesRole = definition.maps.some((role) => person.roles.includes(role));
+    const roleFit = matchesRole ? (definition.id === 'cofounder' || definition.id === 'advisor' ? 0.85 : 1) : 0.1;
+    const availability = availabilityFit(person.availability, need.dedication || project.dedication);
+    const compensation = payFit(person.compensation, need.compensation || project.compensation);
+    return {
+      role: matchesRole ? definition.label : null,
+      need,
+      availability,
+      compensation,
+      fit: roleFit * (0.7 + 0.15 * (availability ?? 0.5) + 0.15 * (compensation ?? 0.5))
+    };
+  }).filter(Boolean);
+  return candidates.sort((a, b) => b.fit - a.fit)[0] || null;
 };
 
-const jaccard = (a = [], b = []) => {
-  const A = new Set(a.map((x) => x.toLowerCase()));
-  const B = new Set(b.map((x) => x.toLowerCase()));
-  if (!A.size || !B.size) return 0;
-  let inter = 0;
-  for (const x of A) if (B.has(x)) inter += 1;
-  return inter / (A.size + B.size - inter);
-};
-
-const shared = (a = [], b = []) => {
-  const B = new Set(b.map((x) => x.toLowerCase()));
-  return a.filter((x) => B.has(x.toLowerCase()));
-};
-
-const roleFit = (a = [], b = []) => {
-  if (!a.length || !b.length) return 0.6;
-  const overlap = jaccard(a, b);
-  const founderish = (list) => list.some((r) => r === 'founder' || r === 'ceo');
-  // Founder + perfil técnico/diseño/growth es la combinación más buscada.
-  if (founderish(a) !== founderish(b)) return 1;
-  return 1 - overlap * 0.55;
-};
-
-const locationFit = (viewer, other, otherMode) => {
-  if (viewer.country && other.country && viewer.country === other.country) return 1;
-  if (otherMode === 'remote' || viewer.work_mode === 'remote') return 0.8;
-  return 0.45;
-};
-
-// Qué roles de persona necesita un listado de roles de proyecto.
+// El filtro por rol del mazo usa exactamente las mismas equivalencias que el puntaje.
 export const personRolesFor = (rolesNeeded = []) => {
   const out = new Set();
-  for (const need of rolesNeeded) {
-    const def = PROJECT_ROLES.find((r) => r.id === need.role || r.label === need.role);
-    def?.maps.forEach((r) => out.add(r));
-  }
+  for (const need of rolesNeeded) needDefinition(need)?.maps.forEach((role) => out.add(role));
   return [...out];
 };
 
-const needsFitFor = (rolesNeeded, personRoles) => {
-  if (!rolesNeeded?.length) return { fit: 0.55, role: null };
-  for (const need of rolesNeeded) {
-    const def = PROJECT_ROLES.find((r) => r.id === need.role || r.label === need.role);
-    if (def && def.id !== 'cofounder' && def.id !== 'advisor' && def.maps.some((r) => personRoles.includes(r))) return { fit: 1, role: def.label };
-  }
-  for (const need of rolesNeeded) {
-    const def = PROJECT_ROLES.find((r) => r.id === need.role || r.label === need.role);
-    if (def && def.maps.some((r) => personRoles.includes(r))) return { fit: 0.85, role: def.label };
-  }
-  return { fit: 0.25, role: null };
-};
-
 const finalize = (factors) => {
-  const total = factors.reduce((sum, f) => sum + f.weight, 0);
-  const raw = factors.reduce((sum, f) => sum + f.weight * f.value, 0) / total;
-  const score = Math.round(52 + raw * 47);
-  const reasons = factors
-    .filter((f) => f.reason && f.value >= 0.75)
-    .sort((a, b) => b.weight * b.value - a.weight * a.value)
-    .map((f) => f.reason);
-  const breakdown = factors.map((f) => ({ key: f.key, label: f.label, value: Math.round(f.value * 100) }));
-  return { score: Math.min(99, Math.max(40, score)), reasons: reasons.slice(0, 4), breakdown };
+  const totalWeight = factors.reduce((sum, factor) => sum + factor.weight, 0);
+  const known = factors.filter((factor) => factor.value !== null && Number.isFinite(factor.value));
+  const knownWeight = known.reduce((sum, factor) => sum + factor.weight, 0);
+  const score = knownWeight >= totalWeight * 0.45
+    ? Math.round(100 * known.reduce((sum, factor) => sum + factor.weight * factor.value, 0) / knownWeight)
+    : null;
+  const reasons = known
+    .filter((factor) => factor.reason && factor.value >= 0.75)
+    .sort((left, right) => right.weight * right.value - left.weight * left.value)
+    .map((factor) => factor.reason)
+    .slice(0, 4);
+  const breakdown = factors.map((factor) => ({
+    key: factor.key,
+    label: factor.label,
+    value: factor.value === null ? null : Math.round(factor.value * 100)
+  }));
+  return { score, reasons, breakdown, coverage: Math.round(100 * knownWeight / totalWeight) };
 };
 
-/**
- * @param viewer usuario que mira (fila parseada)
- * @param person persona objetivo (fila parseada)
- * @param viewerProjects proyectos publicados del viewer (parseados)
- */
 export function personCompat(viewer, person, viewerProjects = []) {
-  let needs = { fit: 0.6, role: null, project: null };
-  for (const project of viewerProjects) {
-    const fit = needsFitFor(project.rolesNeeded, person.roles);
-    if (fit.fit > needs.fit) needs = { ...fit, project: project.name };
-  }
-  const sharedInterests = shared(person.interests, viewer.interests);
-  const sharedLanguages = shared(person.languages, viewer.languages);
-  const complementarySkills = person.skills.filter((s) => !viewer.skills.map((x) => x.toLowerCase()).includes(s.toLowerCase()));
-  const personRole = labelOf(ROLES, person.roles[0]);
+  const projects = viewerProjects.filter((project) => project.status === 'published' && project.moderation === 'ok');
+  const needs = projects.map((project) => {
+    const need = bestNeed(project, person);
+    return need ? { ...need, project: project.name } : null;
+  }).filter(Boolean).sort((left, right) => right.fit - left.fit)[0] || null;
+  const goal = goalFit(viewer.goal, person.goal);
+  const roles = rolesFit(viewer.roles, person.roles);
+  const availability = availabilityFit(viewer.availability, person.availability);
+  const compensation = payFit(viewer.compensation, person.compensation);
+  const interests = commonRatio(viewer.interests, person.interests);
+  const languages = commonRatio(viewer.languages, person.languages);
+  const location = modeFit(viewer, person);
+  const newSkills = person.skills.filter((skill) => !viewer.skills.some((own) => normalized(own) === normalized(skill)));
+  const skills = roles !== null && roles >= 0.75 && person.skills.length
+    ? Math.min(0.95, 0.4 + newSkills.length * 0.18) : null;
   return finalize([
-    { key: 'needs', label: 'Perfil que buscás', weight: 0.2, value: needs.fit, reason: needs.project && needs.role ? `${needs.project} busca ${needs.role}` : null },
-    { key: 'goal', label: 'Objetivos', weight: 0.2, value: goalFit(viewer.goal, person.goal), reason: GOAL_REASON[person.goal] || null },
-    { key: 'roles', label: 'Roles complementarios', weight: 0.18, value: roleFit(viewer.roles, person.roles), reason: personRole ? `${personRole} complementa tu perfil` : null },
-    { key: 'availability', label: 'Disponibilidad', weight: 0.14, value: availFit(viewer.availability, person.availability), reason: person.availability && person.availability === viewer.availability ? `Misma disponibilidad (${labelOf(AVAILABILITY, person.availability, 'short')})` : null },
-    { key: 'compensation', label: 'Compensación', weight: 0.13, value: compFit(viewer.compensation, person.compensation), reason: person.compensation ? `Alineados en ${labelOf(COMPENSATION, person.compensation).toLowerCase()}` : null },
-    { key: 'interests', label: 'Industrias en común', weight: 0.08, value: sharedInterests.length ? Math.min(1, 0.6 + sharedInterests.length * 0.2) : 0.45, reason: sharedInterests.length ? `Les interesa ${sharedInterests.slice(0, 2).join(' y ')}` : null },
-    { key: 'location', label: 'Ubicación', weight: 0.05, value: locationFit(viewer, person, person.work_mode), reason: viewer.country && viewer.country === person.country ? `Ambos en ${person.country}` : null },
-    { key: 'languages', label: 'Idiomas', weight: 0.02, value: sharedLanguages.length ? 1 : 0.5, reason: null },
-    { key: 'skills', label: 'Skills complementarias', weight: 0.0001, value: complementarySkills.length ? 1 : 0.5, reason: complementarySkills.length ? `Suma ${complementarySkills.slice(0, 2).join(' y ')}` : null }
+    { key: 'needs', label: 'Perfil que buscás', weight: 0.22, value: needs?.fit ?? null, reason: needs?.role ? needs.project + ' busca ' + needs.role : null },
+    { key: 'goal', label: 'Objetivos', weight: 0.2, value: goal, reason: goal >= 0.75 && person.goal === 'join_project' ? 'Quiere sumarse a un proyecto' : goal >= 0.75 && person.goal === 'find_cofounder' ? 'Busca cofounder' : null },
+    { key: 'roles', label: 'Roles complementarios', weight: 0.18, value: roles, reason: roles >= 0.75 ? 'Sus roles se complementan' : null },
+    { key: 'availability', label: 'Disponibilidad', weight: 0.13, value: availability, reason: availability >= 0.75 ? 'Disponibilidad compatible (' + labelOf(AVAILABILITY, person.availability, 'short') + ')' : null },
+    { key: 'compensation', label: 'Compensación', weight: 0.12, value: compensation, reason: compensation >= 0.8 ? 'Expectativas de compensación compatibles' : null },
+    { key: 'interests', label: 'Industrias en común', weight: 0.07, value: interests, reason: interests > 0 ? 'Les interesa ' + shared(person.interests, viewer.interests).slice(0, 2).join(' y ') : null },
+    { key: 'location', label: 'Modalidad y ubicación', weight: 0.04, value: location, reason: location >= 0.8 ? modeReason(viewer, person) : null },
+    { key: 'languages', label: 'Idiomas', weight: 0.02, value: languages, reason: languages > 0 ? 'Comparten ' + shared(person.languages, viewer.languages)[0] : null },
+    { key: 'skills', label: 'Skills complementarias', weight: 0.02, value: skills, reason: newSkills.length && skills >= 0.75 ? 'Aporta ' + newSkills.slice(0, 2).join(' y ') : null }
   ]);
 }
 
 export function projectCompat(viewer, project) {
-  const needs = needsFitFor(project.rolesNeeded, viewer.roles);
-  const stackOverlap = shared(project.stack, viewer.skills);
-  const interestMatch = project.industry && viewer.interests.map((x) => x.toLowerCase()).includes(project.industry.toLowerCase());
-  const joinGoal = { join_project: 1, find_cofounder: 0.85, explore: 0.7, create_project: 0.5, find_talent: 0.35 }[viewer.goal] ?? 0.6;
-  const stageLabel = labelOf(STAGES, project.stage);
+  const need = bestNeed(project, viewer);
+  const goal = !goalIds.has(viewer.goal) ? null : ({
+    join_project: 1,
+    find_cofounder: project.rolesNeeded.some((role) => role.role === 'cofounder') ? 0.9 : 0.6,
+    explore: 0.55,
+    create_project: 0.35,
+    find_talent: 0.2
+  })[viewer.goal];
+  const skills = commonRatio(project.stack, viewer.skills);
+  const availability = need?.availability ?? availabilityFit(viewer.availability, project.dedication);
+  const compensation = need?.compensation ?? payFit(viewer.compensation, project.compensation);
+  const interests = project.industry && viewer.interests.length
+    ? Number(viewer.interests.some((industry) => normalized(industry) === normalized(project.industry))) : null;
+  const location = modeFit(viewer, project);
   return finalize([
-    { key: 'needs', label: 'Buscan tu perfil', weight: 0.3, value: needs.fit, reason: needs.role ? `Buscan ${needs.role}` : null },
-    { key: 'goal', label: 'Objetivos', weight: 0.14, value: joinGoal, reason: viewer.goal === 'join_project' ? 'Querés sumarte a un proyecto' : null },
-    { key: 'skills', label: 'Stack y skills', weight: 0.14, value: project.stack.length ? Math.min(1, 0.45 + stackOverlap.length * 0.25) : 0.6, reason: stackOverlap.length ? `Usan ${stackOverlap.slice(0, 2).join(' y ')}` : null },
-    { key: 'availability', label: 'Dedicación', weight: 0.13, value: availFit(viewer.availability, project.dedication), reason: project.dedication && project.dedication === viewer.availability ? `Piden ${labelOf(AVAILABILITY, project.dedication, 'short')}` : null },
-    { key: 'compensation', label: 'Compensación', weight: 0.13, value: compFit(viewer.compensation, project.compensation), reason: project.compensation && compFit(viewer.compensation, project.compensation) >= 0.8 ? `Ofrecen ${labelOf(PROJECT_COMPENSATION, project.compensation).toLowerCase()}` : null },
-    { key: 'interests', label: 'Industria', weight: 0.1, value: interestMatch ? 1 : 0.5, reason: interestMatch ? `Te interesa ${project.industry}` : null },
-    { key: 'location', label: 'Modalidad', weight: 0.06, value: locationFit(viewer, project, project.work_mode), reason: project.work_mode === 'remote' ? 'Trabajo remoto' : viewer.country === project.country ? `En ${project.country}` : null },
-    { key: 'stage', label: 'Etapa', weight: 0.0001, value: 1, reason: stageLabel && ['mvp', 'users', 'revenue', 'investment'].includes(project.stage) ? `Ya están en ${stageLabel}` : null }
+    { key: 'needs', label: 'Buscan tu perfil', weight: 0.34, value: need?.fit ?? null, reason: need?.role ? 'Buscan ' + need.role : null },
+    { key: 'goal', label: 'Objetivos', weight: 0.12, value: goal, reason: viewer.goal === 'join_project' ? 'Querés sumarte a un proyecto' : viewer.goal === 'find_cofounder' && goal >= 0.75 ? 'Buscás un proyecto como cofounder' : null },
+    { key: 'skills', label: 'Stack y skills', weight: 0.14, value: skills, reason: skills > 0 ? 'Usan ' + shared(project.stack, viewer.skills).slice(0, 2).join(' y ') : null },
+    { key: 'availability', label: 'Dedicación', weight: 0.15, value: availability, reason: availability >= 0.75 ? 'Tu disponibilidad encaja con la dedicación pedida' : null },
+    { key: 'compensation', label: 'Compensación', weight: 0.13, value: compensation, reason: compensation >= 0.8 ? 'Tu expectativa de compensación es compatible' : null },
+    { key: 'interests', label: 'Industria', weight: 0.07, value: interests, reason: interests ? 'Te interesa ' + project.industry : null },
+    { key: 'location', label: 'Modalidad y ubicación', weight: 0.05, value: location, reason: location >= 0.8 ? modeReason(viewer, project) : null }
   ]);
+}
+
+export function compatPayload(compat, { advanced = false, preview = false } = {}) {
+  return {
+    score: compat.score,
+    coverage: compat.coverage,
+    reasons: compat.reasons.slice(0, preview && !advanced ? 2 : 4),
+    breakdown: advanced ? compat.breakdown : null
+  };
 }

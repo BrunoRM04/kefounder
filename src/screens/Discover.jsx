@@ -502,7 +502,7 @@ export default function Discover() {
               <button type="button" key={`${item.type}-${item.id}`} className="queue-row" onClick={() => open(item)}>
                 {item.type === 'project' ? <ProjectLogo project={item} size={44} /> : <Avatar person={item} size={44} online={item.online} />}
                 <div className="queue-copy"><strong>{item.name}</strong><small>{item.type === 'project' ? item.tagline : item.headline}</small></div>
-                {item.match && <em>{item.match.score}%</em>}
+                {item.match?.score != null && <em>{item.match.score}%</em>}
               </button>
             )) : <p className="queue-empty">{loading ? 'Cargando…' : 'No hay más tarjetas por ahora.'}</p>}
             <p className="queue-tip">Abrí cualquier tarjeta para ver el perfil completo sin perder tu lugar.</p>

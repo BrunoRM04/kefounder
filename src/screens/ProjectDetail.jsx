@@ -114,7 +114,7 @@ function ProjectHero({ project }) {
   return (
     <Cover src={project.cover} accent={project.accent} className="detail-cover" width={1400}>
       <div className="detail-cover-shade" />
-      {project.match && <span className="detail-cover-badge">✳ {project.match.score}% de compatibilidad</span>}
+      {project.match?.score != null && <span className="detail-cover-badge">✳ {project.match.score}% de compatibilidad</span>}
       <div className="detail-cover-title detail-cover-project">
         <ProjectLogo project={project} size={64} />
         <div>

@@ -55,7 +55,7 @@ El recorrido central es:
 4. **Conversar:** chat en tiempo real, con archivos, enlaces, propuesta de reunión y la opción de compartir un proyecto.
 5. **Construir:** los founders publican proyectos con los perfiles que buscan y siguen a sus candidatos por etapas.
 
-La **compatibilidad** se calcula en el servidor. Considera objetivos, roles complementarios, los perfiles que busca cada proyecto, disponibilidad, compensación, industria y ubicación. Cada tarjeta muestra el porcentaje y los motivos.
+La **compatibilidad** se calcula en el servidor. Considera objetivos, roles complementarios, los perfiles que busca cada proyecto, disponibilidad, compensación, industria y ubicación. La tarjeta muestra un porcentaje y motivos cuando hay datos suficientes para calcularlo.
 
 Además, el producto tiene:
 
@@ -104,7 +104,7 @@ La startup la pide desde «Mis proyectos» y el equipo la gestiona desde el pane
 
 > **Encontrá a las personas con las que vas a construir.**
 
-El deslizar tarjetas es solo la mecánica. El valor real es el sistema de compatibilidad entre personas, skills, proyectos, disponibilidad, etapa, compensación y objetivos.
+El deslizar tarjetas es solo la mecánica. El valor real es el sistema de compatibilidad entre personas, skills, perfiles buscados por cada proyecto, disponibilidad, compensación, modalidad y objetivos. La etapa se muestra como contexto del proyecto, pero no altera el porcentaje.
 
 A futuro, la plataforma puede convertirse en la herramienta con la que se arma un equipo completo. El camino va de encontrar un cofundador a sumar developer, diseño y growth, y a seguir administrando las búsquedas desde KeFounder!.
 

@@ -101,7 +101,7 @@ describe('autenticación y onboarding', () => {
     assert.equal(incomplete.status, 400);
 
     const done = await c.put('/api/me/onboarding', {
-      goal: 'join_project', roles: ['developer'], availability: 'h10_20', compensation: 'equity',
+      goal: 'join_project', roles: ['developer'], availability: 'h10_20', compensation: 'equity', workMode: 'remote',
       name: 'Ana Test', city: 'Montevideo', country: 'Uruguay', headline: 'Backend developer', bio: 'Me gusta construir APIs que no se caen nunca.',
       skills: ['Node.js', 'PostgreSQL', 'AWS'], links: { github: 'github.com/ana' }
     });
@@ -119,7 +119,7 @@ describe('autenticación y onboarding', () => {
     assert.equal(people.status, 200);
     assert.ok(people.data.items.length > 5);
     for (const item of people.data.items) {
-      assert.ok(item.match.score >= 40 && item.match.score <= 99);
+      assert.ok(item.match.score === null || (item.match.score >= 0 && item.match.score <= 100));
       assert.equal(item.email, undefined, 'no se filtran emails');
       assert.equal(item.password_hash, undefined);
       assert.ok(Array.isArray(item.roles) && Array.isArray(item.skills), 'listas parseadas');
@@ -148,6 +148,92 @@ describe('autenticación y onboarding', () => {
   });
 });
 
+test('compatibilidad entre cuentas reales: edición, detalle, guardados y requisitos por rol', async () => {
+  const founder = client();
+  const candidate = client();
+  const suffix = Date.now();
+  const founderRegister = await founder.post('/api/auth/register', { name: 'Fundadora Real', email: `fundadora${suffix}@test.dev`, password: 'secreto123' });
+  const candidateRegister = await candidate.post('/api/auth/register', { name: 'Desarrolladora Real', email: `desarrolladora${suffix}@test.dev`, password: 'secreto123' });
+  assert.equal(founderRegister.status, 201);
+  assert.equal(candidateRegister.status, 201);
+  const founderId = founderRegister.data.user.id;
+  assert.equal((await founder.put('/api/me/onboarding', {
+    name: 'Fundadora Real', goal: 'find_talent', roles: ['founder'], availability: 'h10_20',
+    compensation: 'equity', workMode: 'remote', interests: ['Fintech'], languages: ['Español']
+  })).status, 200);
+  const withoutMode = await candidate.put('/api/me/onboarding', {
+    name: 'Desarrolladora Real', goal: 'join_project', roles: ['developer'], availability: 'h10_20', compensation: 'equity'
+  });
+  assert.equal(withoutMode.status, 400);
+  assert.equal(withoutMode.data.field, 'workMode');
+  assert.equal((await candidate.put('/api/me/onboarding', {
+    name: 'Desarrolladora Real', goal: 'join_project', roles: ['developer'], skills: ['React'],
+    interests: ['Fintech'], languages: ['Español'], availability: 'h10_20', compensation: 'equity', workMode: 'remote'
+  })).status, 200);
+
+  const projectBody = {
+    name: 'Proyecto Persistido', tagline: 'Buscamos un equipo para una fintech.',
+    industry: 'Fintech', stack: ['React'], workMode: 'remote', dedication: 'h10_20', compensation: 'equity',
+    rolesNeeded: [{ role: 'cto', dedication: 'h10_20', compensation: 'equity' }], publish: true
+  };
+  const created = await founder.post('/api/projects', projectBody);
+  assert.equal(created.status, 201, JSON.stringify(created.data));
+  const projectId = created.data.project.id;
+  const deck = await candidate.get('/api/discover?mode=projects&limit=40');
+  const card = deck.data.items.find((item) => item.id === projectId);
+  assert.ok(card?.match?.score !== null);
+  assert.equal(card.match.breakdown, null, 'Free no recibe el desglose Pro');
+  const detail = await candidate.get(`/api/projects/${projectId}`);
+  assert.equal(detail.data.project.match.score, card.match.score);
+  assert.deepEqual(detail.data.project.match.reasons.slice(0, 2), card.match.reasons);
+
+  assert.equal((await candidate.post('/api/actions', { targetType: 'project', targetId: projectId, action: 'save' })).status, 200);
+  const savedBefore = (await candidate.get('/api/saved')).data.projects.find((item) => item.id === projectId);
+  assert.equal(savedBefore.match.score, card.match.score);
+  const updated = await founder.put(`/api/projects/${projectId}`, {
+    rolesNeeded: [{ role: 'cto', dedication: 'fulltime', compensation: 'paid' }]
+  });
+  assert.equal(updated.status, 200, JSON.stringify(updated.data));
+  const savedAfter = (await candidate.get('/api/saved')).data.projects.find((item) => item.id === projectId);
+  const detailAfter = await candidate.get(`/api/projects/${projectId}`);
+  assert.ok(savedAfter.match.score < savedBefore.match.score);
+  assert.equal(detailAfter.data.project.match.score, savedAfter.match.score);
+  assert.equal((await candidate.del(`/api/saves/project/${projectId}`)).status, 200);
+  const paidFilter = await candidate.get('/api/discover?mode=projects&role=developer&compensation=paid&limit=40');
+  const equityFilter = await candidate.get('/api/discover?mode=projects&role=developer&compensation=equity&limit=40');
+  assert.ok(paidFilter.data.items.some((item) => item.id === projectId), 'el filtro usa la compensación del rol');
+  assert.ok(!equityFilter.data.items.some((item) => item.id === projectId), 'no usa la compensación general si el rol tiene otra');
+
+  const personBefore = await candidate.get(`/api/users/${founderId}`);
+  assert.equal(personBefore.status, 200);
+  assert.equal(personBefore.data.user.match.breakdown, null);
+  assert.equal((await founder.put('/api/me/profile', { goal: 'explore', workMode: 'onsite', city: 'Buenos Aires', country: 'Argentina' })).status, 200);
+  const personAfter = await candidate.get(`/api/users/${founderId}`);
+  assert.ok(personAfter.data.user.match.score < personBefore.data.user.match.score);
+  const peopleDeck = await candidate.get('/api/discover?mode=people&limit=40');
+  assert.equal(peopleDeck.data.items.find((item) => item.id === founderId).match.score, personAfter.data.user.match.score);
+
+  assert.equal((await candidate.post('/api/billing/checkout', { plan: 'pro', period: 'monthly' })).status, 200);
+  const advanced = await candidate.get(`/api/projects/${projectId}`);
+  assert.ok(Array.isArray(advanced.data.project.match.breakdown));
+  assert.ok(advanced.data.project.match.breakdown.some((item) => item.key === 'availability' && item.value < 100));
+  ctx.db.run('UPDATE users SET work_mode = ?, work_mode_confirmed = 0 WHERE id = ?', ['remote', founderId]);
+  ctx.db.run('UPDATE projects SET work_mode = ?, work_mode_confirmed = 0 WHERE id = ?', ['remote', projectId]);
+  const legacyPerson = await candidate.get(`/api/users/${founderId}`);
+  const legacyProject = await candidate.get(`/api/projects/${projectId}`);
+  assert.equal(legacyPerson.data.user.workMode, '', 'una modalidad heredada no parece elegida');
+  assert.equal(legacyProject.data.project.workMode, '');
+  assert.equal(legacyProject.data.project.match.breakdown.find((item) => item.key === 'location').value, null);
+  assert.equal((await founder.put('/api/me/profile', { workMode: 'remote' })).status, 200);
+  assert.equal((await founder.put(`/api/projects/${projectId}`, { workMode: 'remote' })).status, 200);
+  assert.equal((await candidate.post('/api/actions', { targetType: 'project', targetId: projectId, action: 'save' })).status, 200);
+  assert.equal((await founder.put('/api/me/settings', { visible: false })).status, 200);
+  assert.equal((await candidate.get(`/api/users/${founderId}`)).status, 404);
+  assert.equal((await candidate.get(`/api/projects/${projectId}`)).status, 404);
+  assert.ok(!(await candidate.get('/api/saved')).data.projects.some((item) => item.id === projectId));
+  assert.equal((await candidate.post('/api/actions', { targetType: 'project', targetId: projectId, action: 'connect' })).status, 404);
+});
+
 describe('descubrir, conectar y match', () => {
   test('quienes mostraron interés aparecen primero y conectar genera match', async () => {
     const sol = await login('sol@kefounder.demo');
@@ -172,7 +258,7 @@ describe('descubrir, conectar y match', () => {
   test('límite diario de conexiones en Free', async () => {
     const c = client();
     await c.post('/api/auth/register', { name: 'Límite', email: 'limite@test.dev', password: 'secreto123' });
-    await c.put('/api/me/onboarding', { goal: 'explore', roles: ['other'], availability: 'lt10', compensation: 'unsure', name: 'Límite' });
+    await c.put('/api/me/onboarding', { goal: 'explore', roles: ['other'], availability: 'lt10', compensation: 'unsure', workMode: 'remote', name: 'Límite' });
     const feed = await c.get('/api/discover?mode=people&limit=40');
     let last;
     for (let i = 0; i < 11; i += 1) {
@@ -188,7 +274,7 @@ describe('descubrir, conectar y match', () => {
   test('límite de guardados, pasar y deshacer', async () => {
     const c = client();
     await c.post('/api/auth/register', { name: 'Guarda', email: 'guarda@test.dev', password: 'secreto123' });
-    await c.put('/api/me/onboarding', { goal: 'explore', roles: ['designer'], availability: 'lt10', compensation: 'equity', name: 'Guarda' });
+    await c.put('/api/me/onboarding', { goal: 'explore', roles: ['designer'], availability: 'lt10', compensation: 'equity', workMode: 'remote', name: 'Guarda' });
     const feed = await c.get('/api/discover?mode=people&limit=40');
     for (let i = 0; i < 10; i += 1) {
       const r = await c.post('/api/actions', { targetType: 'person', targetId: feed.data.items[i].id, action: 'save' });
@@ -227,7 +313,7 @@ describe('descubrir, conectar y match', () => {
   test('conectar con un proyecto de demo: el bot acepta y escribe', async () => {
     const c = client();
     await c.post('/api/auth/register', { name: 'Bot Test', email: 'bot@test.dev', password: 'secreto123' });
-    await c.put('/api/me/onboarding', { goal: 'join_project', roles: ['developer'], availability: 'fulltime', compensation: 'equity', name: 'Bot Test' });
+    await c.put('/api/me/onboarding', { goal: 'join_project', roles: ['developer'], availability: 'fulltime', compensation: 'equity', workMode: 'remote', name: 'Bot Test' });
     const projects = await c.get('/api/discover?mode=projects');
     const target = projects.data.items.find((p) => p.owner.name !== 'Sol Ortega');
     const res = await c.post('/api/actions', { targetType: 'project', targetId: target.id, action: 'connect' });
@@ -359,8 +445,8 @@ describe('planes, proyectos y estadísticas', () => {
   test('crear con "publicar" sin cupo deja un borrador y avisa el plan', async () => {
     const c = client();
     await c.post('/api/auth/register', { name: 'Cupo', email: 'cupo@test.dev', password: 'secreto123' });
-    await c.put('/api/me/onboarding', { goal: 'create_project', roles: ['founder'], availability: 'fulltime', compensation: 'equity', name: 'Cupo' });
-    const base = { tagline: 'Una idea con potencial enorme.', stage: 'idea', rolesNeeded: [{ role: 'cto' }], publish: true };
+    await c.put('/api/me/onboarding', { goal: 'create_project', roles: ['founder'], availability: 'fulltime', compensation: 'equity', workMode: 'remote', name: 'Cupo' });
+    const base = { tagline: 'Una idea con potencial enorme.', stage: 'idea', rolesNeeded: [{ role: 'cto' }], workMode: 'remote', dedication: 'h10_20', compensation: 'equity', publish: true };
     const first = await c.post('/api/projects', { ...base, name: 'Primero' });
     assert.equal(first.data.project.status, 'published');
     assert.equal(first.data.publishBlocked, null);
@@ -375,7 +461,7 @@ describe('planes, proyectos y estadísticas', () => {
 
   test('crear, editar, duplicar y eliminar proyecto', async () => {
     const martin = await login('martin@kefounder.demo');
-    const created = await martin.post('/api/projects', { name: 'Stacklab', tagline: 'Tu equipo técnico on-demand.', stage: 'idea', rolesNeeded: [{ role: 'designer', dedication: 'lt10', compensation: 'equity' }], dedication: 'lt10', compensation: 'equity', publish: true });
+    const created = await martin.post('/api/projects', { name: 'Stacklab', tagline: 'Tu equipo técnico on-demand.', stage: 'idea', rolesNeeded: [{ role: 'designer', dedication: 'lt10', compensation: 'equity' }], workMode: 'remote', dedication: 'lt10', compensation: 'equity', publish: true });
     assert.equal(created.status, 201);
     assert.equal(created.data.project.status, 'published');
     const id = created.data.project.id;
@@ -406,7 +492,7 @@ describe('regresiones de la revisión de código', () => {
   const newUser = async (name) => {
     const c = client();
     await c.post('/api/auth/register', { name, email: `${name.toLowerCase().replace(/\s/g, '')}${Date.now()}@test.dev`, password: 'secreto123' });
-    const { data } = await c.put('/api/me/onboarding', { goal: 'join_project', roles: ['developer'], availability: 'h10_20', compensation: 'equity', name });
+    const { data } = await c.put('/api/me/onboarding', { goal: 'join_project', roles: ['developer'], availability: 'h10_20', compensation: 'equity', workMode: 'remote', name });
     return { c, id: data.user.id };
   };
 
@@ -449,7 +535,7 @@ describe('regresiones de la revisión de código', () => {
     const u = await newUser('Pau Plan');
     await u.c.post('/api/billing/checkout', { plan: 'startup', period: 'monthly' });
     for (const name of ['Uno', 'Dos', 'Tres']) {
-      await u.c.post('/api/projects', { name, tagline: 'Un proyecto de prueba.', rolesNeeded: [{ role: 'cto' }], publish: true });
+      await u.c.post('/api/projects', { name, tagline: 'Un proyecto de prueba.', rolesNeeded: [{ role: 'cto' }], workMode: 'remote', dedication: 'h10_20', compensation: 'equity', publish: true });
     }
     await u.c.post('/api/billing/checkout', { plan: 'plus', period: 'monthly' });
     const published = (await u.c.get('/api/me/projects')).data.items.filter((p) => p.status === 'published');
@@ -458,7 +544,7 @@ describe('regresiones de la revisión de código', () => {
 
   test('editar un proyecto publicado con datos inválidos no guarda nada', async () => {
     const u = await newUser('Val Idar');
-    const { data } = await u.c.post('/api/projects', { name: 'Válido', tagline: 'Descripción correcta.', rolesNeeded: [{ role: 'cto' }], publish: true });
+    const { data } = await u.c.post('/api/projects', { name: 'Válido', tagline: 'Descripción correcta.', rolesNeeded: [{ role: 'cto' }], workMode: 'remote', dedication: 'h10_20', compensation: 'equity', publish: true });
     const bad = await u.c.put(`/api/projects/${data.project.id}`, { tagline: '', name: 'Cambiado' });
     assert.equal(bad.status, 400);
     const after = (await u.c.get('/api/me/projects')).data.items[0];
@@ -501,7 +587,7 @@ describe('actividad de los perfiles demo', () => {
   test('la actividad ambiental genera interés con tope diario', async () => {
     const c = client();
     await c.post('/api/auth/register', { name: 'Ambiente', email: 'ambiente@test.dev', password: 'secreto123' });
-    await c.put('/api/me/onboarding', { goal: 'join_project', roles: ['developer'], availability: 'h10_20', compensation: 'equity', name: 'Ambiente' });
+    await c.put('/api/me/onboarding', { goal: 'join_project', roles: ['developer'], availability: 'h10_20', compensation: 'equity', workMode: 'remote', name: 'Ambiente' });
     const ambient = createBots(ctx, { enabled: true });
     ambient.startAmbient({ everyMs: 20, perDay: 2 });
     const reached = await waitFor(async () => (await c.get('/api/auth/me')).data.user.counts.interests >= 2, 5000);

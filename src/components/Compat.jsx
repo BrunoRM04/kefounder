@@ -10,30 +10,33 @@ export function CompatBlock({ match }) {
     <div className="compat">
       <div className="compat-head">
         <span className="kicker">Compatibilidad</span>
-        <div className="compat-score">{match.score}<small>%</small></div>
+        {match.score !== null && <div className="compat-score">{match.score}<small>%</small></div>}
       </div>
-      {match.reasons?.length > 0 ? (
+      {Number.isFinite(match.coverage) && <p className="compat-coverage">Datos evaluados: {match.coverage}% de los factores</p>}
+      {match.score === null ? (
+        <p className="compat-text">Todavía faltan datos de los perfiles para calcular una compatibilidad útil.</p>
+      ) : match.reasons?.length > 0 ? (
         <ul className="compat-reasons">
           {match.reasons.map((r) => <li key={r}><Check size={14} /> {r}</li>)}
         </ul>
       ) : (
-        <p className="compat-text">Coinciden en intereses, disponibilidad y objetivos.</p>
+        <p className="compat-text">No hay coincidencias concretas para destacar con los datos cargados.</p>
       )}
       {match.breakdown ? (
         <div className="compat-breakdown">
-          {match.breakdown.filter((b) => b.value > 0 && b.key !== 'skills' && b.key !== 'stage').map((b) => (
+          {match.breakdown.map((b) => (
             <div key={b.key} className="compat-bar">
               <span>{b.label}</span>
-              <div><i style={{ width: `${b.value}%` }} /></div>
-              <em>{b.value}%</em>
+              <div><i style={{ width: `${b.value ?? 0}%` }} /></div>
+              <em>{b.value === null ? 'Sin datos' : `${b.value}%`}</em>
             </div>
           ))}
         </div>
-      ) : (
+      ) : match.score !== null ? (
         <button type="button" className="compat-lock" onClick={() => showPaywall(paywallFor('advancedCompat'))}>
           <Lock size={13} /> Ver por qué son compatibles en detalle · Pro
         </button>
-      )}
+      ) : null}
     </div>
   );
 }

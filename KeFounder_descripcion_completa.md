@@ -427,11 +427,13 @@ Por ejemplo, un founder que busca talento técnico puede recibir una recomendaci
 
 ### 5.2. Entre una persona y un proyecto
 
-Evalúa si el proyecto busca su perfil, la intención de la persona, coincidencias de stack y skills, dedicación, compensación, industria y modalidad o ubicación. La etapa puede aportar contexto a la explicación.
+Evalúa si el proyecto busca su perfil, la intención de la persona, coincidencias de stack y skills, dedicación, compensación, industria y modalidad o ubicación. Si un perfil buscado tiene dedicación o compensación propia, se usan esos requisitos en vez de las condiciones generales del proyecto.
 
 ### 5.3. Cómo se presenta
 
-Las tarjetas muestran un porcentaje acompañado de razones. Desde Pro se habilita el desglose avanzado.
+Las tarjetas muestran un porcentaje acompañado de razones basadas en coincidencias verificables. No hay un puntaje base artificial: se calcula un promedio ponderado de los factores con datos y, si la cobertura es insuficiente, no se muestra porcentaje. En el detalle se muestra qué proporción de factores pudo evaluarse. En Pro el desglose indica «Sin datos» cuando no hay información para evaluar un factor. El resultado se recalcula con los datos actuales al abrir Descubrir, detalles o guardados.
+
+Las modalidades «Remoto» heredadas de versiones anteriores en cuentas y proyectos reales no cuentan como una elección del propietario hasta que las confirme al editar. Así no se atribuye una preferencia que pudo provenir del valor predeterminado anterior.
 
 El porcentaje es una orientación basada en la información cargada. No garantiza que una colaboración funcione ni reemplaza conversar sobre expectativas, experiencia o acuerdos.
 
@@ -692,7 +694,7 @@ Registro, login, edición de perfil, proyectos, guardados, solicitudes, matches,
 
 ### 10.2. Perfiles de ejemplo y respuestas simuladas
 
-La base inicial contiene cuentas y proyectos ficticios. Los perfiles demo pueden aceptar solicitudes, responder mensajes y generar actividad para permitir una prueba completa.
+Cuando se habilita la demo, una base vacía se llena de cuentas y proyectos ficticios. Los perfiles demo pueden aceptar solicitudes, responder mensajes y generar actividad para permitir una prueba completa. Sin esa opción, una base nueva queda vacía para cuentas reales.
 
 Esas respuestas se generan mediante lógica y textos programados. No son conversaciones con personas reales ni un asistente conectado a un modelo de IA externo.
 
@@ -774,17 +776,17 @@ Esta modalidad levanta la API en el puerto 3000 y Vite en el 5173. Vite permite 
 | `PORT` | `3000` | Puerto del backend. |
 | `HOST` | `0.0.0.0` | Interfaz de escucha; permite acceso desde la red local. |
 | `KEFOUNDER_DATA_DIR` | `./data` | Ubicación de la base y los archivos. |
-| `KEFOUNDER_DEMO` | `1` | Mostrar accesos a cuentas de demostración. |
-| `KEFOUNDER_DEMO_BOTS` | `1` | Activar actividad simulada de perfiles demo. |
+| `KEFOUNDER_DEMO` | `0` en `npm start`; `1` en los comandos locales de desarrollo | Sembrar y mostrar cuentas de demostración solo si se habilita expresamente. |
+| `KEFOUNDER_DEMO_BOTS` | `1` solo con demo activa | Activar actividad simulada de perfiles demo. |
 
-Para desactivar las funciones demo se utilizan valores `0`. Ocultar accesos o apagar bots no elimina automáticamente los perfiles ficticios de una base existente.
+El arranque sin demo no borra datos. Si detecta cuentas ficticias en la base, se detiene y pide usar una base limpia o retirarlas primero. El checkout y el correo siguen siendo demostrativos y requieren integraciones reales antes del lanzamiento comercial.
 
 ## 12. Validaciones realizadas
 
 Con el panel de administración, la revista, la difusión y «Necesito ayuda con…» se completaron:
 
 - Compilación del frontend con Vite.
-- **107 pruebas automáticas**, sin fallos: 43 de la API (incluida una matriz que recorre cada función de cada plan con las cuatro cuentas de ejemplo), 24 del panel (permisos, suspensión, moderación, reportes, identidad, planes de cortesía, tareas, auditoría, exportación CSV, copias de seguridad y conservación de cuentas reales al reiniciar la demo) y 13 de la revista (lectura sin cuenta, borradores, publicación y programación, portada, imágenes, formato seguro, lecturas, datos para compartir y notas de ejemplo) 8 de la difusión (beneficio por plan, cupos, pedido, cancelación, borrador, publicación, rechazo y avisos) y 19 de «Necesito ayuda con…» (podio de la semana cerrada, ranking en vivo, topes de puntos, podio con al menos dos personas, pedidos, soluciones, votos que no se reciclan, elección, avisos, bloqueos, privacidad del ranking, pedidos que se reabren si se oculta la solución elegida, reconocimientos en el perfil y moderación).
+- **113 pruebas automáticas**, sin fallos: 44 de la API (incluido el flujo de compatibilidad entre dos cuentas reales y una matriz de funciones por plan), 24 del panel, 13 de la revista, 8 de difusión, 19 de «Necesito ayuda con…», 3 del cálculo de compatibilidad y 2 del arranque sin demo.
 - **23 pasos de prueba en navegador**, sin fallos: 14 de la app, 5 del panel (creación de la cuenta por consola, resumen, plan de cortesía con motivo, tareas y búsqueda global, menú en celular), 2 de la revista (entrar sin cuenta desde la bienvenida y leer una nota en el celular; escribir y publicar una nota desde el panel), 1 de la difusión (pedirla desde Mis proyectos en el celular y tomarla desde el panel) y 1 de «Necesito ayuda con…» (pedir desde el celular, responder desde la PC, votar, elegir la solución y ver los puntos en el ranking y el reconocimiento en el perfil).
 - **Chequeo de pantallas** (`npm run test:responsive`): todas las rutas de la app, la revista y el panel, más las hojas y menús que se abren, en 16 tamaños (320×568, 360×740, 375×667, 390×844, 412×915, 430×932, celular acostado 844×390, 768×1024, 820×1180, 1024×768, 1280×720, 1366×768, 1440×900, 1536×864, 1920×1080 y 2560×1440). Mide desbordes horizontales, controles cortados por el borde, contenido tapado por barras fijas, textos que no entran y errores de la página o de la API.
 - Capturas del panel en 320, 375, 390, 820, 1024, 1280, 1366, 1536 y 1920 px de ancho.

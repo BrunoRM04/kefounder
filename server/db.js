@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS users (
   availability TEXT NOT NULL DEFAULT '',
   compensation TEXT NOT NULL DEFAULT '',
   looking_for TEXT NOT NULL DEFAULT '',
-  work_mode TEXT NOT NULL DEFAULT 'remote',
+  work_mode TEXT NOT NULL DEFAULT '',
   experience_years INTEGER,
   experience TEXT NOT NULL DEFAULT '[]',
   age INTEGER,
@@ -63,14 +63,14 @@ CREATE TABLE IF NOT EXISTS projects (
   industry TEXT NOT NULL DEFAULT '',
   city TEXT NOT NULL DEFAULT '',
   country TEXT NOT NULL DEFAULT '',
-  work_mode TEXT NOT NULL DEFAULT 'remote',
+  work_mode TEXT NOT NULL DEFAULT '',
   website TEXT NOT NULL DEFAULT '',
   cover TEXT NOT NULL DEFAULT '',
   logo TEXT NOT NULL DEFAULT '',
   accent TEXT NOT NULL DEFAULT '#D4E0DA',
   roles_needed TEXT NOT NULL DEFAULT '[]',
-  dedication TEXT NOT NULL DEFAULT 'exploring',
-  compensation TEXT NOT NULL DEFAULT 'talk',
+  dedication TEXT NOT NULL DEFAULT '',
+  compensation TEXT NOT NULL DEFAULT '',
   stack TEXT NOT NULL DEFAULT '[]',
   team TEXT NOT NULL DEFAULT '[]',
   has_users INTEGER NOT NULL DEFAULT 0,
@@ -437,6 +437,17 @@ const MIGRATIONS = [
         UNIQUE (week, place)
       );
       CREATE INDEX IF NOT EXISTS idx_help_awards_user ON help_awards(user_id, week);
+    `
+  },
+  {
+    id: '2026-10-03-modalidad-confirmada',
+    up: `
+      ALTER TABLE users ADD COLUMN work_mode_confirmed INTEGER NOT NULL DEFAULT 0;
+      ALTER TABLE projects ADD COLUMN work_mode_confirmed INTEGER NOT NULL DEFAULT 0;
+      UPDATE users SET work_mode_confirmed = 1
+        WHERE is_demo = 1 OR email LIKE '%@kefounder.demo' OR email LIKE '%@demo.kefounder' OR email LIKE '%@found.demo';
+      UPDATE projects SET work_mode_confirmed = 1
+        WHERE owner_id IN (SELECT id FROM users WHERE work_mode_confirmed = 1);
     `
   }
 ];
